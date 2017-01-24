@@ -45,15 +45,15 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, scaleBy) {
                   locX, locY,
                   this.frameWidth * scaleBy,
                   this.frameHeight * scaleBy);
-}
+};
 
 Animation.prototype.currentFrame = function () {
     return Math.floor(this.elapsedTime / this.frameDuration);
-}
+};
 
 Animation.prototype.isDone = function () {
     return (this.elapsedTime >= this.totalTime);
-}
+};
 
 
 //Entity Area
@@ -139,7 +139,7 @@ Hero.prototype.update = function() {
 
   }
 
-}
+};
 
 Hero.prototype.draw = function(ctx) {
 
@@ -185,7 +185,7 @@ Hero.prototype.draw = function(ctx) {
   }
 
 
-}
+};
 
 function Background(game) {
     this.type = "background";
@@ -196,7 +196,7 @@ function Background(game) {
 
 
 Background.prototype.update = function () {
-}
+};
 
 Background.prototype.draw = function (ctx) {
     ctx.save();
@@ -229,7 +229,7 @@ Background.prototype.draw = function (ctx) {
     ctx.fillStyle="Black";
     ctx.fillRect(0,0,1200,800);
     ctx.restore();
-}
+};
 
 function Map(game, map) {
   this.type = "map";
@@ -250,7 +250,7 @@ function Map(game, map) {
 
 Map.prototype.update = function() {
 
-}
+};
 
 Map.prototype.draw = function(ctx) {
 
@@ -260,7 +260,7 @@ Map.prototype.draw = function(ctx) {
       tile.draw(ctx);
     }
   }
-}
+};
 
 function Block(game, x , y, type) {
   this.type = type;
@@ -272,7 +272,7 @@ function Block(game, x , y, type) {
 
 Block.prototype.update = function() {
 
-}
+};
 
 Block.prototype.draw = function(ctx) {
   if (this.type === 1) {
@@ -291,7 +291,7 @@ Block.prototype.draw = function(ctx) {
                 this.height,
                 this.width);
   }
-}
+};
 
 var mapArray = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -326,7 +326,7 @@ AM.queueDownload("./img/horz_walk_left.png");
 AM.queueDownload("./img/horz_walk_right.png");
 AM.queueDownload("./img/right_jump.png");
 AM.queueDownload("./img/left_jump.png");
-AM.queueDownload("./img/tileSheet.jpg")
+AM.queueDownload("./img/tileSheet.jpg");
 AM.queueDownload("./img/lava.png");
 
 AM.downloadAll(function () {
