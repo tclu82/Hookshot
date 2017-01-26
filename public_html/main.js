@@ -45,6 +45,7 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, scaleBy) {
                   locX, locY,
                   this.frameWidth * scaleBy,
                   this.frameHeight * scaleBy);
+                  
 };
 
 Animation.prototype.currentFrame = function () {
@@ -63,7 +64,7 @@ function Hero(game, x, y) {
   this.animationRight = new Animation(AM.getAsset("./img/horz_walk_right.png"), 0, 0, 104, 128, .03 , 31, true, false);
   this.animationLeft = new Animation(AM.getAsset("./img/horz_walk_left.png"), 0, 0, 80, 128, .03 , 31, true, false);
   this.animationJumpRight = new Animation(AM.getAsset("./img/right_jump.png"), 0, 0, 96, 120, .05 , 12, true, false);
-  this.animationJumpLeft = new Animation(AM.getAsset("./img/left_jump.png"), 0, 0, 84, 128, .05 , 12, true, false);
+  this.animationJumpLeft = new Animation(AM.getAsset("./img/left_jump.png"), 20, 0, 84, 128, .05 , 12, true, false);
   this.game = game;
   this.x = x;
   this.y = y;
@@ -136,29 +137,28 @@ Hero.prototype.update = function() {
                this.x + this.width < block.x + block.width))) {
                
                     this.y = block.y - this.height;
-                    //console.log("bam");
+           }
+           
+           // left
+            if (this.x + this.width > block.x  &&
+                this.x < (block.x + block.width) &&
+                this.x >= (block.x + block.width) - this.game.clockTick * this.speed &&
+                this.y  < block.y + block.height &&
+                this.height + this.y > block.y) {
+                console.log();
+                this.x = block.x + block.width;
 
            }
            
-           /*
-           
-           if (this.x + this.width >= block.x &&
-               this.x + this.width <= block.x + block.width &&
-               this.y + this.height > block.y &&
-               this.y <= block.y + block.height) {
-                console.log(block.y);
-               // this.x = block.x;
-               
-           }
-                    */
                     
-           
-           if (this.x < block.x + block.width &&
-                this.x + block.width > block.x &&
+           // right
+           else if (this.x < block.x &&
+                this.x + this.width > block.x &&
+                this.x + this.width <= block.x + this.game.clockTick * this.speed &&
                 this.y  < block.y + block.height &&
                 this.height + this.y > block.y) {
-                console.log(block.x);
-                this.x = block.x - block.width;
+                console.log("right");
+                this.x = block.x - this.width;
 
            }
                     
@@ -182,6 +182,12 @@ Hero.prototype.update = function() {
 };
 
 Hero.prototype.draw = function(ctx) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.strokeStyle ="Yellow";
+    ctx.rect(this.x, this.y, this.width, this.height);
+    ctx.stroke();
+    ctx.restore();
 
 
   if (this.game.jumping) {
@@ -328,6 +334,14 @@ Block.prototype.update = function() {
 };
 
 Block.prototype.draw = function(ctx) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.strokeStyle ="Blue";
+    ctx.rect(this.x, this.y, this.width, this.height);
+    ctx.stroke();
+    ctx.restore();
+    
+    
   if (this.type === 1) {
     ctx.drawImage(AM.getAsset("./img/tileSheet.jpg"),
                 0 , 0,  // source from sheet
@@ -354,9 +368,9 @@ Block.prototype.draw = function(ctx) {
   }
 };
 
-var mapArray = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+var mapArray = [[1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -364,7 +378,7 @@ var mapArray = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
                 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                 [0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                 [0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                [0,1,1,0,0,0,1,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                 [1,1,1,1,4,1,1,1,1,1,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 [1,1,1,1,1,1,1,1,1,1,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
               ];
@@ -390,7 +404,7 @@ AM.downloadAll(function () {
     gameEngine.ctx = ctx;
     var bg = new Background(gameEngine);
     var map = new Map(gameEngine, mapArray);
-    var hero = new Hero(gameEngine, 100,300);
+    var hero = new Hero(gameEngine, 100,0);
 
 
 
