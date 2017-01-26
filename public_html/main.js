@@ -74,8 +74,8 @@ function Hero(game, x, y) {
   this.jumpCurrent = 0;
   this.removeFromWorld = false;
   this.ctx = game.ctx;
-  this.width = 30;
-  this.height = 80;
+  this.width = 40;
+  this.height = 70;
   this.scale = .65;
 
 }
@@ -121,20 +121,60 @@ Hero.prototype.update = function() {
     }
 
     // Detection for hitting a Block
-    for (var i = 0; i < 26; i++) {
-      for (var j = 0; j < 38; j++) {
+    for (var i = 0; i < map.rows; i++) {
+      for (var j = 0; j < map.cols; j++) {
         var block = map.mapBlocks[i][j];
         // If its block type 1
-        if (block.type === 1 && this.x < block.x + block.width &&
-           this.x + block.width > block.x &&
-           this.y < block.y + block.height &&
-           this.height + this.y > block.y) {
-              this.y = block.y - block.height * 2 - 8;
+                
+        if (block.type === 1) {
+           
+           //If Hero hits a block from the top with Hero's Feet
+           if (this.y + this.height  <= block.y + this.fallSpeed &&
+               this.y + this.height >= block.y && 
+             ((this.x <= block.x + block.width && this.x >= block.x) || 
+              (this.x + this.width > block.x && 
+               this.x + this.width < block.x + block.width))) {
+               
+                    this.y = block.y - this.height;
+                    //console.log("bam");
+
+           }
+           
+           /*
+           
+           if (this.x + this.width >= block.x &&
+               this.x + this.width <= block.x + block.width &&
+               this.y + this.height > block.y &&
+               this.y <= block.y + block.height) {
+                console.log(block.y);
+               // this.x = block.x;
+               
+           }
+                    */
+                    
+           
+           if (this.x < block.x + block.width &&
+                this.x + block.width > block.x &&
+                this.y  < block.y + block.height &&
+                this.height + this.y > block.y) {
+                console.log(block.x);
+                this.x = block.x - block.width;
+
+           }
+                    
+                    
 
         }
+                
 
       }
     }
+    /*
+    this.x < block.x + block.width &&
+           this.x + block.width > block.x &&
+           this.y < block.y + block.height &&
+           this.height + this.y > block.y
+        */
 
 
   }
@@ -170,6 +210,7 @@ Hero.prototype.draw = function(ctx) {
                   this.x, this.y,
                   85 * this.scale,
                   128 * this.scale);
+            
         break;
 
       case "left":
@@ -179,6 +220,7 @@ Hero.prototype.draw = function(ctx) {
                     this.x, this.y,
                     85 * this.scale,
                     128 * this.scale);
+                    
         break;
     }
 
@@ -218,29 +260,37 @@ Background.prototype.draw = function (ctx) {
     ctx.moveTo(0,650);
     ctx.lineTo(1200,650);
     ctx.stroke();
+    
+    
+*/
 
-    ctx.strokeStyle = "Yellow";
-    ctx.beginPath();
-    ctx.moveTo(0,600);
-    ctx.lineTo(1200,600);
-    ctx.stroke();
-    */
+    ctx.drawImage(AM.getAsset("./img/new_cave_bg.jpg"),
+                    0 , 0,  // source from sheet
+                    1600, 600,
+                    0, 0,
+                    1200,
+                    800);
+    
 
-    ctx.fillStyle="Black";
-    ctx.fillRect(0,0,1200,800);
+   // ctx.fillStyle="Black";
+   // ctx.fillRect(0,0,1200,800);
+   
     ctx.restore();
 };
 
 function Map(game, map) {
   this.type = "map";
-  this.mapBlocks = new Array(26);
+  this.rows = 13;
+  this.cols = 38;
+  this.mapBlocks = new Array(this.rows);
 
-  for (var i = 0; i < 26; i++) {
-    this.mapBlocks[i] = new Array(38);
+  for (var i = 0; i < this.rows; i++) {
+    this.mapBlocks[i] = new Array(this.cols);
   }
-  for (var i = 0; i < 26; i++) {
-    for (var j = 0; j < 38; j++) {
-      this.mapBlocks[i][j] = new Block(game, j * 32, i * 32, map[i][j]);
+  for (var i = 0; i < this.rows; i++) {
+    for (var j = 0; j < this.cols; j++) {
+      this.mapBlocks[i][j] = new Block(game, j * 64, i * 64, map[i][j]);
+
 
     }
   }
@@ -254,8 +304,8 @@ Map.prototype.update = function() {
 
 Map.prototype.draw = function(ctx) {
 
-  for (var i = 0; i < 26; i++) {
-    for (var j = 0; j < 38; j++) {
+  for (var i = 0; i < this.rows; i++) {
+    for (var j = 0; j < this.cols; j++) {
       var tile = this.mapBlocks[i][j];
       tile.draw(ctx);
     }
@@ -266,8 +316,11 @@ function Block(game, x , y, type) {
   this.type = type;
   this.x = x;
   this.y = y;
-  this.height= 32;
-  this.width = 32;
+  this.spriteHeight = 32;
+  this.spriteWidth = 32;
+  //this.scale = 2;
+  this.height= 64;
+  this.width = 64;
 }
 
 Block.prototype.update = function() {
@@ -278,7 +331,7 @@ Block.prototype.draw = function(ctx) {
   if (this.type === 1) {
     ctx.drawImage(AM.getAsset("./img/tileSheet.jpg"),
                 0 , 0,  // source from sheet
-                this.height, this.width,
+                this.spriteHeight, this.spriteWidth,
                 this.x, this.y,
                 this.height,
                 this.width);
@@ -287,6 +340,14 @@ Block.prototype.draw = function(ctx) {
     ctx.drawImage(AM.getAsset("./img/lava.png"),
                 6 , 6,  // source from sheet
                 60 , 60,
+                this.x, this.y,
+                this.height,
+                this.width);
+  }
+  else if (this.type === 4) {
+      ctx.drawImage(AM.getAsset("./img/skeleton_spike2.png"),
+                83 , 0,  // source from sheet
+                270 , 382,
                 this.x, this.y,
                 this.height,
                 this.width);
@@ -301,24 +362,11 @@ var mapArray = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
                 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                 [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+                [0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                [1,1,1,1,4,1,1,1,1,1,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1,1,1,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
               ];
 var AM =  new AssetManager();
 
@@ -328,6 +376,8 @@ AM.queueDownload("./img/right_jump.png");
 AM.queueDownload("./img/left_jump.png");
 AM.queueDownload("./img/tileSheet.jpg");
 AM.queueDownload("./img/lava.png");
+AM.queueDownload("./img/new_cave_bg.jpg");
+AM.queueDownload("./img/skeleton_spike2.png");
 
 AM.downloadAll(function () {
 
@@ -349,6 +399,8 @@ AM.downloadAll(function () {
     gameEngine.addEntity(bg);
     gameEngine.addEntity(hero);
     gameEngine.addEntity(map);
+    
+
 
     gameEngine.start();
 
