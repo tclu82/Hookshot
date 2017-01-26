@@ -111,10 +111,6 @@ Hero.prototype.update = function() {
       }
     }
 
-//
-//
-
-
   }
     this.collideCheck();
 
@@ -127,7 +123,10 @@ Hero.prototype.draw = function(ctx) {
     ctx.strokeStyle ="Yellow";
     ctx.rect(this.x, this.y, this.width, this.height);
     ctx.stroke();
+
     ctx.restore();
+    
+    
 
 
   if (this.game.jumping) {
@@ -176,6 +175,8 @@ Hero.prototype.draw = function(ctx) {
 };
 
 Hero.prototype.collideCheck = function() {
+    
+  
       // Get the Map out of the Games Entity list
     var map = null;
     for (var i = 0; i < this.game.entities.length; i++) {
@@ -184,7 +185,15 @@ Hero.prototype.collideCheck = function() {
         map = e;
       }
     }
-
+    
+    var gridY = Math.round(map.rows * (this.y  / (64 * map.rows)));
+    var gridX = Math.round(map.cols * (this.x / (64 * map.cols)));
+    
+    if (gridX < 0) gridX = 0;
+    if (gridY < 0) gridY = 0;
+    if (gridX >= map.cols) gridX = map.cols - 1;
+    if (gridY >= map.rows) gridY = map.rows - 1;
+    
     // Detection for hitting a Block
     for (var i = 0; i < map.rows; i++) {
       for (var j = 0; j < map.cols; j++) {
@@ -197,10 +206,20 @@ Hero.prototype.collideCheck = function() {
            if (this.y + this.height  <= block.y + this.fallSpeed &&
                this.y + this.height >= block.y && 
              ((this.x <= block.x + block.width && this.x >= block.x) || 
-              (this.x + this.width > block.x && 
-               this.x + this.width < block.x + block.width))) {
+              (this.x + this.width >= block.x && 
+               this.x  <= block.x + block.width))) {
            
                     this.y = block.y - this.height;
+           }
+           
+           // Head
+           if (this.y <= block.y + block.height &&
+               this.y >= (block.y + block.height) - this.jumpSpeed * 2 && 
+             ((this.x <= block.x + block.width && this.x >= block.x) || 
+              (this.x + this.width > block.x && 
+               this.x  < block.x + block.width))) {
+           
+                    this.y = block.y + block.height;
            }
            
            // left
@@ -210,7 +229,7 @@ Hero.prototype.collideCheck = function() {
                 this.y  < block.y + block.height &&
                 this.height + this.y > block.y) {
             
-                this.x = block.x + block.width;
+                this.x = (block.x + block.width) + 1;
 
            }
            
@@ -222,7 +241,7 @@ Hero.prototype.collideCheck = function() {
                 this.y  < block.y + block.height &&
                 this.height + this.y > block.y) {
             
-                this.x = block.x - this.width;
+                this.x = (block.x - this.width) - 3;
 
            }
                     
@@ -372,14 +391,14 @@ Block.prototype.draw = function(ctx) {
 var mapArray = [[1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 [1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [0,1,1,0,0,0,1,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                [1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                [1,0,0,0,0,0,0,0,1,1,1,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                [1,0,0,0,,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                [1,1,1,0,0,0,1,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                 [1,1,1,1,4,1,1,1,1,1,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 [1,1,1,1,1,1,1,1,1,1,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
               ];
