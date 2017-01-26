@@ -64,7 +64,7 @@ function Hero(game, x, y) {
   this.animationRight = new Animation(AM.getAsset("./img/horz_walk_right.png"), 0, 0, 104, 128, .03 , 31, true, false);
   this.animationLeft = new Animation(AM.getAsset("./img/horz_walk_left.png"), 0, 0, 80, 128, .03 , 31, true, false);
   this.animationJumpRight = new Animation(AM.getAsset("./img/right_jump.png"), 0, 0, 96, 120, .05 , 12, true, false);
-  this.animationJumpLeft = new Animation(AM.getAsset("./img/left_jump.png"), 20, 0, 84, 128, .05 , 12, true, false);
+  this.animationJumpLeft = new Animation(AM.getAsset("./img/left_jump.png"), 12, 0, 83, 128, .05 , 12, true, false);
   this.game = game;
   this.x = x;
   this.y = y;
@@ -111,73 +111,13 @@ Hero.prototype.update = function() {
       }
     }
 
-
-    // Get the Map out of the Games Entity list
-    var map = null;
-    for (var i = 0; i < this.game.entities.length; i++) {
-      var e = this.game.entities[i];
-      if (e.type === "map") {
-        map = e;
-      }
-    }
-
-    // Detection for hitting a Block
-    for (var i = 0; i < map.rows; i++) {
-      for (var j = 0; j < map.cols; j++) {
-        var block = map.mapBlocks[i][j];
-        // If its block type 1
-                
-        if (block.type === 1) {
-           
-           //If Hero hits a block from the top with Hero's Feet
-           if (this.y + this.height  <= block.y + this.fallSpeed &&
-               this.y + this.height >= block.y && 
-             ((this.x <= block.x + block.width && this.x >= block.x) || 
-              (this.x + this.width > block.x && 
-               this.x + this.width < block.x + block.width))) {
-               
-                    this.y = block.y - this.height;
-           }
-           
-           // left
-            if (this.x + this.width > block.x  &&
-                this.x < (block.x + block.width) &&
-                this.x >= (block.x + block.width) - this.game.clockTick * this.speed &&
-                this.y  < block.y + block.height &&
-                this.height + this.y > block.y) {
-                console.log();
-                this.x = block.x + block.width;
-
-           }
-           
-                    
-           // right
-           else if (this.x < block.x &&
-                this.x + this.width > block.x &&
-                this.x + this.width <= block.x + this.game.clockTick * this.speed &&
-                this.y  < block.y + block.height &&
-                this.height + this.y > block.y) {
-                console.log("right");
-                this.x = block.x - this.width;
-
-           }
-                    
-                    
-
-        }
-                
-
-      }
-    }
-    /*
-    this.x < block.x + block.width &&
-           this.x + block.width > block.x &&
-           this.y < block.y + block.height &&
-           this.height + this.y > block.y
-        */
+//
+//
 
 
   }
+    this.collideCheck();
+
 
 };
 
@@ -234,6 +174,67 @@ Hero.prototype.draw = function(ctx) {
 
 
 };
+
+Hero.prototype.collideCheck = function() {
+      // Get the Map out of the Games Entity list
+    var map = null;
+    for (var i = 0; i < this.game.entities.length; i++) {
+      var e = this.game.entities[i];
+      if (e.type === "map") {
+        map = e;
+      }
+    }
+
+    // Detection for hitting a Block
+    for (var i = 0; i < map.rows; i++) {
+      for (var j = 0; j < map.cols; j++) {
+        var block = map.mapBlocks[i][j];
+        // If its block type 1
+                
+        if (block.type === 1) {
+           
+           //If Hero hits a block from the top with Hero's Feet
+           if (this.y + this.height  <= block.y + this.fallSpeed &&
+               this.y + this.height >= block.y && 
+             ((this.x <= block.x + block.width && this.x >= block.x) || 
+              (this.x + this.width > block.x && 
+               this.x + this.width < block.x + block.width))) {
+           
+                    this.y = block.y - this.height;
+           }
+           
+           // left
+            if (this.x + this.width > block.x  &&
+                this.x < (block.x + block.width) &&
+                this.x >= (block.x + block.width) - this.game.clockTick * this.speed &&
+                this.y  < block.y + block.height &&
+                this.height + this.y > block.y) {
+            
+                this.x = block.x + block.width;
+
+           }
+           
+                    
+           // right
+           else if (this.x < block.x &&
+                this.x + this.width > block.x &&
+                this.x + this.width <= block.x + this.game.clockTick * this.speed &&
+                this.y  < block.y + block.height &&
+                this.height + this.y > block.y) {
+            
+                this.x = block.x - this.width;
+
+           }
+                    
+                    
+
+        }
+                
+
+      }
+    }
+    
+}
 
 function Background(game) {
     this.type = "background";
