@@ -84,7 +84,12 @@ function Hero(game, x, y) {
 Hero.prototype.update = function() {
   if(this.game.rightEdge === true) {
     this.x = 1;
-    this.y = 500;
+    this.y = 600;
+  }
+
+  if(this.game.leftEdge === true) {
+    this.x = 1190;
+    this.y = 600;
   }
   if (this.game.moveRight) {
     this.x += this.game.clockTick * this.speed;
@@ -294,9 +299,9 @@ Background.prototype.draw = function (ctx) {
 
 */
 
-    ctx.drawImage(AM.getAsset("./img/new_cave_bg.jpg"),
+    ctx.drawImage(AM.getAsset("./img/stonebackground.png"),
                     0 , 0,  // source from sheet
-                    1600, 600,
+                    1190, 798,
                     0, 0,
                     1200,
                     800);
@@ -386,9 +391,9 @@ Block.prototype.draw = function(ctx) {
 
 
   if (this.type === 1) {
-    ctx.drawImage(AM.getAsset("./img/tileSheet.jpg"),
+    ctx.drawImage(AM.getAsset("./img/background_tile.png"),
                 0 , 0,  // source from sheet
-                this.spriteHeight, this.spriteWidth,
+                512, 512,
                 this.x, this.y,
                 this.height,
                 this.width);
@@ -409,21 +414,37 @@ Block.prototype.draw = function(ctx) {
                 this.height,
                 this.width);
   }
+  else if (this.type === 6) {
+      ctx.drawImage(AM.getAsset("./img/Empty_Spike2.png"),
+                83 , 0,  // source from sheet
+                270 , 382,
+                this.x, this.y,
+                this.height,
+                this.width);
+  }
+  else if (this.type === 7) {
+      ctx.drawImage(AM.getAsset("./img/SpikeWithSkull2.png"),
+                83 , 0,  // source from sheet
+                270 , 382,
+                this.x, this.y,
+                this.height,
+                this.width);
+  }
 };
 
 var mapArray = [[1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 [1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                 [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,0,0,0,0,0,0,1,1,1,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,0,0,,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,1,1,0,0,0,1,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,1,1,1,4,1,1,1,1,1,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-                [1,1,1,1,1,1,1,1,1,1,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1],
+                [1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1.0,0,0,0,0,0,0,0,0,0,1],
+                [1,0,0,0,0,0,0,0,1,1,1,0,0,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,1],
+                [1,0,0,0,,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1],
+                [1,1,1,0,0,0,1,1,1,0,0,0,0,0,0,1,1,1,0,0,0,0,1,1,1,1,1,1,7,6,6,6,4,6,6,6,7,1],
+                [1,1,1,1,4,1,1,1,1,5,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1,1,5,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
               ];
 var AM =  new AssetManager();
 
@@ -431,10 +452,12 @@ AM.queueDownload("./img/horz_walk_left.png");
 AM.queueDownload("./img/horz_walk_right.png");
 AM.queueDownload("./img/right_jump.png");
 AM.queueDownload("./img/left_jump.png");
-AM.queueDownload("./img/tileSheet.jpg");
+AM.queueDownload("./img/background_tile.png");
 AM.queueDownload("./img/lava.png");
-AM.queueDownload("./img/new_cave_bg.jpg");
+AM.queueDownload("./img/stonebackground.png");
 AM.queueDownload("./img/skeleton_spike2.png");
+AM.queueDownload("./img/SpikeWithSkull2.png");
+AM.queueDownload("./img/Empty_Spike2.png");
 
 AM.downloadAll(function () {
 

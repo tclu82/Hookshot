@@ -127,6 +127,7 @@ GameEngine.prototype.update = function () {
 
           } else if (entity.type === "hero" && entity.x < 0) {
             this.leftEdge = true;
+            console.log("need to go left");
           }
             entity.update();
         }
