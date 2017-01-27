@@ -45,7 +45,7 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, scaleBy) {
                   locX, locY,
                   this.frameWidth * scaleBy,
                   this.frameHeight * scaleBy);
-                  
+
 };
 
 Animation.prototype.currentFrame = function () {
@@ -82,6 +82,15 @@ function Hero(game, x, y) {
 }
 
 Hero.prototype.update = function() {
+  if(this.game.rightEdge === true) {
+    this.x = 1;
+    this.y = 600;
+  }
+
+  if(this.game.leftEdge === true) {
+    this.x = 1190;
+    this.y = 600;
+  }
   if (this.game.moveRight) {
     this.x += this.game.clockTick * this.speed;
   }
@@ -125,12 +134,13 @@ Hero.prototype.draw = function(ctx) {
     ctx.stroke();
 
     ctx.restore();
-    
-    
+
+
 
 
   if (this.game.jumping) {
     if (this.game.direction === "right") {
+
       this.animationJumpRight.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
     }
     else if (this.game.direction === "left") {
@@ -155,7 +165,7 @@ Hero.prototype.draw = function(ctx) {
                   this.x, this.y,
                   85 * this.scale,
                   128 * this.scale);
-            
+
         break;
 
       case "left":
@@ -165,7 +175,7 @@ Hero.prototype.draw = function(ctx) {
                     this.x, this.y,
                     85 * this.scale,
                     128 * this.scale);
-                    
+
         break;
     }
 
@@ -175,8 +185,8 @@ Hero.prototype.draw = function(ctx) {
 };
 
 Hero.prototype.collideCheck = function() {
-    
-  
+
+
       // Get the Map out of the Games Entity list
     var map = null;
     for (var i = 0; i < this.game.entities.length; i++) {
@@ -185,74 +195,74 @@ Hero.prototype.collideCheck = function() {
         map = e;
       }
     }
-    
+
     var gridY = Math.round(map.rows * (this.y  / (64 * map.rows)));
     var gridX = Math.round(map.cols * (this.x / (64 * map.cols)));
-    
+
     if (gridX < 0) gridX = 0;
     if (gridY < 0) gridY = 0;
     if (gridX >= map.cols) gridX = map.cols - 1;
     if (gridY >= map.rows) gridY = map.rows - 1;
-    
+
     // Detection for hitting a Block
     for (var i = 0; i < map.rows; i++) {
       for (var j = 0; j < map.cols; j++) {
         var block = map.mapBlocks[i][j];
         // If its block type 1
-                
+
         if (block.type === 1) {
-           
+
            //If Hero hits a block from the top with Hero's Feet
            if (this.y + this.height  <= block.y + this.fallSpeed &&
-               this.y + this.height >= block.y && 
-             ((this.x <= block.x + block.width && this.x >= block.x) || 
-              (this.x + this.width >= block.x && 
+               this.y + this.height >= block.y &&
+             ((this.x <= block.x + block.width && this.x >= block.x) ||
+              (this.x + this.width >= block.x &&
                this.x  <= block.x + block.width))) {
-           
+
                     this.y = block.y - this.height;
            }
-           
+
            // Head
            if (this.y <= block.y + block.height &&
-               this.y >= (block.y + block.height) - this.jumpSpeed * 2 && 
-             ((this.x <= block.x + block.width && this.x >= block.x) || 
-              (this.x + this.width > block.x && 
+               this.y >= (block.y + block.height) - this.jumpSpeed * 2 &&
+             ((this.x <= block.x + block.width && this.x >= block.x) ||
+              (this.x + this.width > block.x &&
                this.x  < block.x + block.width))) {
-           
+
                     this.y = block.y + block.height;
            }
-           
+
            // left
             if (this.x + this.width > block.x  &&
                 this.x < (block.x + block.width) &&
                 this.x >= (block.x + block.width) - this.game.clockTick * this.speed &&
                 this.y  < block.y + block.height &&
                 this.height + this.y > block.y) {
-            
+
                 this.x = (block.x + block.width) + 1;
 
            }
-           
-                    
+
+
            // right
            else if (this.x < block.x &&
                 this.x + this.width > block.x &&
                 this.x + this.width <= block.x + this.game.clockTick * this.speed &&
                 this.y  < block.y + block.height &&
                 this.height + this.y > block.y) {
-            
+
                 this.x = (block.x - this.width) - 3;
 
            }
-                    
-                    
+
+
 
         }
-                
+
 
       }
     }
-    
+
 };
 
 function Hookshot(game, hero) {
@@ -265,9 +275,6 @@ function Hookshot(game, hero) {
     this.targetY = null;
     this.height = null;
     this.width = null;
-    this.animationShoot = null;
-    console.log("Hookshot Created");
-    
 }
 
 Hookshot.prototype.update = function() {
@@ -295,12 +302,13 @@ Hookshot.prototype.update = function() {
     
 };
 
-Hookshot.prototype.draw = function() {
+
+
+Hookshot.prototype.draw = function(ctx) {
     
     if (this.game.clicked) {
-            console.log("Hookshot Drawn");
 
-    this.game.ctx.drawImage(AM.getAsset("./img/shot.png"),
+             ctx.drawImage(AM.getAsset("./img/shot.png"),
                     185 , 0,  // source from sheet
                     20, 315,
                     this.startX, this.startY,
@@ -342,45 +350,60 @@ Background.prototype.draw = function (ctx) {
     ctx.moveTo(0,650);
     ctx.lineTo(1200,650);
     ctx.stroke();
-    
-    
+
+
 */
 
-    ctx.drawImage(AM.getAsset("./img/new_cave_bg.jpg"),
+    ctx.drawImage(AM.getAsset("./img/stonebackground.png"),
                     0 , 0,  // source from sheet
-                    1600, 600,
+                    1190, 798,
                     0, 0,
                     1200,
                     800);
-    
+
 
    // ctx.fillStyle="Black";
    // ctx.fillRect(0,0,1200,800);
-   
+
     ctx.restore();
 };
 
 function Map(game, map) {
+  this.game = game;
   this.type = "map";
   this.rows = 13;
   this.cols = 38;
+  this.map = map;
   this.mapBlocks = new Array(this.rows);
 
   for (var i = 0; i < this.rows; i++) {
-    this.mapBlocks[i] = new Array(this.cols);
+    this.mapBlocks[i] = new Array(this.cols / 2);
   }
   for (var i = 0; i < this.rows; i++) {
     for (var j = 0; j < this.cols; j++) {
       this.mapBlocks[i][j] = new Block(game, j * 64, i * 64, map[i][j]);
-
-
     }
   }
-
-
 }
 
 Map.prototype.update = function() {
+
+  if(this.game.rightEdge === true) {
+    for (var i = 0; i < this.rows; i++) {
+      for (var j = 19; j < this.cols; j++) {
+        var newX = j - 19;
+        this.mapBlocks[i][newX] = new Block(this.game, newX * 64, i * 64, this.map[i][j]);
+      }
+    }
+    this.game.rightEdge = false;
+  } else if (this.game.leftEdge === true) {
+    for (var i = 0; i < this.rows; i++) {
+      for (var j = 0; j < 19; j++) {
+        this.mapBlocks[i][j] = new Block(this.game, j * 64, i * 64, this.map[i][j]);
+      }
+    }
+    this.game.leftEdge = false;
+  }
 
 };
 
@@ -396,6 +419,7 @@ Map.prototype.draw = function(ctx) {
 
 function Block(game, x , y, type) {
   this.type = type;
+  this.game = game;
   this.x = x;
   this.y = y;
   this.spriteHeight = 32;
@@ -403,6 +427,9 @@ function Block(game, x , y, type) {
   //this.scale = 2;
   this.height= 64;
   this.width = 64;
+  this.torch = new Animation(AM.getAsset("./img/torch.png"), 0, 0, 59, 148, .03 , 50, true, false);
+  this.surfaceLava = new Animation(AM.getAsset("./img/surface_lava.png"), 1, 0, 40, 56, .05 , 50, true, false);
+
 }
 
 Block.prototype.update = function() {
@@ -416,12 +443,12 @@ Block.prototype.draw = function(ctx) {
     ctx.rect(this.x, this.y, this.width, this.height);
     ctx.stroke();
     ctx.restore();
-    
-    
+
+
   if (this.type === 1) {
-    ctx.drawImage(AM.getAsset("./img/tileSheet.jpg"),
+    ctx.drawImage(AM.getAsset("./img/background_tile.png"),
                 0 , 0,  // source from sheet
-                this.spriteHeight, this.spriteWidth,
+                512, 512,
                 this.x, this.y,
                 this.height,
                 this.width);
@@ -442,21 +469,44 @@ Block.prototype.draw = function(ctx) {
                 this.height,
                 this.width);
   }
+  else if (this.type === 6) {
+      ctx.drawImage(AM.getAsset("./img/Empty_Spike2.png"),
+                83 , 0,  // source from sheet
+                270 , 382,
+                this.x, this.y,
+                this.height,
+                this.width);
+  }
+  else if (this.type === 7) {
+      ctx.drawImage(AM.getAsset("./img/SpikeWithSkull2.png"),
+                83 , 0,  // source from sheet
+                270 , 382,
+                this.x, this.y,
+                this.height,
+                this.width);
+  }
+  else if (this.type === 8) {
+        this.torch.drawFrame(this.game.clockTick, ctx, this.x, this.y, .5);
+  }
+
+  else if (this.type === 9) {
+        this.surfaceLava.drawFrame(this.game.clockTick, ctx, this.x - 10, this.y, 2.7);
+  }
 };
 
 var mapArray = [[1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 [1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,0,0,0,0,0,0,1,1,1,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,0,0,,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,1,1,0,0,0,1,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,1,1,4,4,4,1,1,1,1,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-                [1,1,1,1,1,1,1,1,1,1,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,1,0,0,0,0,0,0,0,0,1,1],
+                [1,0,0,0,0,0,0,0,8,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1],
+                [1,0,0,0,0,0,8,0,0,0,1,0,0,1,0,0,0,8,0,0,0,0,8,0,0,1,1,1.0,0,8,0,8,0,8,0,8,0,1],
+                [1,0,8,0,8,0,0,0,1,1,1,0,0,1,1,1,0,0,0,0,8,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,1],
+                [1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1],
+                [1,1,1,0,0,0,1,1,1,9,9,9,9,9,9,1,1,1,0,0,0,0,1,1,1,1,1,1,7,6,6,6,4,6,6,6,7,1],
+                [1,1,1,1,4,1,1,1,1,5,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1,1,5,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
               ];
 var AM =  new AssetManager();
 
@@ -464,11 +514,18 @@ AM.queueDownload("./img/horz_walk_left.png");
 AM.queueDownload("./img/horz_walk_right.png");
 AM.queueDownload("./img/right_jump.png");
 AM.queueDownload("./img/left_jump.png");
-AM.queueDownload("./img/tileSheet.jpg");
+AM.queueDownload("./img/background_tile.png");
 AM.queueDownload("./img/lava.png");
-AM.queueDownload("./img/new_cave_bg.jpg");
+AM.queueDownload("./img/stonebackground.png");
 AM.queueDownload("./img/skeleton_spike2.png");
+AM.queueDownload("./img/SpikeWithSkull2.png");
+AM.queueDownload("./img/Empty_Spike2.png");
+AM.queueDownload("./img/torch.png");
+AM.queueDownload("./img/surface_lava.png");
 AM.queueDownload("./img/shot.png");
+
+
+
 
 AM.downloadAll(function () {
 
@@ -491,7 +548,7 @@ AM.downloadAll(function () {
     gameEngine.addEntity(hero);
     gameEngine.addEntity(hookshot);
     gameEngine.addEntity(map);
-    
+
 
 
     gameEngine.start();
