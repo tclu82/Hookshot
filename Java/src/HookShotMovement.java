@@ -69,10 +69,13 @@ public class HookShotMovement {
      */
     public void heroMove(int moveByDegree) {
 
-        for (int degree=0; degree>=-180; degree-= moveByDegree) {
+        for (int degree=0; degree<=180; degree+= moveByDegree) {
 
             /**
-             * In Java, Math.cos(Math.toRadians(degree)) can be writte Math.sin(30 / 180 * Math.PI) in JavaScript or
+             * In JavaScript:
+             *
+             * currentPoint.x = -(Math.cos(degree / 180 * Math.PI) - 1) * hookShotLength;
+             * currentPoint.y = Math.sin(degree / 180 * Math.PI) * hookShotLength;
 
                  // Converts from degrees to radians.
                  Math.radians = function(degrees) {
@@ -83,13 +86,13 @@ public class HookShotMovement {
                  y = Math.sin(Math.radians(theDegreeWeWantT));
              *
              */
-            currentPoint.x = Math.cos(Math.toRadians(degree)) * hookShotLength;
+            currentPoint.x = -(Math.cos(Math.toRadians(degree)) - 1) * hookShotLength;
 
             currentPoint.y = Math.sin(Math.toRadians(degree)) * hookShotLength;
 
             String position = String.format("Degree: %d, X: %.3f, Y: %.3f",
                     degree,
-                    -currentPoint.x,
+                    currentPoint.x,
                     currentPoint.y);
 
             System.out.println(position);
