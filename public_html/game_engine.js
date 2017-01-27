@@ -124,8 +124,9 @@ GameEngine.prototype.update = function () {
         if (!entity.removeFromWorld) {
           if(entity.type === "hero" && entity.x >= 1200) {
             this.rightEdge = true;
-            console.log("You mom is not false");
 
+          } else if (entity.type === "hero" && entity.x < 0) {
+            this.leftEdge = true;
           }
             entity.update();
         }
