@@ -269,16 +269,31 @@ function Hookshot(game, hero) {
     this.type = "hookshot";
     this.owner = hero;
     this.game = game;
+    this.hooked = false;
     this.startX = null;
     this.startY = null;
     this.targetX = null;
     this.targetY = null;
     this.height = null;
     this.width = null;
+          // Get the Map out of the Games Entity list
+    this.map = null;
+
+    
 }
 
 Hookshot.prototype.update = function() {
     
+    if (this.map === null) {
+        for (var i = 0; i < this.game.entities.length; i++) {
+            var e = this.game.entities[i];
+            if (e.type === "map") {
+                this.map = e;
+            }
+        }   
+    }
+    
+
     this.startX = this.owner.x;
     this.startY = this.owner.y;
 
@@ -288,10 +303,23 @@ Hookshot.prototype.update = function() {
         this.targetX = this.game.click.x;
         this.targetY = this.game.click.y;
         
-        this.height = Math.abs(this.startX - this.targetX);
-        this.width = Math.abs(this.startY - this.targetY);
+        var gridY = Math.floor(this.map.rows * (this.targetY  / (64 * this.map.rows)));
+        var gridX = Math.floor(this.map.cols * (this.targetX / (64 * this.map.cols)));
+      
+        
+        if (gridX < 0) gridX = 0;
+        if (gridY < 0) gridY = 0;
+
+        if (this.map.mapBlocks[gridY][gridX].type === 1) {
+            this.hooked = true;
+            
+            this.height = Math.abs(this.startY - this.targetY);
+            this.width = Math.abs(this.startX - this.targetX);
+        }
         
         
+        
+             
     }
     else {
         this.targetX = null;
@@ -306,14 +334,30 @@ Hookshot.prototype.update = function() {
 
 Hookshot.prototype.draw = function(ctx) {
     
-    if (this.game.clicked) {
+    if (this.hooked && !this.game.clicked) {
+        this.hooked = false;
+    }
+    
+    if (this.game.clicked && this.hooked) {
+        
+        ctx.save();
+        ctx.beginPath();
+        ctx.strokeStyle = "saddleBrown";
+        ctx.lineWidth = 3;
+        ctx.moveTo(this.startX + this.owner.width,this.startY + (this.owner.height / 2));
+        ctx.lineTo(this.targetX,this.targetY);
+        ctx.stroke();
+        ctx.restore();
 
+/*
              ctx.drawImage(AM.getAsset("./img/shot.png"),
-                    185 , 0,  // source from sheet
-                    20, 315,
+                    0 , 563,  // source from sheet
+                    800, 20,
                     this.startX, this.startY,
-                    this.height,
-                    this.width);
+                    this.width,
+                    this.height);
+        
+        */
                     
     }
 };
@@ -501,7 +545,7 @@ var mapArray = [[1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
                 [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
                 [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,1,0,0,0,0,0,0,0,0,1,1],
                 [1,0,0,0,0,0,0,0,8,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1],
-                [1,0,0,0,0,0,8,0,0,0,1,0,0,1,0,0,0,8,0,0,0,0,8,0,0,1,1,1.0,0,8,0,8,0,8,0,8,0,1],
+                [1,0,0,0,0,0,8,0,0,0,1,0,0,1,0,0,0,8,0,0,0,0,8,0,0,1,1,1.0,0,8,0,8,0,8,0,8,0,1], // NOt sure whats going on.
                 [1,0,8,0,8,0,0,0,1,1,1,0,0,1,1,1,0,0,0,0,8,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,1],
                 [1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1],
                 [1,1,1,0,0,0,1,1,1,9,9,9,9,9,9,1,1,1,0,0,0,0,1,1,1,1,1,1,7,6,6,6,4,6,6,6,7,1],
@@ -545,9 +589,9 @@ AM.downloadAll(function () {
     gameEngine.init(ctx);
 
     gameEngine.addEntity(bg);
-    gameEngine.addEntity(hero);
-    gameEngine.addEntity(hookshot);
     gameEngine.addEntity(map);
+    gameEngine.addEntity(hookshot);
+    gameEngine.addEntity(hero);
 
 
 
