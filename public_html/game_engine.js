@@ -33,6 +33,7 @@ function GameEngine() {
     this.showOutlines = false;
     this.ctx = null;
     this.click = null;
+    this.clicked = false;
     this.mouse = null;
     this.rightMove = null;
     this.leftMove = null;
@@ -64,6 +65,15 @@ GameEngine.prototype.start = function () {
 GameEngine.prototype.startInput = function () {
     console.log('Starting input');
     var that = this;
+    
+    var getXandY = function (e) {
+        var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
+        var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
+
+        return { x: x, y: y };
+    };
+    
+    
 
     this.ctx.canvas.addEventListener("keydown", function (e) {
 
@@ -94,7 +104,23 @@ GameEngine.prototype.startInput = function () {
         if (e.key === 'a') {
           that.moveLeft = false;
         }
-    });
+        
+        e.preventDefault();
+    }, false);
+    
+    this.ctx.canvas.addEventListener("click", function(e) {
+        that.click = getXandY(e);
+
+
+        if (that.clicked === true) {
+            that.clicked = false;
+        } 
+        else {
+            that.clicked = true;
+        }
+
+        e.preventDefault();
+    }, false);
 
     console.log('Input started');
 };

@@ -253,7 +253,63 @@ Hero.prototype.collideCheck = function() {
       }
     }
     
+};
+
+function Hookshot(game, hero) {
+    this.type = "hookshot";
+    this.owner = hero;
+    this.game = game;
+    this.startX = null;
+    this.startY = null;
+    this.targetX = null;
+    this.targetY = null;
+    this.height = null;
+    this.width = null;
+    this.animationShoot = null;
+    console.log("Hookshot Created");
+    
 }
+
+Hookshot.prototype.update = function() {
+    
+    this.startX = this.owner.x;
+    this.startY = this.owner.y;
+
+    
+    if (this.game.clicked) {
+
+        this.targetX = this.game.click.x;
+        this.targetY = this.game.click.y;
+        
+        this.height = Math.abs(this.startX - this.targetX);
+        this.width = Math.abs(this.startY - this.targetY);
+        
+        
+    }
+    else {
+        this.targetX = null;
+        this.targetY = null;
+        this.height = null;
+        this.width = null;
+    }
+    
+};
+
+Hookshot.prototype.draw = function() {
+    
+    if (this.game.clicked) {
+            console.log("Hookshot Drawn");
+
+    this.game.ctx.drawImage(AM.getAsset("./img/shot.png"),
+                    185 , 0,  // source from sheet
+                    20, 315,
+                    this.startX, this.startY,
+                    this.height,
+                    this.width);
+                    
+    }
+};
+
 
 function Background(game) {
     this.type = "background";
@@ -399,7 +455,7 @@ var mapArray = [[1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
                 [1,0,0,0,0,0,0,0,1,1,1,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                 [1,0,0,0,,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                 [1,1,1,0,0,0,1,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,1,1,1,4,1,1,1,1,1,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,1,1,4,4,4,1,1,1,1,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 [1,1,1,1,1,1,1,1,1,1,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
               ];
 var AM =  new AssetManager();
@@ -412,6 +468,7 @@ AM.queueDownload("./img/tileSheet.jpg");
 AM.queueDownload("./img/lava.png");
 AM.queueDownload("./img/new_cave_bg.jpg");
 AM.queueDownload("./img/skeleton_spike2.png");
+AM.queueDownload("./img/shot.png");
 
 AM.downloadAll(function () {
 
@@ -425,13 +482,14 @@ AM.downloadAll(function () {
     var bg = new Background(gameEngine);
     var map = new Map(gameEngine, mapArray);
     var hero = new Hero(gameEngine, 100,0);
-
+    var hookshot = new Hookshot(gameEngine, hero);
 
 
     gameEngine.init(ctx);
 
     gameEngine.addEntity(bg);
     gameEngine.addEntity(hero);
+    gameEngine.addEntity(hookshot);
     gameEngine.addEntity(map);
     
 
