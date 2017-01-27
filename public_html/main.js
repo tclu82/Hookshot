@@ -140,6 +140,7 @@ Hero.prototype.draw = function(ctx) {
 
   if (this.game.jumping) {
     if (this.game.direction === "right") {
+
       this.animationJumpRight.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
     }
     else if (this.game.direction === "left") {
@@ -327,12 +328,8 @@ function Map(game, map) {
   for (var i = 0; i < this.rows; i++) {
     for (var j = 0; j < this.cols; j++) {
       this.mapBlocks[i][j] = new Block(game, j * 64, i * 64, map[i][j]);
-
-
     }
   }
-
-
 }
 
 Map.prototype.update = function() {
@@ -368,6 +365,7 @@ Map.prototype.draw = function(ctx) {
 
 function Block(game, x , y, type) {
   this.type = type;
+  this.game = game;
   this.x = x;
   this.y = y;
   this.spriteHeight = 32;
@@ -375,6 +373,9 @@ function Block(game, x , y, type) {
   //this.scale = 2;
   this.height= 64;
   this.width = 64;
+  this.torch = new Animation(AM.getAsset("./img/torch.png"), 0, 0, 59, 148, .03 , 50, true, false);
+  this.surfaceLava = new Animation(AM.getAsset("./img/surface_lava.png"), 1, 0, 40, 56, .05 , 50, true, false);
+
 }
 
 Block.prototype.update = function() {
@@ -430,19 +431,26 @@ Block.prototype.draw = function(ctx) {
                 this.height,
                 this.width);
   }
+  else if (this.type === 8) {
+        this.torch.drawFrame(this.game.clockTick, ctx, this.x, this.y, .5);
+  }
+
+  else if (this.type === 9) {
+        this.surfaceLava.drawFrame(this.game.clockTick, ctx, this.x - 10, this.y, 2.7);
+  }
 };
 
 var mapArray = [[1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 [1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0],
                 [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
-                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,1],
-                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1],
-                [1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1.0,0,0,0,0,0,0,0,0,0,1],
-                [1,0,0,0,0,0,0,0,1,1,1,0,0,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,1],
-                [1,0,0,0,,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1],
-                [1,1,1,0,0,0,1,1,1,0,0,0,0,0,0,1,1,1,0,0,0,0,1,1,1,1,1,1,7,6,6,6,4,6,6,6,7,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,1,0,0,0,0,0,0,0,0,1,1],
+                [1,0,0,0,0,0,0,0,8,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1],
+                [1,0,0,0,0,0,8,0,0,0,1,0,0,1,0,0,0,8,0,0,0,0,8,0,0,1,1,1.0,0,8,0,8,0,8,0,8,0,1],
+                [1,0,8,0,8,0,0,0,1,1,1,0,0,1,1,1,0,0,0,0,8,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,1],
+                [1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1],
+                [1,1,1,0,0,0,1,1,1,9,9,9,9,9,9,1,1,1,0,0,0,0,1,1,1,1,1,1,7,6,6,6,4,6,6,6,7,1],
                 [1,1,1,1,4,1,1,1,1,5,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 [1,1,1,1,1,1,1,1,1,5,5,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
               ];
@@ -458,6 +466,10 @@ AM.queueDownload("./img/stonebackground.png");
 AM.queueDownload("./img/skeleton_spike2.png");
 AM.queueDownload("./img/SpikeWithSkull2.png");
 AM.queueDownload("./img/Empty_Spike2.png");
+AM.queueDownload("./img/torch.png");
+AM.queueDownload("./img/surface_lava.png");
+
+
 
 AM.downloadAll(function () {
 
