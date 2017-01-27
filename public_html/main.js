@@ -45,7 +45,7 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, scaleBy) {
                   locX, locY,
                   this.frameWidth * scaleBy,
                   this.frameHeight * scaleBy);
-                  
+
 };
 
 Animation.prototype.currentFrame = function () {
@@ -82,6 +82,10 @@ function Hero(game, x, y) {
 }
 
 Hero.prototype.update = function() {
+  if(this.game.rightEdge === true) {
+    this.x = 1;
+    this.y = 500;
+  }
   if (this.game.moveRight) {
     this.x += this.game.clockTick * this.speed;
   }
@@ -125,8 +129,8 @@ Hero.prototype.draw = function(ctx) {
     ctx.stroke();
 
     ctx.restore();
-    
-    
+
+
 
 
   if (this.game.jumping) {
@@ -155,7 +159,7 @@ Hero.prototype.draw = function(ctx) {
                   this.x, this.y,
                   85 * this.scale,
                   128 * this.scale);
-            
+
         break;
 
       case "left":
@@ -165,7 +169,7 @@ Hero.prototype.draw = function(ctx) {
                     this.x, this.y,
                     85 * this.scale,
                     128 * this.scale);
-                    
+
         break;
     }
 
@@ -175,8 +179,8 @@ Hero.prototype.draw = function(ctx) {
 };
 
 Hero.prototype.collideCheck = function() {
-    
-  
+
+
       // Get the Map out of the Games Entity list
     var map = null;
     for (var i = 0; i < this.game.entities.length; i++) {
@@ -185,74 +189,74 @@ Hero.prototype.collideCheck = function() {
         map = e;
       }
     }
-    
+
     var gridY = Math.round(map.rows * (this.y  / (64 * map.rows)));
     var gridX = Math.round(map.cols * (this.x / (64 * map.cols)));
-    
+
     if (gridX < 0) gridX = 0;
     if (gridY < 0) gridY = 0;
     if (gridX >= map.cols) gridX = map.cols - 1;
     if (gridY >= map.rows) gridY = map.rows - 1;
-    
+
     // Detection for hitting a Block
     for (var i = 0; i < map.rows; i++) {
       for (var j = 0; j < map.cols; j++) {
         var block = map.mapBlocks[i][j];
         // If its block type 1
-                
+
         if (block.type === 1) {
-           
+
            //If Hero hits a block from the top with Hero's Feet
            if (this.y + this.height  <= block.y + this.fallSpeed &&
-               this.y + this.height >= block.y && 
-             ((this.x <= block.x + block.width && this.x >= block.x) || 
-              (this.x + this.width >= block.x && 
+               this.y + this.height >= block.y &&
+             ((this.x <= block.x + block.width && this.x >= block.x) ||
+              (this.x + this.width >= block.x &&
                this.x  <= block.x + block.width))) {
-           
+
                     this.y = block.y - this.height;
            }
-           
+
            // Head
            if (this.y <= block.y + block.height &&
-               this.y >= (block.y + block.height) - this.jumpSpeed * 2 && 
-             ((this.x <= block.x + block.width && this.x >= block.x) || 
-              (this.x + this.width > block.x && 
+               this.y >= (block.y + block.height) - this.jumpSpeed * 2 &&
+             ((this.x <= block.x + block.width && this.x >= block.x) ||
+              (this.x + this.width > block.x &&
                this.x  < block.x + block.width))) {
-           
+
                     this.y = block.y + block.height;
            }
-           
+
            // left
             if (this.x + this.width > block.x  &&
                 this.x < (block.x + block.width) &&
                 this.x >= (block.x + block.width) - this.game.clockTick * this.speed &&
                 this.y  < block.y + block.height &&
                 this.height + this.y > block.y) {
-            
+
                 this.x = (block.x + block.width) + 1;
 
            }
-           
-                    
+
+
            // right
            else if (this.x < block.x &&
                 this.x + this.width > block.x &&
                 this.x + this.width <= block.x + this.game.clockTick * this.speed &&
                 this.y  < block.y + block.height &&
                 this.height + this.y > block.y) {
-            
+
                 this.x = (block.x - this.width) - 3;
 
            }
-                    
-                    
+
+
 
         }
-                
+
 
       }
     }
-    
+
 }
 
 function Background(game) {
@@ -286,8 +290,8 @@ Background.prototype.draw = function (ctx) {
     ctx.moveTo(0,650);
     ctx.lineTo(1200,650);
     ctx.stroke();
-    
-    
+
+
 */
 
     ctx.drawImage(AM.getAsset("./img/new_cave_bg.jpg"),
@@ -296,22 +300,24 @@ Background.prototype.draw = function (ctx) {
                     0, 0,
                     1200,
                     800);
-    
+
 
    // ctx.fillStyle="Black";
    // ctx.fillRect(0,0,1200,800);
-   
+
     ctx.restore();
 };
 
 function Map(game, map) {
+  this.game = game;
   this.type = "map";
   this.rows = 13;
   this.cols = 38;
+  this.map = map;
   this.mapBlocks = new Array(this.rows);
 
   for (var i = 0; i < this.rows; i++) {
-    this.mapBlocks[i] = new Array(this.cols);
+    this.mapBlocks[i] = new Array(this.cols / 2);
   }
   for (var i = 0; i < this.rows; i++) {
     for (var j = 0; j < this.cols; j++) {
@@ -325,6 +331,23 @@ function Map(game, map) {
 }
 
 Map.prototype.update = function() {
+
+  if(this.game.rightEdge === true) {
+    for (var i = 0; i < this.rows; i++) {
+      for (var j = 19; j < this.cols; j++) {
+        var newX = j - 19;
+        this.mapBlocks[i][newX] = new Block(this.game, newX * 64, i * 64, this.map[i][j]);
+      }
+    }
+    this.game.rightEdge = false;
+  } else if (this.game.leftEdge === true) {
+    for (var i = 0; i < this.rows; i++) {
+      for (var j = 0; j < 19; j++) {
+        this.mapBlocks[i][j] = new Block(this.game, j * 64, i * 64, this.map[i][j]);
+      }
+    }
+    this.game.leftEdge = false;
+  }
 
 };
 
@@ -360,8 +383,8 @@ Block.prototype.draw = function(ctx) {
     ctx.rect(this.x, this.y, this.width, this.height);
     ctx.stroke();
     ctx.restore();
-    
-    
+
+
   if (this.type === 1) {
     ctx.drawImage(AM.getAsset("./img/tileSheet.jpg"),
                 0 , 0,  // source from sheet
@@ -433,7 +456,7 @@ AM.downloadAll(function () {
     gameEngine.addEntity(bg);
     gameEngine.addEntity(hero);
     gameEngine.addEntity(map);
-    
+
 
 
     gameEngine.start();

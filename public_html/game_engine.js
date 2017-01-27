@@ -41,6 +41,8 @@ function GameEngine() {
     this.wheel = null;
     this.surfaceWidth = null;
     this.surfaceHeight = null;
+    this.rightEdge = null;
+    this.leftEdge = null;
 }
 
 GameEngine.prototype.init = function (ctx) {
@@ -120,6 +122,11 @@ GameEngine.prototype.update = function () {
         var entity = this.entities[i];
 
         if (!entity.removeFromWorld) {
+          if(entity.type === "hero" && entity.x >= 1200) {
+            this.rightEdge = true;
+            console.log("You mom is not false");
+
+          }
             entity.update();
         }
     }
