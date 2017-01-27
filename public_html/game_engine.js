@@ -173,6 +173,17 @@ GameEngine.prototype.loop = function () {
     this.space = null;
 };
 
+
+
+
+
+
+
+
+
+
+
+
 /*
 Entity.prototype.rotateAndCache = function (image, angle) {
     var offscreenCanvas = document.createElement('canvas');
