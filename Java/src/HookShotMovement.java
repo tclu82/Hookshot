@@ -69,7 +69,7 @@ public class HookShotMovement {
      */
     public void heroMove(int moveByDegree) {
 
-        for (int degree=0; degree>=-180; degree-= moveByDegree) {
+        for (int degree=0; degree<=180; degree+= moveByDegree) {
 
             /**
              * In Java, Math.cos(Math.toRadians(degree)) can be writte Math.sin(30 / 180 * Math.PI) in JavaScript or
@@ -83,7 +83,7 @@ public class HookShotMovement {
                  y = Math.sin(Math.radians(theDegreeWeWantT));
              *
              */
-            currentPoint.x = Math.cos(Math.toRadians(degree)) * hookShotLength;
+            currentPoint.x = (Math.cos(Math.toRadians(degree)) - 1) * hookShotLength;
 
             currentPoint.y = Math.sin(Math.toRadians(degree)) * hookShotLength;
 
@@ -106,7 +106,7 @@ public class HookShotMovement {
         // Decide how long hero's hook shot is
         HookShotMovement hsm = new HookShotMovement(100);
         // Change the integer degree 0~180, the smaller degree number, display more positions
-        hsm.heroMove(10);
+        hsm.heroMove(45);
     }
 
     /**
