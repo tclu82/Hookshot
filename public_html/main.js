@@ -269,6 +269,7 @@ function Hookshot(game, hero) {
     this.type = "hookshot";
     this.owner = hero;
     this.game = game;
+    this.swinging = false;
     this.hooked = false;
     this.startX = null;
     this.startY = null;
@@ -311,10 +312,20 @@ Hookshot.prototype.update = function() {
         if (gridY < 0) gridY = 0;
 
         if (this.map.mapBlocks[gridY][gridX].type === 1) {
+            
             this.hooked = true;
             
-            this.height = Math.abs(this.startY - this.targetY);
-            this.width = Math.abs(this.startX - this.targetX);
+            this.height = Math.abs((this.startY + (this.owner.height / 2)) - this.targetY);
+            this.width = Math.abs((this.startX + this.owner.width) - this.targetX);
+            
+            var length = Math.round(Math.sqrt((this.width * this.width) + (this.height * this.height)));
+            
+            //console.log("length: " + length);
+            if (this.game.mouseDown) {
+                this.swing(180, length);
+            }
+                            this.swing(180, length);
+
         }
         
         
@@ -360,6 +371,24 @@ Hookshot.prototype.draw = function(ctx) {
         */
                     
     }
+};
+
+Hookshot.prototype.swing = function(degree, length) {
+    
+    Math.radians = function(degrees) {
+            return degrees * Math.PI / 180;
+        };
+        
+    for (var d = degree; d >= 0; d-=2) {
+        
+        this.owner.x = -Math.cos(Math.radians(degree) - 1) * length;
+        this.owner.y = Math.sin(Math.radians(degree)) * length;
+        console.log(this.owner.x + " " + this.owner.y);
+    }
+        
+    this.game.mouseDown = false;
+    
+    
 };
 
 
@@ -545,7 +574,7 @@ var mapArray = [[1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
                 [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
                 [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,1,0,0,0,0,0,0,0,0,1,1],
                 [1,0,0,0,0,0,0,0,8,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1],
-                [1,0,0,0,0,0,8,0,0,0,1,0,0,1,0,0,0,8,0,0,0,0,8,0,0,1,1,1.0,0,8,0,8,0,8,0,8,0,1], // NOt sure whats going on.
+                [1,0,0,0,0,0,8,0,0,0,1,0,0,1,0,0,0,8,0,0,0,0,8,0,0,1,1,1,0,8,0,8,0,8,0,8,0,1],
                 [1,0,8,0,8,0,0,0,1,1,1,0,0,1,1,1,0,0,0,0,8,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,1],
                 [1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1],
                 [1,1,1,0,0,0,1,1,1,9,9,9,9,9,9,1,1,1,0,0,0,0,1,1,1,1,1,1,7,6,6,6,4,6,6,6,7,1],
