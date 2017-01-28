@@ -73,6 +73,7 @@ function Hero(game, x, y) {
   this.fallSpeed = 12;
   this.jumpMax = this.jumpSpeed * 20;
   this.jumpCurrent = 0;
+  this.hooked = false;
   this.removeFromWorld = false;
   this.ctx = game.ctx;
   this.width = 40;
@@ -91,15 +92,15 @@ Hero.prototype.update = function() {
     this.x = 1190;
     this.y = 600;
   }
-  if (this.game.moveRight) {
+  if (this.game.moveRight && !this.hooked) {
     this.x += this.game.clockTick * this.speed;
   }
-  if (this.game.moveLeft) {
+  if (this.game.moveLeft && !this.hooked) {
     this.x -= this.game.clockTick * this.speed;
   }
 
 
-  if (this.game.jumping) {
+  if (this.game.jumping && !this.hooked) {
     if (this.jumpCurrent < this.jumpMax) {
       this.y -= this.jumpSpeed;
       this.jumpCurrent += this.jumpSpeed;
@@ -127,6 +128,7 @@ Hero.prototype.update = function() {
 };
 
 Hero.prototype.draw = function(ctx) {
+    /*
     ctx.save();
     ctx.beginPath();
     ctx.strokeStyle ="Yellow";
@@ -135,6 +137,7 @@ Hero.prototype.draw = function(ctx) {
 
     ctx.restore();
 
+*/
 
 
 
@@ -270,14 +273,18 @@ function Hookshot(game, hero) {
     this.owner = hero;
     this.game = game;
     this.swinging = false;
+    this.swingDirection = null;
     this.hooked = false;
     this.startX = null;
     this.startY = null;
+    this.currentX = null;
+    this.currentY = null;
     this.targetX = null;
     this.targetY = null;
     this.height = null;
     this.width = null;
-          // Get the Map out of the Games Entity list
+    this.length = null;
+    this.currentDegree = 0;
     this.map = null;
 
     
@@ -295,14 +302,21 @@ Hookshot.prototype.update = function() {
     }
     
 
-    this.startX = this.owner.x;
-    this.startY = this.owner.y;
+    if (this.startX === null && this.startY === null) {
+        this.startX = this.owner.x;
+        this.startY = this.owner.y; 
+    }
+        this.currentX = this.owner.x;
+        this.currentY = this.owner.y;
+    
 
     
     if (this.game.clicked) {
 
+        this.swinging = true;
         this.targetX = this.game.click.x;
         this.targetY = this.game.click.y;
+        this.swingDirection = this.game.direction;
         
         var gridY = Math.floor(this.map.rows * (this.targetY  / (64 * this.map.rows)));
         var gridX = Math.floor(this.map.cols * (this.targetX / (64 * this.map.cols)));
@@ -314,29 +328,41 @@ Hookshot.prototype.update = function() {
         if (this.map.mapBlocks[gridY][gridX].type === 1) {
             
             this.hooked = true;
+            this.owner.hooked = true;
             
-            this.height = Math.abs((this.startY + (this.owner.height / 2)) - this.targetY);
-            this.width = Math.abs((this.startX + this.owner.width) - this.targetX);
             
-            var length = Math.round(Math.sqrt((this.width * this.width) + (this.height * this.height)));
+            this.height = ((this.startY + (this.owner.height / 2)) - this.targetY);
+            this.width = ((this.startX + this.owner.width) - this.targetX);
             
-            //console.log("length: " + length);
-            if (this.game.mouseDown) {
-                this.swing(180, length);
-            }
-                            this.swing(180, length);
+            this.length = Math.round(Math.sqrt((this.width * this.width) + (this.height * this.height)));
+            
+            var diffX = this.startX - this.targetX;
+            var diffY = this.startY - this.targetY;
+    
+            var swingDegree = (Math.atan(diffX / diffY) * (180 / Math.PI));
+
+            swingDegree = 180 - (swingDegree * 2);
+            
+            this.swing(180);
 
         }
-        
-        
-        
-             
+            
     }
     else {
+        this.hooked = false;
+        this.owner.hooked = false;
+        this.swinging = false;
+        this.startX = null;
+        this.currentX = null;
+        this.currentY = null;
+        this.startY = null;
         this.targetX = null;
         this.targetY = null;
         this.height = null;
         this.width = null;
+        this.length = null;
+        this.currentDegree = 0;
+
     }
     
 };
@@ -347,6 +373,7 @@ Hookshot.prototype.draw = function(ctx) {
     
     if (this.hooked && !this.game.clicked) {
         this.hooked = false;
+        this.owner.hooked = false;
     }
     
     if (this.game.clicked && this.hooked) {
@@ -355,7 +382,7 @@ Hookshot.prototype.draw = function(ctx) {
         ctx.beginPath();
         ctx.strokeStyle = "saddleBrown";
         ctx.lineWidth = 3;
-        ctx.moveTo(this.startX + this.owner.width,this.startY + (this.owner.height / 2));
+        ctx.moveTo(this.currentX + this.owner.width,this.currentY + (this.owner.height / 2));
         ctx.lineTo(this.targetX,this.targetY);
         ctx.stroke();
         ctx.restore();
@@ -373,21 +400,139 @@ Hookshot.prototype.draw = function(ctx) {
     }
 };
 
-Hookshot.prototype.swing = function(degree, length) {
+Hookshot.prototype.swing = function(endDegree) {
     
+   // Math.radians = function(degrees) {
+   //         return degrees * Math.PI / 180;
+   //     };
+        
+    //var diffX = this.targetX - this.startX;
+    //var diffY = this.targetY - this.startY;
+    
+    //var startDegree = (Math.atan(diffX / diffY)) * (180 / Math.PI);
+    
+    /*
+    for (var degree = startDegree; degree <= 180 - startDegree; degree += 1) {
+        this.owner.x = -Math.cos(Math.radians(degree) - 1) * length;
+        this.owner.y = Math.sin(Math.radians(degree)) * length;
+        
+        console.log(this.owner.x);
+        console.log(this.owner.y);
+
+    }
+    */
+   
+   /*
     Math.radians = function(degrees) {
             return degrees * Math.PI / 180;
         };
         
-    for (var d = degree; d >= 0; d-=2) {
-        
-        this.owner.x = -Math.cos(Math.radians(degree) - 1) * length;
-        this.owner.y = Math.sin(Math.radians(degree)) * length;
-        console.log(this.owner.x + " " + this.owner.y);
-    }
-        
-    this.game.mouseDown = false;
+    var diffX = this.targetX - this.startX;
+    var diffY = this.targetY - this.startY;
     
+    var startDegree = (Math.atan(diffX / diffY)) * (180 / Math.PI);
+    
+    
+    if (this.currentDegree <= 180 - startDegree) {
+        this.owner.x = -Math.cos(Math.radians(endDegree) - 1) * length;
+        this.owner.y = Math.sin(Math.radians(endDegree)) * length;
+        this.currentDegree += 5;
+        
+    }
+    */
+    
+   
+   //console.log(this.swingDirection);
+
+    var quarter = endDegree / 5;
+  
+   if (this.currentDegree < endDegree && this.swingDirection === "right") {
+       //console.log(this.currentDegree);
+       if (this.currentDegree < quarter && this.currentDegree > 0) {
+            this.owner.y -= 9;
+            this.owner.x += 5;  
+            
+       }
+       else if (this.currentDegree <= quarter * 2 && this.currentDegree >= quarter) {
+            this.owner.y -= 11;
+            this.owner.x += 7;
+
+       }
+       else if (this.currentDegree <= quarter * 3 && this.currentDegree >= quarter * 2) {
+            this.owner.y -= 12;
+            this.owner.x += 9;
+
+       }
+       else if (this.currentDegree <= quarter * 4 && this.currentDegree >= quarter * 3) {
+            this.owner.y -= 14;
+            this.owner.x += 7;
+
+       }
+       else if (this.currentDegree <= quarter * 5 && this.currentDegree >= quarter * 4) {
+            this.owner.y -= 16;
+            this.owner.x += 5;
+
+       }
+     
+
+       this.currentDegree += (endDegree / 30) - (.004 * this.length)  ;
+       this.owner.collideCheck();
+       
+       
+   }
+   
+      else if (this.currentDegree < endDegree && this.swingDirection === "left") {
+       //console.log(this.currentDegree);
+       if (this.currentDegree < quarter && this.currentDegree > 0) {
+            this.owner.y -= 9;
+            this.owner.x -= 5;  
+            
+       }
+       else if (this.currentDegree <= quarter * 2 && this.currentDegree >= quarter) {
+            this.owner.y -= 11;
+            this.owner.x -= 7;
+
+       }
+       else if (this.currentDegree <= quarter * 3 && this.currentDegree >= quarter * 2) {
+            this.owner.y -= 12;
+            this.owner.x -= 9;
+
+       }
+       else if (this.currentDegree <= quarter * 4 && this.currentDegree >= quarter * 3) {
+            this.owner.y -= 14;
+            this.owner.x -= 7;
+
+       }
+       else if (this.currentDegree <= quarter * 5 && this.currentDegree >= quarter * 4) {
+            this.owner.y -= 16;
+            this.owner.x -= 5;
+
+       }
+     
+
+       this.currentDegree += (endDegree / 30) - (.004 * this.length) ;
+       this.owner.collideCheck();
+   }
+   
+   else {
+       if (this.swingDirection === "left" && this.hooked) {
+           this.swingDirection = "right";
+           this.game.direction = "right";
+           this.currentDegree = 0;
+       }
+       
+       else if (this.swingDirection === "right" && this.hooked) {
+           this.swingDirection = "left";
+           this.game.direction = "left";
+           this.currentDegree = 0;
+       }
+   }
+   
+    
+    
+   
+        
+        
     
 };
 
@@ -510,12 +655,14 @@ Block.prototype.update = function() {
 };
 
 Block.prototype.draw = function(ctx) {
+    /*
     ctx.save();
     ctx.beginPath();
     ctx.strokeStyle ="Blue";
     ctx.rect(this.x, this.y, this.width, this.height);
     ctx.stroke();
     ctx.restore();
+    */
 
 
   if (this.type === 1) {
@@ -569,12 +716,12 @@ Block.prototype.draw = function(ctx) {
 
 var mapArray = [[1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 [1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-                [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0],
-                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
-                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,1,0,0,0,0,0,0,0,0,1,1],
-                [1,0,0,0,0,0,0,0,8,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1],
-                [1,0,0,0,0,0,8,0,0,0,1,0,0,1,0,0,0,8,0,0,0,0,8,0,0,1,1,1,0,8,0,8,0,8,0,8,0,1],
+                [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,1,0,0,0,0,0,0,0,8,0,0],
+                [1,0,0,0,0,0,0,0,8,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1,1],
+                [1,0,0,0,0,0,8,0,0,0,1,0,0,1,0,0,0,8,0,0,0,0,8,0,0,1,1,1,0,8,0,8,0,8,0,8,1,1],
                 [1,0,8,0,8,0,0,0,1,1,1,0,0,1,1,1,0,0,0,0,8,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,1],
                 [1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1],
                 [1,1,1,0,0,0,1,1,1,9,9,9,9,9,9,1,1,1,0,0,0,0,1,1,1,1,1,1,7,6,6,6,4,6,6,6,7,1],
