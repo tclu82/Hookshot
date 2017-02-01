@@ -61,6 +61,99 @@ Animation.prototype.isDone = function () {
     }
 };
 
+function collisionCheck(game, sprite) {
+        
+  var collide = {
+    right: false,
+    left: false,
+    top: false,
+    bottom: false
+  };
+
+  // Get the Map out of the Games Entity list
+  var map = null;
+  for (var i = 0; i < game.entities.length; i++) {
+    var e = game.entities[i];
+    if (e.type === "map") {
+      map = e;
+    }
+  }
+
+
+  var gridY = Math.round(map.rows * (sprite.y  / (64 * map.rows)));
+  var gridX = Math.round(map.cols * (sprite.x / (64 * map.cols)));
+
+  if (gridX < 0) gridX = 0;
+  if (gridY < 0) gridY = 0;
+  if (gridX >= map.cols) gridX = map.cols - 1;
+  if (gridY >= map.rows) gridY = map.rows - 1;
+
+  // Detection for hitting a Block
+  for (var i = 0; i < map.rows; i++) {
+    for (var j = 0; j < map.cols; j++) {
+      var block = map.mapBlocks[i][j];
+
+      // If its block type 1
+
+      if (block.type === 1) {
+
+
+        //If Hero hits a block from the top with Hero's Feet
+        if (sprite.y + sprite.height  <= block.y + sprite.fallSpeed &&
+            sprite.y + sprite.height >= block.y &&
+            ((sprite.x <= block.x + block.width && sprite.x >= block.x) ||
+            (sprite.x + sprite.width >= block.x &&
+            sprite.x  <= block.x + block.width))) {
+
+                collide.bottom = true;
+                sprite.y = block.y - sprite.height;
+                
+                if(sprite.fallDeath) {
+                      sprite.hitGround = true;
+                    }
+
+        }
+
+       // Head
+       if (sprite.y <= block.y + block.height &&
+           sprite.y >= (block.y + block.height) - sprite.jumpSpeed * 2 &&
+         ((sprite.x <= block.x + block.width && sprite.x >= block.x) ||
+          (sprite.x + sprite.width > block.x &&
+           sprite.x  < block.x + block.width))) {
+
+                collide.top = true;
+                sprite.y = block.y + block.height;
+       }
+
+       // left
+        if (sprite.x + sprite.width > block.x  &&
+            sprite.x < (block.x + block.width) &&
+            sprite.x >= (block.x + block.width) - sprite.game.clockTick * sprite.speed &&
+            sprite.y  < block.y + block.height &&
+            sprite.height + sprite.y > block.y) {
+
+            collide.left = true;
+            sprite.x = (block.x + block.width) + 1;
+
+       }
+
+
+       // right
+       if (sprite.x < block.x &&
+            sprite.x + sprite.width > block.x &&
+            sprite.x + sprite.width <= block.x + sprite.game.clockTick * sprite.speed &&
+            sprite.y  < block.y + block.height &&
+            sprite.height + sprite.y > block.y) {
+
+            collide.right = true;
+            sprite.x = (block.x - sprite.width) - 3;
+
+       }
+     }
+    }
+  }
+  return collide;
+}
 
 //Entity Area
 
@@ -78,7 +171,7 @@ function Hero(game, x, y) {
   this.speed = 275;
   this.jumpSpeed = 6;
   this.fallSpeed = 12;
-  this.jumpMax = this.jumpSpeed * 20;
+  this.jumpMax = this.jumpSpeed * 18;
   this.jumpCurrent = 0;
   this.hooked = false;
   this.removeFromWorld = false;
@@ -94,6 +187,7 @@ function Hero(game, x, y) {
   this.fallY = 580;
   this.fallDeath = false;
   this.hitGround = false;
+  this.jumpAllowed = true;
 }
 
 Hero.prototype.update = function() {
@@ -143,9 +237,17 @@ Hero.prototype.update = function() {
 
 
   if (this.game.jumping) {
+
     if (this.jumpCurrent < this.jumpMax) {
-      this.y -= this.jumpSpeed;
-      this.jumpCurrent += this.jumpSpeed;
+        if (this.jumpCurrent >= .8 * this.jumpMax) {
+            this.y -= this.jumpSpeed / 2;
+            this.jumpCurrent += this.jumpSpeed / 2;
+        }
+        else {
+            this.y -= this.jumpSpeed;
+            this.jumpCurrent += this.jumpSpeed;
+        }
+      
     }
     else {
       this.game.jumping = false;
@@ -155,18 +257,35 @@ Hero.prototype.update = function() {
     }
   }
   else {
+      
     if (this.y < 800 && !this.hooked) {
-      this.y += this.fallSpeed ;
-      if (this.jumpCurrent > 0) {
-        this.jumpCurrent -= this.fallSpeed;
-      }
-      if (this.jumpCurrent < 0) {
-        this.jumpCurrent = 0;
-      }
+        
+        if (this.jumpCurrent > this.jumpMax * .8) {
+                this.y += this.fallSpeed * .8;
+            }
+            else {
+                this.y += this.fallSpeed ;
+
+            }
+    
+        if (this.jumpCurrent > 0) {
+            if (this.jumpCurrent > this.jumpMax * .8) {
+                this.jumpCurrent -= this.fallSpeed * .8;
+            }
+            else {
+                this.jumpCurrent -= this.fallSpeed;
+
+            }
+        }
+        if (this.jumpCurrent < 0) {
+            this.jumpCurrent = 0;
+            this.jumpAllowed = true;
+        }
     }
 
   }
-    this.collideCheck();
+  var collisions = collisionCheck(this.game, this);
+    //this.collideCheck();
 
 
 };
@@ -233,90 +352,6 @@ Hero.prototype.draw = function(ctx) {
 
   }
 
-
-};
-
-Hero.prototype.collideCheck = function() {
-
-
-      // Get the Map out of the Games Entity list
-    var map = null;
-    for (var i = 0; i < this.game.entities.length; i++) {
-      var e = this.game.entities[i];
-      if (e.type === "map") {
-        map = e;
-      }
-    }
-
-    var gridY = Math.round(map.rows * (this.y  / (64 * map.rows)));
-    var gridX = Math.round(map.cols * (this.x / (64 * map.cols)));
-
-    if (gridX < 0) gridX = 0;
-    if (gridY < 0) gridY = 0;
-    if (gridX >= map.cols) gridX = map.cols - 1;
-    if (gridY >= map.rows) gridY = map.rows - 1;
-
-    // Detection for hitting a Block
-    for (var i = 0; i < map.rows; i++) {
-      for (var j = 0; j < map.cols; j++) {
-        var block = map.mapBlocks[i][j];
-        // If its block type 1
-
-        if (block.type === 1) {
-
-           //If Hero hits a block from the top with Hero's Feet
-           if (this.y + this.height  <= block.y + this.fallSpeed &&
-               this.y + this.height >= block.y &&
-             ((this.x <= block.x + block.width && this.x >= block.x) ||
-              (this.x + this.width >= block.x &&
-               this.x  <= block.x + block.width))) {
-
-                    this.y = block.y - this.height;
-                    if(this.fallDeath) {
-                      this.hitGround = true;
-                    }
-           }
-
-           // Head
-           if (this.y <= block.y + block.height &&
-               this.y >= (block.y + block.height) - this.jumpSpeed * 2 &&
-             ((this.x <= block.x + block.width && this.x >= block.x) ||
-              (this.x + this.width > block.x &&
-               this.x  < block.x + block.width))) {
-
-                    this.y = block.y + block.height;
-           }
-
-           // left
-            if (this.x + this.width > block.x  &&
-                this.x < (block.x + block.width) &&
-                this.x >= (block.x + block.width) - this.game.clockTick * this.speed &&
-                this.y  < block.y + block.height &&
-                this.height + this.y > block.y) {
-
-                this.x = (block.x + block.width) + 1;
-
-           }
-
-
-           // right
-           else if (this.x < block.x &&
-                this.x + this.width > block.x &&
-                this.x + this.width <= block.x + this.game.clockTick * this.speed &&
-                this.y  < block.y + block.height &&
-                this.height + this.y > block.y) {
-
-                this.x = (block.x - this.width) - 3;
-
-           }
-
-
-
-        }
-
-
-      }
-    }
 
 };
 
@@ -533,8 +568,8 @@ Hookshot.prototype.swing = function(endDegree) {
 
 
        this.currentDegree += (endDegree / 30) - (.004 * this.length)  ;
-       this.owner.collideCheck();
-
+       
+       collisionCheck(this.owner.game, this.owner);
 
    }
 
@@ -567,7 +602,7 @@ Hookshot.prototype.swing = function(endDegree) {
 
 
        this.currentDegree += (endDegree / 30) - (.004 * this.length) ;
-       this.owner.collideCheck();
+       collisionCheck(this.owner.game, this.owner);
    }
 
    else {
