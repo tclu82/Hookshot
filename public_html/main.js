@@ -82,15 +82,24 @@ function collisionCheck(game, sprite) {
 
   var gridY = Math.round(map.rows * (sprite.y  / (64 * map.rows)));
   var gridX = Math.round(map.cols * (sprite.x / (64 * map.cols)));
-
+  
   if (gridX < 0) gridX = 0;
   if (gridY < 0) gridY = 0;
-  if (gridX >= map.cols) gridX = map.cols - 1;
-  if (gridY >= map.rows) gridY = map.rows - 1;
 
+  var gridXStart = gridX - 1;
+  var gridYStart = gridY - 1;
+  if (gridXStart < 0) gridXStart = 0;
+  if (gridYStart < 0) gridYStart = 0;
+  
+  var gridXEnd = gridX + 1;
+  var gridYEnd = gridY + 1;
+  if (gridXEnd >= map.cols) gridXEnd = map.cols - 1;
+  if (gridYEnd >= map.rows) gridYEnd = map.rows - 1;
+ 
+ 
   // Detection for hitting a Block
-  for (var i = 0; i < map.rows; i++) {
-    for (var j = 0; j < map.cols; j++) {
+  for (var i = gridYStart; i <= gridYEnd; i++) {
+    for (var j = gridXStart; j <= gridXEnd; j++) {
       var block = map.mapBlocks[i][j];
 
       // If its block type 1
@@ -295,16 +304,6 @@ Hero.prototype.update = function() {
 };
 
 Hero.prototype.draw = function(ctx) {
-    /*
-    ctx.save();
-    ctx.beginPath();
-    ctx.strokeStyle ="Yellow";
-    ctx.rect(this.x, this.y, this.width, this.height);
-    ctx.stroke();
-
-    ctx.restore();
-
-*/
 
     if (this.hitGround && this.fallDeath) {
       this.animationFallDeath.drawFrame(this.game.clockTick, ctx, this.x - 50, this.y - 25, 1.5);
