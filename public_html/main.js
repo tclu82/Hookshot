@@ -247,8 +247,9 @@ Hero.prototype.update = function() {
 
   var landed = collisionCheck(this.game, this);
   
+  
+  
   if (this.game.jumping && (landed.bottom || this.jumpAllowed)) {
-      this.jumpAllowed = true;
 
     if (this.jumpCurrent < this.jumpMax) {
         if (this.jumpCurrent >= .8 * this.jumpMax) {
@@ -270,6 +271,8 @@ Hero.prototype.update = function() {
     }
   }
   else {
+    this.jumpAllowed = false;
+
       
     if (this.y < 800 && !this.hooked) {
         
@@ -290,7 +293,9 @@ Hero.prototype.update = function() {
 
             }
         }
-        if (this.jumpCurrent < 0) {
+        landed = collisionCheck(this.game,this);
+        
+        if (landed.bottom) {
             this.jumpCurrent = 0;
             this.jumpAllowed = true;
         }
@@ -298,8 +303,6 @@ Hero.prototype.update = function() {
 
   }
   var collisions = collisionCheck(this.game, this);
-    //this.collideCheck();
-
 
 };
 
