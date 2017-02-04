@@ -878,6 +878,7 @@ function Block(game, x , y, type) {
   this.width = 64;
   this.torch = new Animation(AM.getAsset("./img/torch.png"), 0, 0, 59, 148, .03 , 50, true, false);
   this.surfaceLava = new Animation(AM.getAsset("./img/surface_lava.png"), 1, 0, 40, 56, .05 , 50, true, false);
+  this.lava = new Animation(AM.getAsset("./img/lava.png"), 0, 0, 143, 143, .05 , 62, true, false);
 
 }
 
@@ -905,12 +906,14 @@ Block.prototype.draw = function(ctx) {
                 this.width);
   }
   else if(this.type === 5) {
-    ctx.drawImage(AM.getAsset("./img/lava.png"),
-                6 , 6,  // source from sheet
-                60 , 60,
-                this.x, this.y,
-                this.height,
-                this.width);
+    // ctx.drawImage(AM.getAsset("./img/lava.png"),
+    //             6 , 6,  // source from sheet
+    //             60 , 60,
+    //             this.x, this.y,
+    //             this.height,
+    //             this.width);
+      this.lava.drawFrame(this.game.clockTick, ctx, this.x-10, this.y, 2.3);
+
   }
   else if (this.type === 4) {
       ctx.drawImage(AM.getAsset("./img/skeleton_spike2.png"),
@@ -937,7 +940,7 @@ Block.prototype.draw = function(ctx) {
                 this.width);
   }
   else if (this.type === 8) {
-        this.torch.drawFrame(this.game.clockTick, ctx, this.x, this.y, .5);
+        this.torch.drawFrame(this.game.clockTick, ctx, this.x, this.y, 0.5);
   }
 
   else if (this.type === 9) {
