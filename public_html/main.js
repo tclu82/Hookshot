@@ -110,7 +110,7 @@ function collisionCheck(game, sprite) {
 
             // If its block type 1
 
-            if (block.type === 1) {
+            if (block.type === 1 || block.type === 2) {
 
 
                 //If Hero hits a block from the top with Hero's Feet
@@ -125,6 +125,7 @@ function collisionCheck(game, sprite) {
 
                     if (sprite.fallDeath) {
                         sprite.hitGround = true;
+                        console.log("Hit Ground: " + sprite.hitGround);
                     }
 
                 }
@@ -162,7 +163,6 @@ function collisionCheck(game, sprite) {
 
                     collide.right = true;
                     sprite.x = (block.x - sprite.width) - 3;
-
                 }
             }
         }
@@ -203,27 +203,39 @@ function Hero(game, x, y) {
     this.fallDeath = false;
     this.hitGround = false;
     this.jumpAllowed = true;
+    this.hookY = null;
 }
 
 Hero.prototype.update = function () {
+    
+    if (this.hookY === null && this.hooked) {
+        this.hookY = this.y;
+        this.fallY = this.y;
+    }
+
+    
+    
+    if (!this.hooked) {
 
     if (this.triggerFall) {
 
         this.fallCount += this.y - this.fallY;
-        //console.log("caculate " + this.fallCount);
-        //  console.log("New Addition: " + (this.y - this.fallY));
+        console.log("caculate " + this.fallCount);
+        console.log("New Addition: " + (this.y - this.fallY));
         this.fallY = this.y;
 
     }
 
     if (this.fallCount >= this.defaultFallDistance) {
+        console.log("FallDeath: " + this.fallDeath);
         this.fallDeath = true;
     }
 
-    if (this.game.tickCount >= 121) {
+    if (this.game.tickCount >= 121 ) {
         var xDif = Math.abs(this.lastX - this.x);
         var yDif = Math.abs(this.lastY - this.y);
         if (xDif <= 64 && yDif > 3) {
+            console.log("TriggerFall: " + this.triggerFall);
             this.triggerFall = true;
         } else {
             this.triggerFall = false;
@@ -243,10 +255,10 @@ Hero.prototype.update = function () {
         this.x = 1190;
         this.y = 600;
     }
-    if (this.game.moveRight) {
+    if (this.game.moveRight && !this.hooked) {
         this.x += this.game.clockTick * this.speed;
     }
-    if (this.game.moveLeft) {
+    if (this.game.moveLeft && !this.hooked) {
         this.x -= this.game.clockTick * this.speed;
     }
 
@@ -255,7 +267,7 @@ Hero.prototype.update = function () {
 
 
 
-    if (this.game.jumping && (landed.bottom || this.jumpAllowed)) {
+    if (this.game.jumping && (landed.bottom || this.jumpAllowed) && !this.hooked) {
 
         if (this.jumpCurrent < this.jumpMax) {
             if (this.jumpCurrent >= .8 * this.jumpMax) {
@@ -273,7 +285,7 @@ Hero.prototype.update = function () {
             this.animationJumpLeft.elapsedTime = 0;
 
         }
-    } else if (!landed.bottom){
+    } else if (!landed.bottom && !this.hooked){
         this.jumpAllowed = false;
 
 
@@ -309,6 +321,9 @@ Hero.prototype.update = function () {
                 this.jumpCurrent = 0;
                 this.jumpAllowed = true;
             }
+            
+    }
+            
            
 };
 
@@ -411,7 +426,7 @@ Hookshot.prototype.update = function () {
         this.swinging = true;
         this.targetX = this.game.click.x;
         this.targetY = this.game.click.y;
-        this.swingDirection = this.game.direction;
+        this.owner.hookY = null;
 
         var gridY = Math.floor(this.map.rows * (this.targetY / (64 * this.map.rows)));
         var gridX = Math.floor(this.map.cols * (this.targetX / (64 * this.map.cols)));
@@ -422,17 +437,18 @@ Hookshot.prototype.update = function () {
         if (gridY < 0)
             gridY = 0;
 
-        if (this.map.mapBlocks[gridY][gridX].type === 1) {
-            
-            this.swingDirection = this.game.direction;
-
+        if (this.map.mapBlocks[gridY][gridX].type === 2) {
 
             this.hooked = true;
             this.owner.hooked = true;
 
 
             if (this.startAngle === null) {
+<<<<<<< HEAD
                 console.log("HERE");
+=======
+                this.swingDirection = this.game.direction;
+>>>>>>> upstream/master
 
                 this.height = (this.startY - this.targetY);
                 this.width = (this.startX - this.targetX);
@@ -441,6 +457,9 @@ Hookshot.prototype.update = function () {
 
 
                 this.startAngle = (180 / Math.PI) * (Math.acos(this.height / this.length));
+                if (this.startAngle % 3 !== 0) {
+                    this.startAngle -= this.startAngle % 3;
+                }
                 //console.log("Start y" + this.startY);
                 //console.log("length " + this.length);
                 //console.log("height " + this.height);
@@ -474,6 +493,7 @@ Hookshot.prototype.update = function () {
         this.width = null;
         this.length = null;
         this.startAngle = null;
+        this.swingDirection = null;
         this.currentDegree = 0;
         this.count = 1;
 
@@ -528,33 +548,33 @@ Hookshot.prototype.swing = function (moveDegree) {
     //console.log(this.currentDegree);
 
     if (this.swingDirection === "right") {
-        if (this.currentDegree < this.startAngle) {
-            if (this.currentDegree < slice) {
+        if (this.currentDegree <= this.startAngle) {
+            if (this.currentDegree <= slice) {
                 //console.log("first");
                 this.owner.x += transformationValue / 2;
                 this.owner.y += transformationValue;
-            } else if (this.currentDegree < slice * 2) {
+            } else if (this.currentDegree <= slice * 2) {
                 //console.log("second");
                 this.owner.x += transformationValue;
                 this.owner.y += transformationValue;
-            } else if (this.currentDegree < slice * 3) {
+            } else if (this.currentDegree <= slice * 3) {
                 //console.log("third");
                 this.owner.x += transformationValue;
                 this.owner.y += transformationValue / 2;
             }
 
-        } else if (this.currentDegree < maxAngle) {
-            if (this.currentDegree > maxAngle - slice) {
+        } else if (this.currentDegree > this.startAngle && this.currentDegree <= maxAngle) {
+            if (this.currentDegree >= maxAngle - slice) {
                 //console.log("top");
 
                 this.owner.x += transformationValue / 2;
                 this.owner.y -= transformationValue;
-            } else if (this.currentDegree > maxAngle - slice * 2) {
+            } else if (this.currentDegree >= maxAngle - slice * 2) {
                 //console.log("mid");
 
                 this.owner.x += transformationValue;
                 this.owner.y -= transformationValue;
-            } else if (this.currentDegree > maxAngle - slice * 3) {
+            } else if (this.currentDegree >= maxAngle - slice * 3) {
                 //console.log("bottom");
 
                 this.owner.x += transformationValue;
@@ -569,7 +589,7 @@ Hookshot.prototype.swing = function (moveDegree) {
 
     } else {
         //Swing Left
-        if (this.currentDegree < this.startAngle) {
+        if (this.currentDegree <= this.startAngle) {
             if (this.currentDegree < slice) {
                 //console.log("first");
                 this.owner.x -= transformationValue / 2;
@@ -584,18 +604,18 @@ Hookshot.prototype.swing = function (moveDegree) {
                 this.owner.y += transformationValue / 2;
             }
 
-        } else if (this.currentDegree < maxAngle) {
-            if (this.currentDegree > maxAngle - slice) {
+        } else if (this.currentDegree > this.startAngle && this.currentDegree <= maxAngle) {
+            if (this.currentDegree >= maxAngle - slice) {
                 //console.log("top");
 
                 this.owner.x -= transformationValue / 2;
                 this.owner.y -= transformationValue;
-            } else if (this.currentDegree > maxAngle - slice * 2) {
+            } else if (this.currentDegree >= maxAngle - slice * 2) {
                 //console.log("mid");
 
                 this.owner.x -= transformationValue;
                 this.owner.y -= transformationValue;
-            } else if (this.currentDegree > maxAngle - slice * 3) {
+            } else if (this.currentDegree >= maxAngle - slice * 3) {
                 //console.log("bottom");
 
                 this.owner.x -= transformationValue;
@@ -611,7 +631,6 @@ Hookshot.prototype.swing = function (moveDegree) {
     }
            var collide = collisionCheck(this.game, this.owner);
             if (collide.bottom || collide.right || collide.left) {
-                console.log("HIT");
                 this.hooked = false;
                 this.owner.hooked = false;
                 this.game.clicked = false;
@@ -870,12 +889,22 @@ Block.prototype.draw = function (ctx) {
 
 
     if (this.type === 1) {
+        // Floor
         ctx.drawImage(AM.getAsset("./img/background_tile.png"),
                 0, 0, // source from sheet
                 512, 512,
                 this.x, this.y,
                 this.height,
                 this.width);
+    } else if (this.type === 2) {
+        // Roof
+        ctx.drawImage(AM.getAsset("./img/background_tile.png"),
+                0, 0, // source from sheet
+                512, 512,
+                this.x, this.y,
+                this.height,
+                this.width);
+        
     } else if (this.type === 5) {
 
         this.lava.drawFrame(this.game.clockTick, ctx, this.x - 10, this.y, 2.3);
@@ -908,9 +937,9 @@ Block.prototype.draw = function (ctx) {
     }
 };
 
-var mapArray = [[1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                [1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+var mapArray = [[2, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+                [2, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
                 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
                 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0],
