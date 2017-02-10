@@ -432,6 +432,7 @@ Hookshot.prototype.update = function () {
 
 
             if (this.startAngle === null) {
+                console.log("HERE");
 
                 this.height = (this.startY - this.targetY);
                 this.width = (this.startX - this.targetX);
