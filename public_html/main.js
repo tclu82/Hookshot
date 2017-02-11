@@ -444,11 +444,9 @@ Hookshot.prototype.update = function () {
 
 
             if (this.startAngle === null) {
-<<<<<<< HEAD
-                console.log("HERE");
-=======
+
                 this.swingDirection = this.game.direction;
->>>>>>> upstream/master
+
 
                 this.height = (this.startY - this.targetY);
                 this.width = (this.startX - this.targetX);
