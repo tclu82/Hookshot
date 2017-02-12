@@ -473,7 +473,7 @@ Hookshot.prototype.update = function () {
 
             //console.log(this.length);
 
-            this.swing(1);
+            this.swing(3);
 
         }
 
@@ -534,44 +534,57 @@ Hookshot.prototype.draw = function (ctx) {
 
 Hookshot.prototype.swing = function (movePixel) {
 
-    const tarvelDistance = 2 * (this.startX - this.targetX);
+    const tarvelDistance = Math.abs(2 * (this.targetX - this.startX));
 
-    if (this.owner.x >= this.startX && this.owner.x <= this.startX + tarvelDistance) {
+    // console.log("before");
+    // console.log("start x: " + this.startX);
+    // console.log("targe X: " + this.targetX);
+    // console.log("tarvel: " + tarvelDistance);
+    // console.log(tarvelDistance + this.startX + " is tarvelDistance");
 
-        //Swing right
-        if (this.swingDirection === "right") {
+    //Swing right
+    if (this.swingDirection === "right" && this.owner.x < this.startX + tarvelDistance) {
 
-            console.log("x: " + this.owner.x);
+        console.log("x: " + this.owner.x);
 
-            this.owner.x += movePixel;
+        this.owner.x += movePixel;
+
+        this.owner.y = Math.sqrt(this.length * this.length
+                            - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
+                            + this.targetY;
+        
+    //Swing left
+    } else if (this.swingDirection === "left") {
+        
+        // console.log("x: " + this.owner.x);
+
+        if (this.owner.x > this.startX - tarvelDistance) {
+            this.owner.x -= movePixel;
 
             this.owner.y = Math.sqrt(this.length * this.length
                                 - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
                                 + this.targetY;
-            
-        //Swing left
-        } else {
-            
-            
-            
-            
+        
         }
-               var collide = collisionCheck(this.game, this.owner);
-                if (collide.bottom || collide.right || collide.left) {
-                    this.hooked = false;
-                    this.owner.hooked = false;
-                    this.game.clicked = false;
-                    this.swinging = false;
-                }
-
-
-        //Remove after testing
-        //console.log("Count: " + this.count);
-        this.count++;
-        //console.log("The x: " + this.owner.x);
-        //console.log("The y: " + this.owner.y);
-
     }
+        
+    var collide = collisionCheck(this.game, this.owner);
+    
+    if (collide.bottom || collide.right || collide.left) {
+        this.hooked = false;
+        this.owner.hooked = false;
+        this.game.clicked = false;
+        this.swinging = false;
+    }
+
+
+    //     //Remove after testing
+    //     //console.log("Count: " + this.count);
+        this.count++;
+    //     //console.log("The x: " + this.owner.x);
+    //     //console.log("The y: " + this.owner.y);
+
+    // }
 
 };
 
