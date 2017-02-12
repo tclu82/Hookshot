@@ -29,27 +29,39 @@ function Hero(game, x, y) {
     this.fallDeath = false;
     this.hitGround = false;
     this.jumpAllowed = true;
+    this.hookY = null;
 }
 
 Hero.prototype.update = function () {
+    
+    if (this.hookY === null && this.hooked) {
+        this.hookY = this.y;
+        this.fallY = this.y;
+    }
+
+    
+    
+    if (!this.hooked) {
 
     if (this.triggerFall) {
 
         this.fallCount += this.y - this.fallY;
-        //console.log("caculate " + this.fallCount);
-        //  console.log("New Addition: " + (this.y - this.fallY));
+        console.log("caculate " + this.fallCount);
+        console.log("New Addition: " + (this.y - this.fallY));
         this.fallY = this.y;
 
     }
 
     if (this.fallCount >= this.defaultFallDistance) {
+        console.log("FallDeath: " + this.fallDeath);
         this.fallDeath = true;
     }
 
-    if (this.game.tickCount >= 121) {
+    if (this.game.tickCount >= 121 ) {
         var xDif = Math.abs(this.lastX - this.x);
         var yDif = Math.abs(this.lastY - this.y);
         if (xDif <= 64 && yDif > 3) {
+            console.log("TriggerFall: " + this.triggerFall);
             this.triggerFall = true;
         } else {
             this.triggerFall = false;
@@ -69,10 +81,10 @@ Hero.prototype.update = function () {
         this.x = 1190;
         this.y = 600;
     }
-    if (this.game.moveRight) {
+    if (this.game.moveRight && !this.hooked) {
         this.x += this.game.clockTick * this.speed;
     }
-    if (this.game.moveLeft) {
+    if (this.game.moveLeft && !this.hooked) {
         this.x -= this.game.clockTick * this.speed;
     }
 
@@ -81,7 +93,7 @@ Hero.prototype.update = function () {
 
 
 
-    if (this.game.jumping && (landed.bottom || this.jumpAllowed)) {
+    if (this.game.jumping && (landed.bottom || this.jumpAllowed) && !this.hooked) {
 
         if (this.jumpCurrent < this.jumpMax) {
             if (this.jumpCurrent >= .8 * this.jumpMax) {
@@ -99,7 +111,7 @@ Hero.prototype.update = function () {
             this.animationJumpLeft.elapsedTime = 0;
 
         }
-    } else if (!landed.bottom){
+    } else if (!landed.bottom && !this.hooked){
         this.jumpAllowed = false;
 
 
@@ -135,6 +147,9 @@ Hero.prototype.update = function () {
                 this.jumpCurrent = 0;
                 this.jumpAllowed = true;
             }
+            
+    }
+            
            
 };
 
@@ -177,11 +192,7 @@ Hero.prototype.draw = function (ctx) {
                         this.x, this.y,
                         85 * this.scale,
                         128 * this.scale);
-
                 break;
         }
-
     }
-
-
 };

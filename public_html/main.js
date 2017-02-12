@@ -172,6 +172,7 @@ function collisionCheck(game, sprite) {
 
 //Entity Area
 
+/*
 function Hero(game, x, y) {
     this.type = "hero";
     this.animationRight = new Animation(AM.getAsset("./img/horz_walk_right.png"), 0, 0, 104, 128, .03, 31, true, false);
@@ -369,11 +370,13 @@ Hero.prototype.draw = function (ctx) {
 
                 break;
         }
-
     }
-
-
 };
+
+*/
+
+var hero = new Hero(gameEngine, 100, 0);
+
 
 function Hookshot(game, hero) {
     this.type = "hookshot";
@@ -949,6 +952,23 @@ var mapArray = [[2, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
                 [1, 1, 1, 1, 4, 1, 1, 1, 1, 5, 5, 5, 5, 5, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 5, 5, 5, 5, 5, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
                 ];
+
+
+
+
+// function includeJs(jsFilePath) {
+//     var js = document.createElement("script");
+
+//     js.type = "text/javascript";
+//     js.src = jsFilePath;
+
+//     document.body.appendChild(js);
+// }
+
+// includeJs("/path/to/some/file.js");
+
+
+
 var AM = new AssetManager();
 
 AM.queueDownload("./img/horz_walk_left.png");
@@ -982,7 +1002,7 @@ AM.downloadAll(function () {
     gameEngine.ctx = ctx;
     var bg = new Background(gameEngine);
     var map = new Map(gameEngine, mapArray);
-    var hero = new Hero(gameEngine, 100, 0);
+    // var hero = new Hero(gameEngine, 100, 0);
     var hookshot = new Hookshot(gameEngine, hero);
 
 
