@@ -378,7 +378,30 @@ Hero.prototype.draw = function (ctx) {
     else if (this.fallDeath) {
         this.animationFall.drawFrame(this.game.clockTick, ctx, this.x, this.y, 1.5);
     }
-    else if (this.game.jumping) {
+    
+    else if (this.hooked) {
+        switch (this.game.direction) {
+            case "right":
+                ctx.drawImage(AM.getAsset("./img/right_swing.png"),
+                        0, 0, // source from sheet
+                        53, 58,
+                        this.x - this.width, this.y,
+                        53 * 1.5,
+                        58 * 1.5);
+                break;
+                
+            case "left":
+                ctx.drawImage(AM.getAsset("./img/left_swing.png"),
+                        0, 0, // source from sheet
+                        53, 58,
+                        this.x, this.y,
+                        53 * 1.5,
+                        58 * 1.5);
+                break;
+        }
+        
+    }
+    else if (this.game.jumping && !this.hooked) {
         if (this.game.direction === "right") {
             this.animationJumpRight.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
         } else if (this.game.direction === "left") {
@@ -387,13 +410,13 @@ Hero.prototype.draw = function (ctx) {
         }
 
     }
-    else if (this.game.moveRight) {
+    else if (this.game.moveRight && !this.hooked) {
         this.animationRight.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
     }
-    else if (this.game.moveLeft) {
+    else if (this.game.moveLeft && !this.hooked) {
         this.animationLeft.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
     }
-    else if (!this.game.moveLeft && !this.game.moveRight) {
+    else if (!this.game.moveLeft && !this.game.moveRight && !this.hooked) {
         switch (this.game.direction) {
             case "right":
                 ctx.drawImage(AM.getAsset("./img/horz_walk_right.png"),
@@ -1011,9 +1034,9 @@ var mapArray = [[2, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
                 [1, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
                 [1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 8, 0, 0, 0, 0, 8, 0, 0, 1, 1, 1, 0, 8, 0, 8, 0, 8, 0, 8, 1, 1],
                 [1, 0, 8, 0, 8, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 8, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 1, 1, 0, 0, 0, 1, 1, 1, 9, 9, 9, 9, 9, 9, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 7, 6, 6, 6, 4, 6, 6, 6, 7, 1],
-                [1, 1, 1, 1, 4, 1, 1, 1, 11, 5, 5, 5, 5, 5, 5, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [1, 1, 1, 1, 0, 0, 1, 1, 1, 9, 9, 9, 9, 9, 9, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 7, 6, 6, 6, 4, 6, 6, 6, 7, 1],
+                [1, 1, 1, 1, 4, 4, 1, 1, 11, 5, 5, 5, 5, 5, 5, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                 [1, 1, 1, 1, 1, 1, 1, 1, 11, 5, 5, 5, 5, 5, 5, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
                 ];
 var AM = new AssetManager();
@@ -1038,6 +1061,8 @@ AM.queueDownload("./img/left_forward_facing_spike_death.png");
 AM.queueDownload("./img/leftlavaSide.png");
 AM.queueDownload("./img/lavarightside.png");
 AM.queueDownload("./img/BrokenTile.png");
+AM.queueDownload("./img/right_swing.png");
+AM.queueDownload("./img/left_swing.png");
 
 
 
