@@ -194,8 +194,13 @@ function Hero(game, x, y) {
     this.animationLeft = new Animation(AM.getAsset("./img/horz_walk_left.png"), 0, 0, 80, 128, .03, 31, true, false);
     this.animationJumpRight = new Animation(AM.getAsset("./img/right_jump.png"), 0, 0, 96, 120, .1, 12, false, false);
     this.animationJumpLeft = new Animation(AM.getAsset("./img/left_jump.png"), 12, 0, 83, 128, .1, 12, false, false);
-    this.animationFall = new Animation(AM.getAsset("./img/right_forward_fall.png"), 0, 0, 67, 60, .05, 25, true, false);
-    this.animationFallDeath = new Animation(AM.getAsset("./img/right_forward_facing_fall_death.png"), 0, 0, 131, 102, .05, 25, false, false);
+    this.animationLeftFall = new Animation(AM.getAsset("./img/right_forward_fall.png"), 0, 0, 67, 60, .05, 25, true, false);
+    this.animationRightFall = new Animation(AM.getAsset("./img/right_forward_fall.png"), 0, 0, 67, 60, .05, 25, true, false);
+    this.animationLeftFall = new Animation(AM.getAsset("./img/left_fall_forward.png"), 0, 0, 62, 60, .05, 25, true, false);
+
+    this.animationRightFallDeath = new Animation(AM.getAsset("./img/right_forward_facing_fall_death.png"), 0, 0, 131, 102, .05, 25, false, false);
+    this.animationLeftFallDeath = new Animation(AM.getAsset("./img/left_fall_forward_death.png"), 0, 0, 121, 102, .05, 25, false, false);
+
     this.animationRightSpikeDeath = new Animation(AM.getAsset("./img/forward_facing_spike_death.png"), 0, 0, 79, 97, .05, 35, false, false);
     this.animationLeftSpikeDeath = new Animation(AM.getAsset("./img/left_forward_facing_spike_death.png"), 0, 0, 79, 97, .05, 35, false, false);
     this.game = game;
@@ -224,6 +229,8 @@ function Hero(game, x, y) {
     this.hookY = null;
     this.isDead = false;
     this.spikeDeath = false;
+    this.DeathDirection = null;
+    this.FallDirection = null;
 }
 
 Hero.prototype.update = function () {
@@ -240,26 +247,31 @@ Hero.prototype.update = function () {
     if (this.triggerFall) {
 
         this.fallCount += this.y - this.fallY;
-        console.log("caculate " + this.fallCount);
-        console.log("New Addition: " + (this.y - this.fallY));
+        //console.log("caculate " + this.fallCount);
+        //console.log("New Addition: " + (this.y - this.fallY));
         this.fallY = this.y;
 
     }
 
     if (this.fallCount >= this.defaultFallDistance) {
-        console.log("FallDeath: " + this.fallDeath);
+        //console.log("FallDeath: " + this.fallDeath);
         this.fallDeath = true;
+        if (this.FallDirection === null) {
+        this.FallDirection = this.game.direction;
+      }
     }
 
     if (this.game.tickCount >= 121 ) {
         var xDif = Math.abs(this.lastX - this.x);
         var yDif = Math.abs(this.lastY - this.y);
         if (xDif <= 64 && yDif > 3) {
-            console.log("TriggerFall: " + this.triggerFall);
+            //console.log("TriggerFall: " + this.triggerFall);
             this.triggerFall = true;
         } else {
             this.triggerFall = false;
             this.fallCount = 0;
+            this.FallDirection = null;
+
         }
         this.lastX = this.x;
         this.lastY = this.y;
@@ -286,6 +298,9 @@ Hero.prototype.update = function () {
     var landed = collisionCheck(this.game, this);
 
     if(landed.spike) {
+      if(this.DeathDirection === null) {
+        this.DeathDirection = this.game.direction;
+      }
       this.spikeDeath = true;
       console.log(this.spikeDeath);
     }
@@ -318,7 +333,6 @@ Hero.prototype.update = function () {
                 this.y += this.fallSpeed * .8;
             } else {
                 this.y += this.fallSpeed;
-
             }
 
             if (this.jumpCurrent > 0) {
@@ -364,19 +378,29 @@ Hero.prototype.draw = function (ctx) {
 
     if (this.spikeDeath) {
       this.isDead = true;
-      if(this.game.direction === "right") {
-        this.animationRightSpikeDeath.drawFrame(this.game.clockTick, ctx, this.x, this.y, 1.5);
+      if(this.DeathDirection === "right") {
+        this.animationRightSpikeDeath.drawFrame(this.game.clockTick, ctx, this.x + 3, this.y + 40, 1.5);
       } else {
-        this.animationLeftSpikeDeath.drawFrame(this.game.clockTick, ctx, this.x, this.y, 1.5);
+        this.animationLeftSpikeDeath.drawFrame(this.game.clockTick, ctx, this.x - this.width * 2, this.y + 40, 1.5);
       }
     }
       else if (this.hitGround && this.fallDeath) {
       this.isDead = true;
-        this.animationFallDeath.drawFrame(this.game.clockTick, ctx, this.x - 50, this.y - 25, 1.5);
+      if(this.FallDirection === "left") {
+        this.animationLeftFallDeath.drawFrame(this.game.clockTick, ctx, this.x - 50, this.y - 25, 1.5);
+      } else if (this.FallDirection === "right") {
+        this.animationRightFallDeath.drawFrame(this.game.clockTick, ctx, this.x - 50, this.y - 25, 1.5);
+      }
+
 
     }
     else if (this.fallDeath) {
-        this.animationFall.drawFrame(this.game.clockTick, ctx, this.x, this.y, 1.5);
+      if(this.FallDirection === "right") {
+        this.animationRightFall.drawFrame(this.game.clockTick, ctx, this.x, this.y, 1.5);
+      } else if (this.FallDirection === "left") {
+        this.animationLeftFall.drawFrame(this.game.clockTick, ctx, this.x - 30, this.y, 1.5);
+
+      }
     }
     else if (this.game.jumping) {
         if (this.game.direction === "right") {
@@ -1012,7 +1036,7 @@ var mapArray = [[2, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
                 [1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 8, 0, 0, 0, 0, 8, 0, 0, 1, 1, 1, 0, 8, 0, 8, 0, 8, 0, 8, 1, 1],
                 [1, 0, 8, 0, 8, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 8, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
                 [1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 1, 1, 0, 0, 0, 1, 1, 1, 9, 9, 9, 9, 9, 9, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 7, 6, 6, 6, 4, 6, 6, 6, 7, 1],
+                [1, 1, 1, 0, 0, 0, 1, 1, 1, 9, 9, 9, 9, 9, 9, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 7, 6, 0, 0, 0, 6, 6, 6, 7, 1],
                 [1, 1, 1, 1, 4, 1, 1, 1, 11, 5, 5, 5, 5, 5, 5, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                 [1, 1, 1, 1, 1, 1, 1, 1, 11, 5, 5, 5, 5, 5, 5, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
                 ];
@@ -1038,6 +1062,8 @@ AM.queueDownload("./img/left_forward_facing_spike_death.png");
 AM.queueDownload("./img/leftlavaSide.png");
 AM.queueDownload("./img/lavarightside.png");
 AM.queueDownload("./img/BrokenTile.png");
+AM.queueDownload("./img/left_fall_forward.png");
+AM.queueDownload("./img/left_fall_forward_death.png");
 
 
 
