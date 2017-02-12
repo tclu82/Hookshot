@@ -198,6 +198,8 @@ function Hero(game, x, y) {
     this.animationFallDeath = new Animation(AM.getAsset("./img/right_forward_facing_fall_death.png"), 0, 0, 131, 102, .05, 25, false, false);
     this.animationRightSpikeDeath = new Animation(AM.getAsset("./img/forward_facing_spike_death.png"), 0, 0, 79, 97, .05, 35, false, false);
     this.animationLeftSpikeDeath = new Animation(AM.getAsset("./img/left_forward_facing_spike_death.png"), 0, 0, 79, 97, .05, 35, false, false);
+    this.animationRightStand = new Animation(AM.getAsset("./img/right_stand.png"), 0, 0, 48, 58, 0.1, 25, true, false);
+    this.animationLeftStand = new Animation(AM.getAsset("./img/left_stand.png"), 0, 0, 33, 58, 0.1, 25, true, false);
     this.game = game;
     this.x = x;
     this.y = y;
@@ -211,7 +213,7 @@ function Hero(game, x, y) {
     this.ctx = game.ctx;
     this.width = 40;
     this.height = 70;
-    this.scale = .65;
+    this.scale = 1.3;
     this.lastX = null;//
     this.lastY = null;//
     this.triggerFall = false;
@@ -257,9 +259,10 @@ Hero.prototype.update = function () {
         if (xDif <= 64 && yDif > 3) {
             console.log("TriggerFall: " + this.triggerFall);
             this.triggerFall = true;
-        } else {
-            this.triggerFall = false;
-            this.fallCount = 0;
+        } 
+            else {
+                 this.triggerFall = false;
+                 this.fallCount = 0;
         }
         this.lastX = this.x;
         this.lastY = this.y;
@@ -308,7 +311,8 @@ Hero.prototype.update = function () {
             this.animationJumpLeft.elapsedTime = 0;
 
         }
-    } else if (!landed.bottom && !this.hooked){
+    } 
+    else if (!landed.bottom && !this.hooked){
         this.jumpAllowed = false;
 
 
@@ -365,18 +369,18 @@ Hero.prototype.draw = function (ctx) {
     if (this.spikeDeath) {
       this.isDead = true;
       if(this.game.direction === "right") {
-        this.animationRightSpikeDeath.drawFrame(this.game.clockTick, ctx, this.x, this.y, 1.5);
+        this.animationRightSpikeDeath.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
       } else {
-        this.animationLeftSpikeDeath.drawFrame(this.game.clockTick, ctx, this.x, this.y, 1.5);
+        this.animationLeftSpikeDeath.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
       }
     }
       else if (this.hitGround && this.fallDeath) {
       this.isDead = true;
-        this.animationFallDeath.drawFrame(this.game.clockTick, ctx, this.x - 50, this.y - 25, 1.5);
+        this.animationFallDeath.drawFrame(this.game.clockTick, ctx, this.x - 50, this.y - 25, this.scale);
 
     }
     else if (this.fallDeath) {
-        this.animationFall.drawFrame(this.game.clockTick, ctx, this.x, this.y, 1.5);
+        this.animationFall.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
     }
     
     else if (this.hooked) {
@@ -386,8 +390,8 @@ Hero.prototype.draw = function (ctx) {
                         0, 0, // source from sheet
                         53, 58,
                         this.x - this.width, this.y,
-                        53 * 1.5,
-                        58 * 1.5);
+                        53 * this.scale,
+                        58 * this.scale);
                 break;
                 
             case "left":
@@ -395,46 +399,48 @@ Hero.prototype.draw = function (ctx) {
                         0, 0, // source from sheet
                         53, 58,
                         this.x, this.y,
-                        53 * 1.5,
-                        58 * 1.5);
+                        53 * this.scale,
+                        58 * this.scale);
                 break;
         }
         
     }
     else if (this.game.jumping && !this.hooked) {
         if (this.game.direction === "right") {
-            this.animationJumpRight.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
+            this.animationJumpRight.drawFrame(this.game.clockTick, ctx, this.x, this.y, .65);
         } else if (this.game.direction === "left") {
-            this.animationJumpLeft.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
+            this.animationJumpLeft.drawFrame(this.game.clockTick, ctx, this.x, this.y, .65);
 
         }
 
     }
     else if (this.game.moveRight && !this.hooked) {
-        this.animationRight.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
+        this.animationRight.drawFrame(this.game.clockTick, ctx, this.x, this.y, .65);
     }
     else if (this.game.moveLeft && !this.hooked) {
-        this.animationLeft.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
+        this.animationLeft.drawFrame(this.game.clockTick, ctx, this.x, this.y, .65);
     }
     else if (!this.game.moveLeft && !this.game.moveRight && !this.hooked) {
         switch (this.game.direction) {
             case "right":
-                ctx.drawImage(AM.getAsset("./img/horz_walk_right.png"),
-                        1150, 0, // source from sheet
-                        85, 128,
-                        this.x, this.y,
-                        85 * this.scale,
-                        128 * this.scale);
+                this.animationRightStand.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
+//                ctx.drawImage(AM.getAsset("./img/horz_walk_right.png"),
+//                        1150, 0, // source from sheet
+//                        85, 128,
+//                        this.x, this.y,
+//                        85 * this.scale,
+//                        128 * this.scale);
 
                 break;
 
             case "left":
-                ctx.drawImage(AM.getAsset("./img/horz_walk_left.png"),
-                        330, 0, // source from sheet
-                        85, 128,
-                        this.x, this.y,
-                        85 * this.scale,
-                        128 * this.scale);
+                this.animationLeftStand.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
+//                ctx.drawImage(AM.getAsset("./img/horz_walk_left.png"),
+//                        330, 0, // source from sheet
+//                        85, 128,
+//                        this.x, this.y,
+//                        85 * this.scale,
+//                        128 * this.scale);
 
                 break;
         }
@@ -512,7 +518,10 @@ Hookshot.prototype.update = function () {
             this.owner.hooked = true;
 
 
+
             if (this.startAngle === null) {
+                this.owner.y -= 35;
+                this.startY -= 35;
                 this.swingDirection = this.game.direction;
 
                 this.height = (this.startY - this.targetY);
@@ -1063,6 +1072,8 @@ AM.queueDownload("./img/lavarightside.png");
 AM.queueDownload("./img/BrokenTile.png");
 AM.queueDownload("./img/right_swing.png");
 AM.queueDownload("./img/left_swing.png");
+AM.queueDownload("./img/left_stand.png");
+AM.queueDownload("./img/right_stand.png");
 
 
 
