@@ -8,28 +8,24 @@ import java.math.*;
 public class HookShotMovement {
 
     // Fields
-
-    /** The length of hook shot AKA radius */
     private double hookShotLength;
-    /** The anchoring point */
+
     private Point centerPoint;
-    /** The hero current point */
+
     private Point currentPoint;
 
     /**
      * Constructor
+     *
+     * @param hookShotLength
      */
-    private HookShotMovement() {
+    private HookShotMovement(double hookShotLength) {
+
+        this.hookShotLength = hookShotLength;
 
         this.centerPoint = new Point(0, 0);
 
-        currentPoint = new Point(-3, 4);
-
-        double diffX = centerPoint.x - currentPoint.x;
-
-        double diffY = centerPoint.y - currentPoint.y;
-
-        this.hookShotLength = Math.sqrt((diffX * diffX) + (diffY * diffY));
+        currentPoint = new Point(hookShotLength * -1, 0);
     }
     /**
      * Get current X coordination
@@ -59,31 +55,6 @@ public class HookShotMovement {
     }
 
     /**
-     * This method calculates all the (x, y) on the swing circular orbit.
-     *
-     * If the center (a, b), radius = r
-     * All (x,y) on the circular orbit satisfy following equation: (x-a)^2 + (y-b)^2 = r^2
-     *
-     * @param xInterval
-     */
-    public void heroMoveWithoutTrigonometric(double xInterval) {
-        // Determine how far we want to travel of x coordination (twice difference of center.x and current.x)
-        double horizentalDistance = 2 * (centerPoint.x - currentPoint.x);
-        // Update the x coordinate by input pixel
-        for (double x=currentPoint.x; x<=currentPoint.x+horizentalDistance; x+=xInterval) {
-            // Find out mapping y coordination
-            double y = Math.sqrt(hookShotLength * hookShotLength
-                            - centerPoint.x * centerPoint.x
-                            + 2 * centerPoint.x * x - (x * x))
-                            + centerPoint.y;
-
-            String position = String.format("X: %.3f, Y: %.3f", x, y);
-
-            System.out.println(position);
-        }
-    }
-
-    /**
      * This method calculus how our hero move by degree
      *
      * Assume that top left is (-length, 0) which is a starting point, degree is 0,
@@ -98,16 +69,7 @@ public class HookShotMovement {
      */
     public void heroMove(int moveByDegree) {
 
-        // JS: console.log(Math.atan(1) * 180 / Math.PI);
-
-        double diffX = centerPoint.x - currentPoint.x;
-
-        double diffY = centerPoint.y - currentPoint.y;
-
-        double startDegree = Math.toDegrees(Math.atan(diffX / diffY));
-
-
-        for (double degree=startDegree; degree<=180-startDegree; degree+= moveByDegree) {
+        for (int degree=0; degree<=180; degree+= moveByDegree) {
 
             /**
              * In JavaScript:
@@ -124,15 +86,11 @@ public class HookShotMovement {
                  y = Math.sin(Math.radians(theDegreeWeWantT));
              *
              */
-
-
-            currentPoint.x = -(Math.cos(Math.toRadians(degree))-1) * hookShotLength;
+            currentPoint.x = -(Math.cos(Math.toRadians(degree)) - 1) * hookShotLength;
 
             currentPoint.y = Math.sin(Math.toRadians(degree)) * hookShotLength;
 
-
-
-            String position = String.format("Degree: %.3f, X: %.3f, Y: %.3f",
+            String position = String.format("Degree: %d, X: %.3f, Y: %.3f",
                     degree,
                     currentPoint.x,
                     currentPoint.y);
@@ -149,15 +107,9 @@ public class HookShotMovement {
     public static void main(String... theArgs) {
         System.out.println("============Program start==========");
         // Decide how long hero's hook shot is
-        HookShotMovement hsm = new HookShotMovement();
-//        // Change the integer degree 0~180, the smaller degree number, display more positions
-//        hsm.heroMove(15);
-
-//        double startDegree = Math.toDegrees(Math.atan(1));
-//        System.out.println(startDegree);
-
-        // X coordinate increase 0.1 -> prints out all Swing (x, y) from start point to end point
-        hsm.heroMoveWithoutTrigonometric(0.1);
+        HookShotMovement hsm = new HookShotMovement(100);
+        // Change the integer degree 0~180, the smaller degree number, display more positions
+        hsm.heroMove(10);
     }
 
     /**
