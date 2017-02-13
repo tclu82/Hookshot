@@ -67,7 +67,8 @@ function collisionCheck(game, sprite) {
         right: false,
         left: false,
         top: false,
-        bottom: false
+        bottom: false,
+        spike: false
     };
 
     // Get the Map out of the Games Entity list
@@ -121,11 +122,11 @@ function collisionCheck(game, sprite) {
                                         sprite.x <= block.x + block.width))) {
 
                     collide.bottom = true;
+
                     sprite.y = block.y - sprite.height;
 
                     if (sprite.fallDeath) {
                         sprite.hitGround = true;
-                        console.log("Hit Ground: " + sprite.hitGround);
                     }
 
                 }
@@ -165,6 +166,21 @@ function collisionCheck(game, sprite) {
                     sprite.x = (block.x - sprite.width) - 3;
                 }
             }
+            else if (block.type === 4 || block.type === 6 ||block.type === 7 ) {
+
+              if (sprite.y + sprite.height <= block.y + sprite.fallSpeed &&
+                      sprite.y + sprite.height >= block.y &&
+                      ((sprite.x <= block.x + (block.width * .75) && sprite.x >= block.x +(block.width / 4)) ||
+                      (sprite.x + sprite.width >= block.x  + (block.width / 4) &&
+                      sprite.x <= block.x + (block.width * .75)))) {
+
+                                        collide.spike = true;
+
+                                        //sprite.y = block.y - sprite.height/2.5;
+
+            }
+          }
+
         }
     }
     return collide;
@@ -178,8 +194,17 @@ function Hero(game, x, y) {
     this.animationLeft = new Animation(AM.getAsset("./img/horz_walk_left.png"), 0, 0, 80, 128, .03, 31, true, false);
     this.animationJumpRight = new Animation(AM.getAsset("./img/right_jump.png"), 0, 0, 96, 120, .1, 12, false, false);
     this.animationJumpLeft = new Animation(AM.getAsset("./img/left_jump.png"), 12, 0, 83, 128, .1, 12, false, false);
-    this.animationFall = new Animation(AM.getAsset("./img/right_forward_fall.png"), 0, 0, 67, 60, .05, 25, true, false);
-    this.animationFallDeath = new Animation(AM.getAsset("./img/right_forward_facing_fall_death.png"), 0, 0, 131, 102, .05, 25, false, false);
+    this.animationLeftFall = new Animation(AM.getAsset("./img/right_forward_fall.png"), 0, 0, 67, 60, .05, 25, true, false);
+    this.animationRightFall = new Animation(AM.getAsset("./img/right_forward_fall.png"), 0, 0, 67, 60, .05, 25, true, false);
+    this.animationLeftFall = new Animation(AM.getAsset("./img/left_fall_forward.png"), 0, 0, 62, 60, .05, 25, true, false);
+
+    this.animationRightFallDeath = new Animation(AM.getAsset("./img/right_forward_facing_fall_death.png"), 0, 0, 131, 102, .05, 25, false, false);
+    this.animationLeftFallDeath = new Animation(AM.getAsset("./img/left_fall_forward_death.png"), 0, 0, 121, 102, .05, 25, false, false);
+
+    this.animationRightSpikeDeath = new Animation(AM.getAsset("./img/forward_facing_spike_death.png"), 0, 0, 79, 97, .05, 35, false, false);
+    this.animationLeftSpikeDeath = new Animation(AM.getAsset("./img/left_forward_facing_spike_death.png"), 0, 0, 79, 97, .05, 35, false, false);
+    this.animationRightStand = new Animation(AM.getAsset("./img/right_stand.png"), 0, 0, 48, 58, 0.1, 25, true, false);
+    this.animationLeftStand = new Animation(AM.getAsset("./img/left_stand.png"), 0, 0, 33, 58, 0.1, 25, true, false);
     this.game = game;
     this.x = x;
     this.y = y;
@@ -193,7 +218,7 @@ function Hero(game, x, y) {
     this.ctx = game.ctx;
     this.width = 40;
     this.height = 70;
-    this.scale = .65;
+    this.scale = 1.3;
     this.lastX = null;//
     this.lastY = null;//
     this.triggerFall = false;
@@ -204,42 +229,51 @@ function Hero(game, x, y) {
     this.hitGround = false;
     this.jumpAllowed = true;
     this.hookY = null;
+    this.isDead = false;
+    this.spikeDeath = false;
+    this.DeathDirection = null;
+    this.FallDirection = null;
 }
 
 Hero.prototype.update = function () {
-    
+  if(!this.isDead) {
     if (this.hookY === null && this.hooked) {
         this.hookY = this.y;
         this.fallY = this.y;
     }
 
-    
-    
+
+
     if (!this.hooked) {
 
     if (this.triggerFall) {
 
         this.fallCount += this.y - this.fallY;
-        console.log("caculate " + this.fallCount);
-        console.log("New Addition: " + (this.y - this.fallY));
+        //console.log("caculate " + this.fallCount);
+        //console.log("New Addition: " + (this.y - this.fallY));
         this.fallY = this.y;
 
     }
 
     if (this.fallCount >= this.defaultFallDistance) {
-        console.log("FallDeath: " + this.fallDeath);
+        //console.log("FallDeath: " + this.fallDeath);
         this.fallDeath = true;
+        if (this.FallDirection === null) {
+        this.FallDirection = this.game.direction;
+      }
     }
 
     if (this.game.tickCount >= 121 ) {
         var xDif = Math.abs(this.lastX - this.x);
         var yDif = Math.abs(this.lastY - this.y);
         if (xDif <= 64 && yDif > 3) {
-            console.log("TriggerFall: " + this.triggerFall);
+            //console.log("TriggerFall: " + this.triggerFall);
             this.triggerFall = true;
         } else {
             this.triggerFall = false;
             this.fallCount = 0;
+            this.FallDirection = null;
+
         }
         this.lastX = this.x;
         this.lastY = this.y;
@@ -265,9 +299,15 @@ Hero.prototype.update = function () {
 
     var landed = collisionCheck(this.game, this);
 
+    if(landed.spike) {
+      if(this.DeathDirection === null) {
+        this.DeathDirection = this.game.direction;
+      }
+      this.spikeDeath = true;
+      console.log(this.spikeDeath);
+    }
 
-
-    if (this.game.jumping && (landed.bottom || this.jumpAllowed) && !this.hooked) {
+    else  if (this.game.jumping && (landed.bottom || this.jumpAllowed) && !this.hooked) {
 
         if (this.jumpCurrent < this.jumpMax) {
             if (this.jumpCurrent >= .8 * this.jumpMax) {
@@ -285,7 +325,8 @@ Hero.prototype.update = function () {
             this.animationJumpLeft.elapsedTime = 0;
 
         }
-    } else if (!landed.bottom && !this.hooked){
+    }
+    else if (!landed.bottom && !this.hooked){
         this.jumpAllowed = false;
 
 
@@ -295,7 +336,6 @@ Hero.prototype.update = function () {
                 this.y += this.fallSpeed * .8;
             } else {
                 this.y += this.fallSpeed;
-
             }
 
             if (this.jumpCurrent > 0) {
@@ -321,51 +361,106 @@ Hero.prototype.update = function () {
                 this.jumpCurrent = 0;
                 this.jumpAllowed = true;
             }
-            
+
     }
-            
-           
+  }
+
+
+
 };
 
 Hero.prototype.draw = function (ctx) {
 
-    if (this.hitGround && this.fallDeath) {
-        this.animationFallDeath.drawFrame(this.game.clockTick, ctx, this.x - 50, this.y - 25, 1.5);
+  ctx.save();
+  ctx.beginPath();
+  ctx.strokeStyle ="Yellow";
+  ctx.rect(this.x, this.y, this.width, this.height);
+  ctx.stroke();
+  ctx.restore();
 
-    } else if (this.fallDeath) {
-        this.animationFall.drawFrame(this.game.clockTick, ctx, this.x, this.y, 1.5);
-    } else if (this.game.jumping) {
+
+    if (this.spikeDeath) {
+      this.isDead = true;
+      if(this.DeathDirection === "right") {
+        this.animationRightSpikeDeath.drawFrame(this.game.clockTick, ctx, this.x + 3, this.y + 40, 1.5);
+      } else {
+        this.animationLeftSpikeDeath.drawFrame(this.game.clockTick, ctx, this.x - this.width * 2, this.y + 40, 1.5);
+      }
+    }
+      else if (this.hitGround && this.fallDeath) {
+      this.isDead = true;
+      if(this.FallDirection === "left") {
+        this.animationLeftFallDeath.drawFrame(this.game.clockTick, ctx, this.x - 50, this.y - 25, 1.5);
+      } else if (this.FallDirection === "right") {
+        this.animationRightFallDeath.drawFrame(this.game.clockTick, ctx, this.x - 50, this.y - 25, 1.5);
+      }
+    }
+    else if (this.fallDeath) {
+      if(this.FallDirection === "right") {
+        this.animationRightFall.drawFrame(this.game.clockTick, ctx, this.x, this.y, 1.5);
+      } else if (this.FallDirection === "left") {
+        this.animationLeftFall.drawFrame(this.game.clockTick, ctx, this.x - 30, this.y, 1.5);
+
+      }
+    }
+    else if (this.hooked) {
+        switch (this.game.direction) {
+            case "right":
+                ctx.drawImage(AM.getAsset("./img/right_swing.png"),
+                        0, 0, // source from sheet
+                        53, 58,
+                        this.x - this.width, this.y,
+                        53 * this.scale,
+                        58 * this.scale);
+                break;
+
+            case "left":
+                ctx.drawImage(AM.getAsset("./img/left_swing.png"),
+                        0, 0, // source from sheet
+                        53, 58,
+                        this.x, this.y,
+                        53 * this.scale,
+                        58 * this.scale);
+                break;
+        }
+
+    }
+    else if (this.game.jumping && !this.hooked) {
         if (this.game.direction === "right") {
-
-            this.animationJumpRight.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
+            this.animationJumpRight.drawFrame(this.game.clockTick, ctx, this.x, this.y, .65);
         } else if (this.game.direction === "left") {
-            this.animationJumpLeft.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
+            this.animationJumpLeft.drawFrame(this.game.clockTick, ctx, this.x, this.y, .65);
 
         }
 
-    } else if (this.game.moveRight) {
-        this.animationRight.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
-    } else if (this.game.moveLeft) {
-        this.animationLeft.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
-    } else if (!this.game.moveLeft && !this.game.moveRight) {
+    }
+    else if (this.game.moveRight && !this.hooked) {
+        this.animationRight.drawFrame(this.game.clockTick, ctx, this.x, this.y, .65);
+    }
+    else if (this.game.moveLeft && !this.hooked) {
+        this.animationLeft.drawFrame(this.game.clockTick, ctx, this.x, this.y, .65);
+    }
+    else if (!this.game.moveLeft && !this.game.moveRight && !this.hooked) {
         switch (this.game.direction) {
             case "right":
-                ctx.drawImage(AM.getAsset("./img/horz_walk_right.png"),
-                        1150, 0, // source from sheet
-                        85, 128,
-                        this.x, this.y,
-                        85 * this.scale,
-                        128 * this.scale);
+                this.animationRightStand.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
+//                ctx.drawImage(AM.getAsset("./img/horz_walk_right.png"),
+//                        1150, 0, // source from sheet
+//                        85, 128,
+//                        this.x, this.y,
+//                        85 * this.scale,
+//                        128 * this.scale);
 
                 break;
 
             case "left":
-                ctx.drawImage(AM.getAsset("./img/horz_walk_left.png"),
-                        330, 0, // source from sheet
-                        85, 128,
-                        this.x, this.y,
-                        85 * this.scale,
-                        128 * this.scale);
+                this.animationLeftStand.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
+//                ctx.drawImage(AM.getAsset("./img/horz_walk_left.png"),
+//                        330, 0, // source from sheet
+//                        85, 128,
+//                        this.x, this.y,
+//                        85 * this.scale,
+//                        128 * this.scale);
 
                 break;
         }
@@ -441,6 +536,7 @@ Hookshot.prototype.update = function () {
 
             this.hooked = true;
             this.owner.hooked = true;
+
 
 
             if (this.startAngle === null) {
@@ -526,7 +622,7 @@ Hookshot.prototype.draw = function (ctx) {
          this.startX, this.startY,
          this.width,
          this.height);
-         
+
          */
 
     }
@@ -561,21 +657,165 @@ Hookshot.prototype.swing = function (movePixel) {
         if (this.owner.x > this.startX - tarvelDistance) {
             this.owner.x -= movePixel;
 
-            this.owner.y = Math.sqrt(this.length * this.length
-                                - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
-                                + this.targetY;
-        
+
+        } else {
+            this.swingDirection = "right";
+            this.game.direction = "right";
+            this.currentDegree = 0;
         }
+
+
     }
-        
-    var collide = collisionCheck(this.game, this.owner);
-    
-    if (collide.bottom || collide.right || collide.left) {
-        this.hooked = false;
-        this.owner.hooked = false;
-        this.game.clicked = false;
-        this.swinging = false;
-    }
+           var collide = collisionCheck(this.game, this.owner);
+            if (collide.bottom || collide.right || collide.left) {
+                this.hooked = false;
+                this.owner.hooked = false;
+                this.game.clicked = false;
+                this.swinging = false;
+            }
+
+
+    //Remove after testing
+    //console.log("Count: " + this.count);
+    this.count++;
+    //console.log("The x: " + this.owner.x);
+    //console.log("The y: " + this.owner.y);
+
+
+
+
+    // Math.radians = function(degrees) {
+    //         return degrees * Math.PI / 180;
+    //     };
+
+    //var diffX = this.targetX - this.startX;
+    //var diffY = this.targetY - this.startY;
+
+    //var startDegree = (Math.atan(diffX / diffY)) * (180 / Math.PI);
+
+    /*
+     for (var degree = startDegree; degree <= 180 - startDegree; degree += 1) {
+     this.owner.x = -Math.cos(Math.radians(degree) - 1) * length;
+     this.owner.y = Math.sin(Math.radians(degree)) * length;
+
+     console.log(this.owner.x);
+     console.log(this.owner.y);
+
+     }
+     */
+
+    /*
+     Math.radians = function(degrees) {
+     return degrees * Math.PI / 180;
+     };
+
+     var diffX = this.targetX - this.startX;
+     var diffY = this.targetY - this.startY;
+
+     var startDegree = (Math.atan(diffX / diffY)) * (180 / Math.PI);
+
+
+     if (this.currentDegree <= 180 - startDegree) {
+     this.owner.x = Math.cos(Math.radians(endDegree) - 1) * length;
+     this.owner.y = Math.sin(Math.radians(endDegree)) * length;
+     this.currentDegree += 5;
+
+     }
+     */
+
+
+    //console.log(this.swingDirection);
+
+
+    /*
+     // HardeCODE HERE
+     var quarter = endDegree / 5;
+
+     if (this.currentDegree < endDegree && this.swingDirection === "right") {
+     //console.log(this.currentDegree);
+     if (this.currentDegree < quarter && this.currentDegree > 0) {
+     this.owner.y += 3;
+     this.owner.x += 5;
+
+     }
+     else if (this.currentDegree <= quarter * 2 && this.currentDegree >= quarter) {
+     this.owner.y += 2;
+     this.owner.x += 7;
+
+     }
+     else if (this.currentDegree <= quarter * 3 && this.currentDegree >= quarter * 2) {
+     this.owner.x += 9;
+
+     }
+     else if (this.currentDegree <= quarter * 4 && this.currentDegree >= quarter * 3) {
+     this.owner.y -= 2;
+     this.owner.x += 7;
+
+     }
+     else if (this.currentDegree <= quarter * 5 && this.currentDegree >= quarter * 4) {
+     this.owner.y -= 3;
+     this.owner.x += 5;
+
+     }
+
+
+     this.currentDegree += (endDegree / 30) - (.004 * this.length)  ;
+
+     collisionCheck(this.owner.game, this.owner);
+
+     }
+
+     else if (this.currentDegree < endDegree && this.swingDirection === "left") {
+     //console.log(this.currentDegree);
+     if (this.currentDegree < quarter && this.currentDegree > 0) {
+     this.owner.y += 3;
+     this.owner.x -= 5;
+
+     }
+     else if (this.currentDegree <= quarter * 2 && this.currentDegree >= quarter) {
+     this.owner.y += 2;
+     this.owner.x -= 7;
+
+     }
+     else if (this.currentDegree <= quarter * 3 && this.currentDegree >= quarter * 2) {
+     this.owner.x -= 9;
+
+     }
+     else if (this.currentDegree <= quarter * 4 && this.currentDegree >= quarter * 3) {
+     this.owner.y -= 2;
+     this.owner.x -= 7;
+
+     }
+     else if (this.currentDegree <= quarter * 5 && this.currentDegree >= quarter * 4) {
+     this.owner.y -= 3;
+     this.owner.x -= 5;
+
+     }
+
+
+     this.currentDegree += (endDegree / 30) - (.004 * this.length) ;
+     collisionCheck(this.owner.game, this.owner);
+     }
+
+     else {
+     if (this.swingDirection === "left" && this.hooked) {
+     this.swingDirection = "right";
+     this.game.direction = "right";
+     this.currentDegree = 0;
+     }
+
+     else if (this.swingDirection === "right" && this.hooked) {
+     this.swingDirection = "left";
+     this.game.direction = "left";
+     this.currentDegree = 0;
+     }
+     }
+
+     */
+
+
+
+>>>>>>> master
 
 
     //     //Remove after testing
@@ -682,14 +922,14 @@ Block.prototype.update = function () {
 };
 
 Block.prototype.draw = function (ctx) {
-    /*
+
      ctx.save();
      ctx.beginPath();
      ctx.strokeStyle ="Blue";
      ctx.rect(this.x, this.y, this.width, this.height);
      ctx.stroke();
      ctx.restore();
-     */
+
 
 
     if (this.type === 1) {
@@ -708,7 +948,7 @@ Block.prototype.draw = function (ctx) {
                 this.x, this.y,
                 this.height,
                 this.width);
-        
+
     } else if (this.type === 5) {
 
         this.lava.drawFrame(this.game.clockTick, ctx, this.x - 10, this.y, 2.3);
@@ -738,22 +978,45 @@ Block.prototype.draw = function (ctx) {
         this.torch.drawFrame(this.game.clockTick, ctx, this.x, this.y, 0.5);
     } else if (this.type === 9) {
         this.surfaceLava.drawFrame(this.game.clockTick, ctx, this.x - 10, this.y, 2.7);
+    } else if (this.type === 10) {
+        ctx.drawImage(AM.getAsset("./img/lavarightside.png"),
+              0, 0, // source from sheet
+              512, 512,
+              this.x, this.y,
+              this.height,
+              this.width);
+
+    } else if (this.type === 11) {
+        ctx.drawImage(AM.getAsset("./img/leftlavaSide.png"),
+            0, 0, // source from sheet
+            512, 512,
+            this.x, this.y,
+            this.height,
+            this.width);
+
+    } else if (this.type === 12) {
+              ctx.drawImage(AM.getAsset("./img/BrokenTile.png"),
+                  0, 0, // source from sheet
+                  512, 512,
+                  this.x, this.y,
+                  this.height,
+                  this.width);
     }
 };
 
 var mapArray = [[2, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                 [2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-                [2, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [2, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
                 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
                 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0],
                 [1, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
                 [1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 8, 0, 0, 0, 0, 8, 0, 0, 1, 1, 1, 0, 8, 0, 8, 0, 8, 0, 8, 1, 1],
                 [1, 0, 8, 0, 8, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 8, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 1, 1, 0, 0, 0, 1, 1, 1, 9, 9, 9, 9, 9, 9, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 7, 6, 6, 6, 4, 6, 6, 6, 7, 1],
-                [1, 1, 1, 1, 4, 1, 1, 1, 1, 5, 5, 5, 5, 5, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                [1, 1, 1, 1, 1, 1, 1, 1, 1, 5, 5, 5, 5, 5, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+                [1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [1, 1, 1, 1, 0, 0, 1, 1, 1, 9, 9, 9, 9, 9, 9, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 7, 6, 6, 6, 4, 6, 6, 6, 7, 1],
+                [1, 1, 1, 1, 4, 4, 1, 1, 11, 5, 5, 5, 5, 5, 5, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1, 1, 1, 1, 11, 5, 5, 5, 5, 5, 5, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
                 ];
 var AM = new AssetManager();
 
@@ -772,6 +1035,17 @@ AM.queueDownload("./img/surface_lava.png");
 AM.queueDownload("./img/shot.png");
 AM.queueDownload("./img/right_forward_fall.png");
 AM.queueDownload("./img/right_forward_facing_fall_death.png");
+AM.queueDownload("./img/forward_facing_spike_death.png");
+AM.queueDownload("./img/left_forward_facing_spike_death.png");
+AM.queueDownload("./img/leftlavaSide.png");
+AM.queueDownload("./img/lavarightside.png");
+AM.queueDownload("./img/BrokenTile.png");
+AM.queueDownload("./img/right_swing.png");
+AM.queueDownload("./img/left_swing.png");
+AM.queueDownload("./img/left_stand.png");
+AM.queueDownload("./img/right_stand.png");
+AM.queueDownload("./img/left_fall_forward.png");
+AM.queueDownload("./img/left_fall_forward_death.png");
 
 
 
