@@ -569,7 +569,7 @@ Hookshot.prototype.update = function () {
 
             //console.log(this.length);
 
-            this.swing(1);
+            this.swing(5);
 
         }
 
@@ -628,254 +628,108 @@ Hookshot.prototype.draw = function (ctx) {
     }
 };
 
-Hookshot.prototype.swing = function (moveDegree) {
+Hookshot.prototype.swing = function (movePixel) {
+
+    const tarvelDistance = Math.abs(2 * (this.targetX - this.startX));
+
+    // if (this.startX < this.targetX) {
+
+    //     this.swingDirection === 'right';
+
+    //     console.log(1);
+    // }
+    // else if (this.startX > this.targetX) {
+
+    //     this.swingDirection === 'left';
+    //     console.log(2);
+    // }
+
+    // var isSwing;
+
+    // if (this.startX < this.targetX) {
+
+    //     console.log(3);
+
+    //     if (this.owner.x <= this.startX + tarvelDistance && this.owner.x >= this.startX) {
+        
+    //         console.log(4);
+
+    //         isSwing = true;
+
+    //         this.swingDirection === 'right'
+    //     }
+    // }
+    // else if (this.startX > this.targetX) {
+
+    //     console.log(5);
+
+    //     if (this.owner.x >= this.startX - tarvelDistance && this.owner.x <= this.startX) {
+            
+    //         console.log(6);
+
+    //         isSwing = true;
+
+    //         this.swingDirectidon === 'left'
+    //     }
+
+    // }
+    // else {
+
+    //     console.log(7);
+
+    //     isSwing = false;
+    // }
 
 
 
-    this.currentDegree += moveDegree;
-    var transformationValue = ((2 * Math.PI) * (this.length)) * (moveDegree / 360);
 
-    //console.log("Trans: " + transformationValue);
-    var slice = this.startAngle / 3;
-    var maxAngle = this.startAngle * 2;
-    //console.log("maxAngle " + maxAngle);
-    //console.log(this.currentDegree);
 
+    //Swing right
     if (this.swingDirection === "right") {
-        if (this.currentDegree <= this.startAngle) {
-            if (this.currentDegree <= slice) {
-                //console.log("first");
-                this.owner.x += transformationValue / 2;
-                this.owner.y += transformationValue;
-            } else if (this.currentDegree <= slice * 2) {
-                //console.log("second");
-                this.owner.x += transformationValue;
-                this.owner.y += transformationValue;
-            } else if (this.currentDegree <= slice * 3) {
-                //console.log("third");
-                this.owner.x += transformationValue;
-                this.owner.y += transformationValue / 2;
-            }
 
-        } else if (this.currentDegree > this.startAngle && this.currentDegree <= maxAngle) {
-            if (this.currentDegree >= maxAngle - slice) {
-                //console.log("top");
+        console.log("right");
 
-                this.owner.x += transformationValue / 2;
-                this.owner.y -= transformationValue;
-            } else if (this.currentDegree >= maxAngle - slice * 2) {
-                //console.log("mid");
+        if (this.owner.x < this.startX + tarvelDistance) {
 
-                this.owner.x += transformationValue;
-                this.owner.y -= transformationValue;
-            } else if (this.currentDegree >= maxAngle - slice * 3) {
-                //console.log("bottom");
+            this.owner.x += movePixel;
 
-                this.owner.x += transformationValue;
-                this.owner.y -= transformationValue / 2;
-            }
-
-        } else {
-            this.swingDirection = "left";
-            this.game.direction = "left";
-            this.currentDegree = 0;
+            this.owner.y = Math.sqrt(this.length * this.length
+                                - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
+                                + this.targetY;
+        } 
+        else {
+            this.swingDirection === 'left'
         }
+    
+        
+    //Swing left
+    } else if (this.swingDirection === "left") {
+        
+        console.log("left");
 
-    } else {
-        //Swing Left
-        if (this.currentDegree <= this.startAngle) {
-            if (this.currentDegree < slice) {
-                //console.log("first");
-                this.owner.x -= transformationValue / 2;
-                this.owner.y += transformationValue;
-            } else if (this.currentDegree < slice * 2) {
-                //console.log("second");
-                this.owner.x -= transformationValue;
-                this.owner.y += transformationValue;
-            } else if (this.currentDegree < slice * 3) {
-                //console.log("third");
-                this.owner.x -= transformationValue;
-                this.owner.y += transformationValue / 2;
-            }
+        if (this.owner.x > this.startX - tarvelDistance) {
+            this.owner.x -= movePixel;
 
-        } else if (this.currentDegree > this.startAngle && this.currentDegree <= maxAngle) {
-            if (this.currentDegree >= maxAngle - slice) {
-                //console.log("top");
-
-                this.owner.x -= transformationValue / 2;
-                this.owner.y -= transformationValue;
-            } else if (this.currentDegree >= maxAngle - slice * 2) {
-                //console.log("mid");
-
-                this.owner.x -= transformationValue;
-                this.owner.y -= transformationValue;
-            } else if (this.currentDegree >= maxAngle - slice * 3) {
-                //console.log("bottom");
-
-                this.owner.x -= transformationValue;
-                this.owner.y -= transformationValue / 2;
-            }
-        } else {
-            this.swingDirection = "right";
-            this.game.direction = "right";
-            this.currentDegree = 0;
+            this.owner.y = Math.sqrt(this.length * this.length
+                                - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
+                                + this.targetY;
+        
         }
-
-
+        else {
+            this.swingDirection === 'right'
+        }
     }
-           var collide = collisionCheck(this.game, this.owner);
-            if (collide.bottom || collide.right || collide.left) {
-                this.hooked = false;
-                this.owner.hooked = false;
-                this.game.clicked = false;
-                this.swinging = false;
-            }
+    
+    var collide = collisionCheck(this.game, this.owner);
+    
+    if (collide.bottom || collide.right || collide.left) {
+        this.hooked = false;
+        this.owner.hooked = false;
+        this.game.clicked = false;
+        this.swinging = false;
+    }
 
-
-    //Remove after testing
-    //console.log("Count: " + this.count);
     this.count++;
-    //console.log("The x: " + this.owner.x);
-    //console.log("The y: " + this.owner.y);
-
-
-
-
-    // Math.radians = function(degrees) {
-    //         return degrees * Math.PI / 180;
-    //     };
-
-    //var diffX = this.targetX - this.startX;
-    //var diffY = this.targetY - this.startY;
-
-    //var startDegree = (Math.atan(diffX / diffY)) * (180 / Math.PI);
-
-    /*
-     for (var degree = startDegree; degree <= 180 - startDegree; degree += 1) {
-     this.owner.x = -Math.cos(Math.radians(degree) - 1) * length;
-     this.owner.y = Math.sin(Math.radians(degree)) * length;
-
-     console.log(this.owner.x);
-     console.log(this.owner.y);
-
-     }
-     */
-
-    /*
-     Math.radians = function(degrees) {
-     return degrees * Math.PI / 180;
-     };
-
-     var diffX = this.targetX - this.startX;
-     var diffY = this.targetY - this.startY;
-
-     var startDegree = (Math.atan(diffX / diffY)) * (180 / Math.PI);
-
-
-     if (this.currentDegree <= 180 - startDegree) {
-     this.owner.x = Math.cos(Math.radians(endDegree) - 1) * length;
-     this.owner.y = Math.sin(Math.radians(endDegree)) * length;
-     this.currentDegree += 5;
-
-     }
-     */
-
-
-    //console.log(this.swingDirection);
-
-
-    /*
-     // HardeCODE HERE
-     var quarter = endDegree / 5;
-
-     if (this.currentDegree < endDegree && this.swingDirection === "right") {
-     //console.log(this.currentDegree);
-     if (this.currentDegree < quarter && this.currentDegree > 0) {
-     this.owner.y += 3;
-     this.owner.x += 5;
-
-     }
-     else if (this.currentDegree <= quarter * 2 && this.currentDegree >= quarter) {
-     this.owner.y += 2;
-     this.owner.x += 7;
-
-     }
-     else if (this.currentDegree <= quarter * 3 && this.currentDegree >= quarter * 2) {
-     this.owner.x += 9;
-
-     }
-     else if (this.currentDegree <= quarter * 4 && this.currentDegree >= quarter * 3) {
-     this.owner.y -= 2;
-     this.owner.x += 7;
-
-     }
-     else if (this.currentDegree <= quarter * 5 && this.currentDegree >= quarter * 4) {
-     this.owner.y -= 3;
-     this.owner.x += 5;
-
-     }
-
-
-     this.currentDegree += (endDegree / 30) - (.004 * this.length)  ;
-
-     collisionCheck(this.owner.game, this.owner);
-
-     }
-
-     else if (this.currentDegree < endDegree && this.swingDirection === "left") {
-     //console.log(this.currentDegree);
-     if (this.currentDegree < quarter && this.currentDegree > 0) {
-     this.owner.y += 3;
-     this.owner.x -= 5;
-
-     }
-     else if (this.currentDegree <= quarter * 2 && this.currentDegree >= quarter) {
-     this.owner.y += 2;
-     this.owner.x -= 7;
-
-     }
-     else if (this.currentDegree <= quarter * 3 && this.currentDegree >= quarter * 2) {
-     this.owner.x -= 9;
-
-     }
-     else if (this.currentDegree <= quarter * 4 && this.currentDegree >= quarter * 3) {
-     this.owner.y -= 2;
-     this.owner.x -= 7;
-
-     }
-     else if (this.currentDegree <= quarter * 5 && this.currentDegree >= quarter * 4) {
-     this.owner.y -= 3;
-     this.owner.x -= 5;
-
-     }
-
-
-     this.currentDegree += (endDegree / 30) - (.004 * this.length) ;
-     collisionCheck(this.owner.game, this.owner);
-     }
-
-     else {
-     if (this.swingDirection === "left" && this.hooked) {
-     this.swingDirection = "right";
-     this.game.direction = "right";
-     this.currentDegree = 0;
-     }
-
-     else if (this.swingDirection === "right" && this.hooked) {
-     this.swingDirection = "left";
-     this.game.direction = "left";
-     this.currentDegree = 0;
-     }
-     }
-
-     */
-
-
-
-
-
-
-
 };
 
 
