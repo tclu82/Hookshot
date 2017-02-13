@@ -540,9 +540,9 @@ Hookshot.prototype.update = function () {
 
 
             if (this.startAngle === null) {
-                this.owner.y -= 35;
-                this.startY -= 35;
+
                 this.swingDirection = this.game.direction;
+
 
                 this.height = (this.startY - this.targetY);
                 this.width = (this.startX - this.targetX);
@@ -569,7 +569,7 @@ Hookshot.prototype.update = function () {
 
             //console.log(this.length);
 
-            this.swing(1);
+            this.swing(3);
 
         }
 
@@ -628,93 +628,36 @@ Hookshot.prototype.draw = function (ctx) {
     }
 };
 
-Hookshot.prototype.swing = function (moveDegree) {
+Hookshot.prototype.swing = function (movePixel) {
+
+    const tarvelDistance = Math.abs(2 * (this.targetX - this.startX));
+
+    // console.log("before");
+    // console.log("start x: " + this.startX);
+    // console.log("targe X: " + this.targetX);
+    // console.log("tarvel: " + tarvelDistance);
+    // console.log(tarvelDistance + this.startX + " is tarvelDistance");
+
+    //Swing right
+    if (this.swingDirection === "right" && this.owner.x < this.startX + tarvelDistance) {
+
+        console.log("x: " + this.owner.x);
+
+        this.owner.x += movePixel;
+
+        this.owner.y = Math.sqrt(this.length * this.length
+                            - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
+                            + this.targetY;
+        
+    //Swing left
+    } else if (this.swingDirection === "left") {
+        
+        // console.log("x: " + this.owner.x);
+
+        if (this.owner.x > this.startX - tarvelDistance) {
+            this.owner.x -= movePixel;
 
 
-
-    this.currentDegree += moveDegree;
-    var transformationValue = ((2 * Math.PI) * (this.length)) * (moveDegree / 360);
-
-    //console.log("Trans: " + transformationValue);
-    var slice = this.startAngle / 3;
-    var maxAngle = this.startAngle * 2;
-    //console.log("maxAngle " + maxAngle);
-    //console.log(this.currentDegree);
-
-    if (this.swingDirection === "right") {
-        if (this.currentDegree <= this.startAngle) {
-            if (this.currentDegree <= slice) {
-                //console.log("first");
-                this.owner.x += transformationValue / 2;
-                this.owner.y += transformationValue;
-            } else if (this.currentDegree <= slice * 2) {
-                //console.log("second");
-                this.owner.x += transformationValue;
-                this.owner.y += transformationValue;
-            } else if (this.currentDegree <= slice * 3) {
-                //console.log("third");
-                this.owner.x += transformationValue;
-                this.owner.y += transformationValue / 2;
-            }
-
-        } else if (this.currentDegree > this.startAngle && this.currentDegree <= maxAngle) {
-            if (this.currentDegree >= maxAngle - slice) {
-                //console.log("top");
-
-                this.owner.x += transformationValue / 2;
-                this.owner.y -= transformationValue;
-            } else if (this.currentDegree >= maxAngle - slice * 2) {
-                //console.log("mid");
-
-                this.owner.x += transformationValue;
-                this.owner.y -= transformationValue;
-            } else if (this.currentDegree >= maxAngle - slice * 3) {
-                //console.log("bottom");
-
-                this.owner.x += transformationValue;
-                this.owner.y -= transformationValue / 2;
-            }
-
-        } else {
-            this.swingDirection = "left";
-            this.game.direction = "left";
-            this.currentDegree = 0;
-        }
-
-    } else {
-        //Swing Left
-        if (this.currentDegree <= this.startAngle) {
-            if (this.currentDegree < slice) {
-                //console.log("first");
-                this.owner.x -= transformationValue / 2;
-                this.owner.y += transformationValue;
-            } else if (this.currentDegree < slice * 2) {
-                //console.log("second");
-                this.owner.x -= transformationValue;
-                this.owner.y += transformationValue;
-            } else if (this.currentDegree < slice * 3) {
-                //console.log("third");
-                this.owner.x -= transformationValue;
-                this.owner.y += transformationValue / 2;
-            }
-
-        } else if (this.currentDegree > this.startAngle && this.currentDegree <= maxAngle) {
-            if (this.currentDegree >= maxAngle - slice) {
-                //console.log("top");
-
-                this.owner.x -= transformationValue / 2;
-                this.owner.y -= transformationValue;
-            } else if (this.currentDegree >= maxAngle - slice * 2) {
-                //console.log("mid");
-
-                this.owner.x -= transformationValue;
-                this.owner.y -= transformationValue;
-            } else if (this.currentDegree >= maxAngle - slice * 3) {
-                //console.log("bottom");
-
-                this.owner.x -= transformationValue;
-                this.owner.y -= transformationValue / 2;
-            }
         } else {
             this.swingDirection = "right";
             this.game.direction = "right";
@@ -872,9 +815,16 @@ Hookshot.prototype.swing = function (moveDegree) {
 
 
 
+>>>>>>> master
 
 
+    //     //Remove after testing
+    //     //console.log("Count: " + this.count);
+        this.count++;
+    //     //console.log("The x: " + this.owner.x);
+    //     //console.log("The y: " + this.owner.y);
 
+    // }
 
 };
 
