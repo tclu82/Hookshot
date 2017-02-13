@@ -628,6 +628,12 @@ Hookshot.prototype.draw = function (ctx) {
     }
 };
 
+// var that = this;
+
+// that.swingDirection = this.swingDirection;
+
+
+
 Hookshot.prototype.swing = function (movePixel) {
 
     const tarvelDistance = Math.abs(2 * (this.targetX - this.startX));
@@ -680,43 +686,61 @@ Hookshot.prototype.swing = function (movePixel) {
     //     isSwing = false;
     // }
 
-
-
-
+    var that = this;
 
     //Swing right
-    if (this.swingDirection === "right") {
+    if (that.swingDirection === "right") {
 
-        console.log("right");
+        // console.log("right1");
 
-        if (this.owner.x < this.startX + tarvelDistance) {
+        if (this.startX < this.targetX) {
 
-            this.owner.x += movePixel;
+            if (that.owner.x < that.startX + tarvelDistance) {
 
-            this.owner.y = Math.sqrt(this.length * this.length
-                                - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
-                                + this.targetY;
-        } 
-        else {
-            this.swingDirection === 'left'
+                // console.log("right2");
+
+                that.owner.x += movePixel;
+
+                that.owner.y = Math.sqrt(that.length * that.length
+                                    - (that.owner.x - that.targetX) * (that.owner.x - that.targetX))
+                                    + that.targetY;
+            } 
         }
-    
+        //     else {
+
+        //         // console.log("right3");
+
+        //         that.swingDirection === 'left';
+
+        //     }
+
+        // }
+        // else if (this.startX > this.targetX) {
+
+        //     that.swingDirection === 'left';
+
+        // } 
         
     //Swing left
-    } else if (this.swingDirection === "left") {
+    } else {
         
-        console.log("left");
+        console.log("left1");
 
-        if (this.owner.x > this.startX - tarvelDistance) {
-            this.owner.x -= movePixel;
+        if (that.owner.x > that.startX - tarvelDistance) {
 
-            this.owner.y = Math.sqrt(this.length * this.length
-                                - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
-                                + this.targetY;
+            console.log("left2");
+
+            that.owner.x -= movePixel;
+
+            that.owner.y = Math.sqrt(that.length * that.length
+                                - (that.owner.x - that.targetX) * (that.owner.x - that.targetX))
+                                + that.targetY;
         
         }
         else {
-            this.swingDirection === 'right'
+            console.log("left3");
+
+            that.swingDirection === 'right'
         }
     }
     
