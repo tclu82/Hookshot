@@ -691,13 +691,13 @@ Hookshot.prototype.swing = function (movePixel) {
     //Swing right
     if (that.swingDirection === "right") {
 
-        // console.log("right1");
+        console.log("right1");
 
         if (this.startX < this.targetX) {
 
             if (that.owner.x < that.startX + tarvelDistance) {
 
-                // console.log("right2");
+                console.log("right2");
 
                 that.owner.x += movePixel;
 
@@ -705,42 +705,50 @@ Hookshot.prototype.swing = function (movePixel) {
                                     - (that.owner.x - that.targetX) * (that.owner.x - that.targetX))
                                     + that.targetY;
             } 
+            else {
+
+                console.log("right3");
+                that.swingDirection === 'left';
+                
+            }
+
         }
-        //     else {
-
-        //         // console.log("right3");
-
-        //         that.swingDirection === 'left';
-
-        //     }
-
-        // }
         // else if (this.startX > this.targetX) {
+        else {
+        
+            that.swingDirection === 'left';
+    
 
-        //     that.swingDirection === 'left';
-
-        // } 
+        } 
         
     //Swing left
     } else {
         
         console.log("left1");
 
-        if (that.owner.x > that.startX - tarvelDistance) {
 
-            console.log("left2");
+        if (this.startX > this.targetX) {
 
-            that.owner.x -= movePixel;
+            if (that.owner.x > that.startX - tarvelDistance) {
 
-            that.owner.y = Math.sqrt(that.length * that.length
-                                - (that.owner.x - that.targetX) * (that.owner.x - that.targetX))
-                                + that.targetY;
-        
+                console.log("left2");
+
+                that.owner.x -= movePixel;
+
+                that.owner.y = Math.sqrt(that.length * that.length
+                                    - (that.owner.x - that.targetX) * (that.owner.x - that.targetX))
+                                    + that.targetY;
+            
+            }
+            else {
+                console.log("left3");
+
+                that.swingDirection === 'right'
+            }
+
         }
         else {
-            console.log("left3");
-
-            that.swingDirection === 'right'
+            that.swingDirection === 'right';
         }
     }
     
