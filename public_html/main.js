@@ -717,7 +717,7 @@ Hookshot.prototype.swing = function (movePixel) {
         // else if (this.startX > this.targetX) {
         else {
         
-            that.swingDirection === 'left';
+            that.swingDirection = 'left';
     
 
         } 
@@ -744,7 +744,8 @@ Hookshot.prototype.swing = function (movePixel) {
             else {
                 console.log("left3");
 
-                that.swingDirection === 'right'
+                that.swingDirection = 'right';
+                this.game.direction = 'right';
             }
 
         }
