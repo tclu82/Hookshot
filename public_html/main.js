@@ -490,6 +490,7 @@ function Hookshot(game, hero) {
     this.currentDegree = 0;
     this.map = null;
     this.count = 1; // remove test only
+    this.travelDistance = null;
 
 
 
@@ -539,35 +540,18 @@ Hookshot.prototype.update = function () {
 
 
 
-            if (this.startAngle === null) {
-                this.owner.y -= 35;
-                this.startY -= 35;
+            if (this.length === null) {
+//                this.owner.y -= 35;
+//                this.startY -= 35;
                 this.swingDirection = this.game.direction;
 
                 this.height = (this.startY - this.targetY);
                 this.width = (this.startX - this.targetX);
 
                 this.length = (Math.sqrt((this.width * this.width) + (this.height * this.height)));
+                this.travelDistance = Math.abs(2 * (this.targetX - this.startX));
 
-
-                this.startAngle = (180 / Math.PI) * (Math.acos(this.height / this.length));
-                if (this.startAngle % 3 !== 0) {
-                    this.startAngle -= this.startAngle % 3;
-                }
-                //console.log("Start y" + this.startY);
-                //console.log("length " + this.length);
-                //console.log("height " + this.height);
-                //console.log("StartAngle " + this.startAngle);
             }
-
-            //  var diffX = this.startX - this.targetX;
-            //  var diffY = this.startY - this.targetY;
-
-            //  var swingDegree = (Math.atan(diffX / diffY) * (180 / Math.PI));
-
-            //  swingDegree = 180 - (swingDegree * 2);
-
-            //console.log(this.length);
 
             this.swing(5);
 
@@ -586,6 +570,7 @@ Hookshot.prototype.update = function () {
         this.height = null;
         this.width = null;
         this.length = null;
+        this.travelDistancel = null;
         this.startAngle = null;
         this.swingDirection = null;
         this.currentDegree = 0;
@@ -628,87 +613,35 @@ Hookshot.prototype.draw = function (ctx) {
     }
 };
 
-// var that = this;
-
-// that.swingDirection = this.swingDirection;
-
 
 
 Hookshot.prototype.swing = function (movePixel) {
 
-    const tarvelDistance = Math.abs(2 * (this.targetX - this.startX));
-
-    // if (this.startX < this.targetX) {
-
-    //     this.swingDirection === 'right';
-
-    //     console.log(1);
-    // }
-    // else if (this.startX > this.targetX) {
-
-    //     this.swingDirection === 'left';
-    //     console.log(2);
-    // }
-
-    // var isSwing;
-
-    // if (this.startX < this.targetX) {
-
-    //     console.log(3);
-
-    //     if (this.owner.x <= this.startX + tarvelDistance && this.owner.x >= this.startX) {
-        
-    //         console.log(4);
-
-    //         isSwing = true;
-
-    //         this.swingDirection === 'right'
-    //     }
-    // }
-    // else if (this.startX > this.targetX) {
-
-    //     console.log(5);
-
-    //     if (this.owner.x >= this.startX - tarvelDistance && this.owner.x <= this.startX) {
-            
-    //         console.log(6);
-
-    //         isSwing = true;
-
-    //         this.swingDirectidon === 'left'
-    //     }
-
-    // }
-    // else {
-
-    //     console.log(7);
-
-    //     isSwing = false;
-    // }
-
-    var that = this;
+//    var tarvelDistance = Math.abs(2 * (this.targetX - this.startX));
 
     //Swing right
-    if (that.swingDirection === "right") {
+    if (this.swingDirection === "right") {
 
         console.log("right1");
 
         if (this.startX < this.targetX) {
 
-            if (that.owner.x < that.startX + tarvelDistance) {
+            if (this.owner.x < this.startX + this.travelDistance) {
 
                 console.log("right2");
 
-                that.owner.x += movePixel;
+                this.owner.x += movePixel;
 
-                that.owner.y = Math.sqrt(that.length * that.length
-                                    - (that.owner.x - that.targetX) * (that.owner.x - that.targetX))
-                                    + that.targetY;
+                this.owner.y = Math.sqrt(this.length * this.length
+                                    - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
+                                    + this.targetY;
             } 
             else {
+                
 
                 console.log("right3");
-                that.swingDirection = 'left';
+                this.startX = this.owner.x;
+                this.swingDirection = 'left';
                 this.game.direction = 'left';
                 
             }
@@ -717,7 +650,8 @@ Hookshot.prototype.swing = function (movePixel) {
         // else if (this.startX > this.targetX) {
         else {
         
-            that.swingDirection = 'left';
+            this.swingDirection = 'left';
+            this.game.direction = 'left';
     
 
         } 
@@ -730,27 +664,29 @@ Hookshot.prototype.swing = function (movePixel) {
 
         if (this.startX > this.targetX) {
 
-            if (that.owner.x > that.startX - tarvelDistance) {
+            if (this.owner.x > this.startX - this.travelDistance) {
 
                 console.log("left2");
 
-                that.owner.x -= movePixel;
+                this.owner.x -= movePixel;
 
-                that.owner.y = Math.sqrt(that.length * that.length
-                                    - (that.owner.x - that.targetX) * (that.owner.x - that.targetX))
-                                    + that.targetY;
+                this.owner.y = Math.sqrt(this.length * this.length
+                                    - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
+                                    + this.targetY;
             
             }
             else {
                 console.log("left3");
-
-                that.swingDirection = 'right';
+                this.startX = this.owner.x;
+                this.swingDirection = 'right';
                 this.game.direction = 'right';
             }
 
         }
         else {
-            that.swingDirection = 'right';
+            this.swingDirection = 'right';
+            this.game.direction = 'right';
+            
         }
     }
     
