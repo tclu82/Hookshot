@@ -613,33 +613,34 @@ Hookshot.prototype.draw = function (ctx) {
     }
 };
 
-
+Hookshot.prototype.calculateOwnerY = function(ownerX) {
+    return Math.sqrt(this.length * this.length
+                    - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
+                    + this.targetY;
+}
 
 Hookshot.prototype.swing = function (movePixel) {
 
-//    var tarvelDistance = Math.abs(2 * (this.targetX - this.startX));
-
-    //Swing right
+    // Facing right and swing right
     if (this.swingDirection === "right") {
 
-        console.log("right1");
+        // console.log("right1");
 
+        // Start to swing right
         if (this.startX < this.targetX) {
-
+            // During the swing
             if (this.owner.x < this.startX + this.travelDistance) {
 
-                console.log("right2");
+                // console.log("right2");
 
                 this.owner.x += movePixel;
-
-                this.owner.y = Math.sqrt(this.length * this.length
-                                    - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
-                                    + this.targetY;
-            } 
+                this.owner.y = this.calculateOwnerY(this.owner.x);
+    
+            }
+            // Hit the end, reverse direction 
             else {
                 
-
-                console.log("right3");
+                // console.log("right3");
                 this.startX = this.owner.x;
                 this.swingDirection = 'left';
                 this.game.direction = 'left';
@@ -647,7 +648,7 @@ Hookshot.prototype.swing = function (movePixel) {
             }
 
         }
-        // else if (this.startX > this.targetX) {
+        // facing right but shot left
         else {
         
             this.swingDirection = 'left';
@@ -656,33 +657,32 @@ Hookshot.prototype.swing = function (movePixel) {
 
         } 
         
-    //Swing left
+    // Facing left and swing left
     } else {
         
-        console.log("left1");
+        // console.log("left1");
 
 
         if (this.startX > this.targetX) {
-
+            // During the swing
             if (this.owner.x > this.startX - this.travelDistance) {
 
-                console.log("left2");
+                // console.log("left2");
 
                 this.owner.x -= movePixel;
-
-                this.owner.y = Math.sqrt(this.length * this.length
-                                    - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
-                                    + this.targetY;
+                this.owner.y = this.calculateOwnerY(this.owner.x);
             
             }
+            // Hit the end, reverse direction 
             else {
-                console.log("left3");
+                // console.log("left3");
                 this.startX = this.owner.x;
                 this.swingDirection = 'right';
                 this.game.direction = 'right';
             }
 
         }
+        // facing left but shot right
         else {
             this.swingDirection = 'right';
             this.game.direction = 'right';
