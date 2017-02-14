@@ -749,7 +749,7 @@ Hookshot.prototype.swing = function (movePixel) {
 
         }
         else {
-            that.swingDirection === 'right';
+            that.swingDirection = 'right';
         }
     }
     
