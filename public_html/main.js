@@ -1,5 +1,5 @@
 
-function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse) {
+function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse, lockFrame) {
     this.spriteSheet = spriteSheet;
     this.startX = startX;
     this.startY = startY;
@@ -11,6 +11,7 @@ function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDu
     this.elapsedTime = 0;
     this.loop = loop;
     this.reverse = reverse;
+    this.lockFrame = lockFrame;
 }
 
 Animation.prototype.drawFrame = function (tick, ctx, x, y, scaleBy) {
@@ -53,12 +54,14 @@ Animation.prototype.currentFrame = function () {
 };
 
 Animation.prototype.isDone = function () {
-    if (!this.loop && this.elapsedTime >= this.totalTime) {
+    if (this.lockFrame && this.elapsedTime >= this.totalTime) {
+        console.log("LastFrame");
         this.elapsedTime -= this.frameDuration;
         return false;
-    } else {
-        return (this.elapsedTime >= this.totalTime);
-    }
+    } 
+      return (this.elapsedTime >= this.totalTime);
+
+  
 };
 
 function collisionCheck(game, sprite) {
@@ -68,7 +71,8 @@ function collisionCheck(game, sprite) {
         left: false,
         top: false,
         bottom: false,
-        spike: false
+        spike: false,
+        chest: null
     };
 
     // Get the Map out of the Games Entity list
@@ -111,8 +115,7 @@ function collisionCheck(game, sprite) {
 
             // If its block type 1
 
-            if (block.type === 1 || block.type === 2) {
-
+            if (block.type === 1 || block.type === 2 || block.type === 12 || block.type === 3) {
 
                 //If Hero hits a block from the top with Hero's Feet
                 if (sprite.y + sprite.height <= block.y + sprite.fallSpeed &&
@@ -124,7 +127,7 @@ function collisionCheck(game, sprite) {
                     collide.bottom = true;
 
                     sprite.y = block.y - sprite.height;
-                    sprite.wasHooked = false;
+               
                     if (sprite.fallDeath) {
                         sprite.hitGround = true;
                     }
@@ -152,6 +155,12 @@ function collisionCheck(game, sprite) {
                         sprite.height + sprite.y > block.y) {
 
                     collide.left = true;
+                    if (block.type === 3) {
+                        collide.chest = block;
+                        
+                    }
+                    
+                    
                     sprite.x = (block.x + block.width) + 1;
 
                 }
@@ -240,14 +249,15 @@ function Hero(game, x, y) {
     this.animationLeftFall = new Animation(AM.getAsset("./img/right_forward_fall.png"), 0, 0, 67, 60, .05, 25, true, false);
     this.animationRightFall = new Animation(AM.getAsset("./img/right_forward_fall.png"), 0, 0, 67, 60, .05, 25, true, false);
     this.animationLeftFall = new Animation(AM.getAsset("./img/left_fall_forward.png"), 0, 0, 62, 60, .05, 25, true, false);
-    this.animationRightFallDeath = new Animation(AM.getAsset("./img/right_forward_facing_fall_death.png"), 0, 0, 131, 102, .05, 25, false, false);
-    this.animationLeftFallDeath = new Animation(AM.getAsset("./img/left_fall_forward_death.png"), 0, 0, 121, 102, .05, 25, false, false);
-    this.animationRightSpikeDeath = new Animation(AM.getAsset("./img/forward_facing_spike_death.png"), 0, 0, 79, 97, .05, 35, false, false);
-    this.animationLeftSpikeDeath = new Animation(AM.getAsset("./img/left_forward_facing_spike_death.png"), 0, 0, 79, 97, .05, 35, false, false);
+    this.animationRightFallDeath = new Animation(AM.getAsset("./img/right_forward_facing_fall_death.png"), 0, 0, 131, 102, .05, 25, false, false, true);
+    this.animationLeftFallDeath = new Animation(AM.getAsset("./img/left_fall_forward_death.png"), 0, 0, 121, 102, .05, 25, false, false, true);
+    this.animationRightSpikeDeath = new Animation(AM.getAsset("./img/forward_facing_spike_death.png"), 0, 0, 79, 97, .05, 35, false, false, true);
+    this.animationLeftSpikeDeath = new Animation(AM.getAsset("./img/left_forward_facing_spike_death.png"), 0, 0, 79, 97, .05, 35, false, false, true);
     this.animationRightStand = new Animation(AM.getAsset("./img/right_stand.png"), 0, 0, 48, 58, 0.1, 25, true, false);
     this.animationLeftStand = new Animation(AM.getAsset("./img/left_stand.png"), 0, 0, 33, 58, 0.1, 25, true, false);
-    this.animationLeftDismount = new Animation(AM.getAsset("./img/left_dismount.png"), 0, 0, 65, 66, 0.05, 10, false, false);
-    this.animationRightDismount = new Animation(AM.getAsset("./img/right_dismount.png"), 0, 0, 52, 60, 0.05, 10, false, false);
+    this.animationLeftDismount = new Animation(AM.getAsset("./img/left_dismount.png"), 0, 0, 65, 66, 0.05, 10, true, false, true);
+    this.animationRightDismount = new Animation(AM.getAsset("./img/right_dismount.png"), 0, 0, 66, 65, 0.05, 10, true, false, true);
+    this.animationOpenChest = new Animation(AM.getAsset("./img/left_facing_open_chest.png"), 0, 0, 44, 59, .05, 29, false, false);
     this.game = game;
     this.x = x;
     this.y = y;
@@ -278,6 +288,7 @@ function Hero(game, x, y) {
     this.FallDirection = null;
     this.secondHalf = false;
     this.wasHooked = false;
+    this.action_OpenChest = false;
 
 }
 
@@ -384,6 +395,13 @@ Hero.prototype.update = function () {
 
 
     var landed = collisionCheck(this.game, this);
+    
+    if(landed.bottom || landed.spike) {
+        this.wasHooked = false;
+        this.animationLeftDismount.elapsedTime = 0;
+        this.animationRightDismount.elapsedTime = 0;
+    }
+    
 
     if(landed.spike) {
       if(this.DeathDirection === null) {
@@ -391,6 +409,11 @@ Hero.prototype.update = function () {
       }
       this.spikeDeath = true;
       //console.log(this.spikeDeath);
+    } 
+    else if (landed.chest !== null) {
+        landed.chest.opening = true;
+        this.action_OpenChest = true;
+        
     }
 
     else  if (this.game.jumping && (landed.bottom || this.jumpAllowed) && !this.hooked) {
@@ -432,21 +455,21 @@ Hero.prototype.update = function () {
 
                 }
             }
-            landed = collisionCheck(this.game, this);
-
-            if (landed.bottom) {
-                this.jumpCurrent = 0;
-                this.jumpAllowed = true;
-            }
+//            landed = collisionCheck(this.game, this);
+//
+//            if (landed.bottom) {
+//                this.jumpCurrent = 0;
+//                this.jumpAllowed = true;
+//            }
         }
 
     }
-            landed = collisionCheck(this.game, this);
+    landed = collisionCheck(this.game, this);
 
-            if (landed.bottom) {
-                this.jumpCurrent = 0;
-                this.jumpAllowed = true;
-            }
+    if (landed.bottom) {
+        this.jumpCurrent = 0;
+        this.jumpAllowed = true;
+    }
 
     }
   }
@@ -520,36 +543,42 @@ Hero.prototype.draw = function (ctx) {
     ctx.textAlign = "center";
     ctx.fillText("Click for another feeble attempt! ", 655, 400);
     }
-    console.log(this.wasHooked );
+
     if(this.wasHooked && !this.hooked) {
       console.log("wasHooked");
 ;      if(this.game.direction === "left") {
-        this.animationLeftDismount.drawFrame(this.game.clockTick, ctx, this.x, this.y, 1.5);
+        this.animationLeftDismount.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
       } else if (this.game.direction === "right") {
-        this.animationRightDismount.drawFrame(this.game.clockTick, ctx, this.x, this.y, 1.5);
+        this.animationRightDismount.drawFrame(this.game.clockTick, ctx, this.x - 30, this.y, this.scale);
+      }
+    }
+     else if (this.action_OpenChest) {
+      this.animationOpenChest.drawFrame(this.game.clockTick, ctx, this.x - 15, this.y - 8, this.scale);
+      if (this.animationOpenChest.isDone()) {
+        this.action_OpenChest = false;
       }
     }
     else if (this.spikeDeath) {
       this.isDead = true;
       if(this.DeathDirection === "right") {
-        this.animationRightSpikeDeath.drawFrame(this.game.clockTick, ctx, this.x + 3, this.y + 40, 1.5);
+        this.animationRightSpikeDeath.drawFrame(this.game.clockTick, ctx, this.x + 3, this.y + 40, this.scale);
       } else {
-        this.animationLeftSpikeDeath.drawFrame(this.game.clockTick, ctx, this.x - this.width * 2, this.y + 40, 1.5);
+        this.animationLeftSpikeDeath.drawFrame(this.game.clockTick, ctx, this.x - this.width * 2, this.y + 40, this.scale);
       }
     }
       else if (this.hitGround && this.fallDeath) {
       this.isDead = true;
       if(this.FallDirection === "left") {
-        this.animationLeftFallDeath.drawFrame(this.game.clockTick, ctx, this.x - 50, this.y - 25, 1.5);
+        this.animationLeftFallDeath.drawFrame(this.game.clockTick, ctx, this.x - 50, this.y - 10, this.scale);
       } else if (this.FallDirection === "right") {
-        this.animationRightFallDeath.drawFrame(this.game.clockTick, ctx, this.x - 50, this.y - 25, 1.5);
+        this.animationRightFallDeath.drawFrame(this.game.clockTick, ctx, this.x - 50, this.y - 10, this.scale);
       }
     }
     else if (this.fallDeath && !this.hooked) {
       if(this.FallDirection === "right") {
-        this.animationRightFall.drawFrame(this.game.clockTick, ctx, this.x, this.y, 1.5);
+        this.animationRightFall.drawFrame(this.game.clockTick, ctx, this.x - 30, this.y, this.scale);
       } else if (this.FallDirection === "left") {
-        this.animationLeftFall.drawFrame(this.game.clockTick, ctx, this.x - 30, this.y, 1.5);
+        this.animationLeftFall.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
 
       }
     }
@@ -687,8 +716,10 @@ Hookshot.prototype.update = function () {
             gridX = 0;
         if (gridY < 0)
             gridY = 0;
+        
+        var block = this.map.mapBlocks[gridY][gridX];
 
-        if (this.map.mapBlocks[gridY][gridX].type === 2) {
+        if (block.type === 2) {
 
             this.hooked = true;
             this.owner.hooked = true;
@@ -763,6 +794,12 @@ Hookshot.prototype.update = function () {
             this.lastY = this.owner.y;
             this.swing(this.currentSwingSpeed);
 
+        } 
+        else if (block.type === 12) {
+            block.landed = false;
+            
+        } else {
+            this.game.clicked = false;
         }
 
     } else {
@@ -798,9 +835,8 @@ Hookshot.prototype.draw = function (ctx) {
         this.hooked = false;
         this.owner.wasHooked = true;
         this.owner.hooked = false;
-    }
-
-    if (this.game.clicked && this.hooked) {
+    } 
+    else if (this.game.clicked && this.hooked) {
         this.owner.wasHooked = true;
         ctx.save();
         ctx.beginPath();
@@ -810,6 +846,17 @@ Hookshot.prototype.draw = function (ctx) {
         ctx.lineTo(this.targetX, this.targetY);
         ctx.stroke();
         ctx.restore();
+    } else if (this.game.clicked) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.strokeStyle = "saddleBrown";
+        ctx.lineWidth = 3;
+        ctx.moveTo(this.currentX + (this.owner.width / 2), this.currentY + (this.owner.height / 2));
+        ctx.lineTo(this.targetX, this.targetY);
+        ctx.stroke();
+        ctx.restore();
+        
+   
 
         /*
          ctx.drawImage(AM.getAsset("./img/shot.png"),
@@ -991,6 +1038,7 @@ Map.prototype.draw = function (ctx) {
         for (var j = 0; j < this.cols; j++) {
             var tile = this.mapBlocks[i][j];
             tile.draw(ctx);
+            tile.update(this);
         }
     }
 };
@@ -1030,17 +1078,108 @@ function Block(game, x, y, type) {
     this.removeFromWorld = false;
     this.x = x;
     this.y = y;
+    this.landed = true;
+    this.fallCounter = 0;
+    this.fallspeed = 8;
     this.spriteHeight = 32;
     this.spriteWidth = 32;
     this.height = 64;
     this.width = 64;
+    this.opening = null;
+    this.chestAnimation = new Animation(AM.getAsset("./img/chest_open_rightside.png"), 0, 0, 47, 44, .05, 49, false, false, true);
     this.torch = new Animation(AM.getAsset("./img/torch.png"), 0, 0, 59, 148, .03, 50, true, false);
     this.surfaceLava = new Animation(AM.getAsset("./img/surface_lava.png"), 1, 0, 40, 56, .05, 50, true, false);
     this.lava = new Animation(AM.getAsset("./img/lava.png"), 0, 0, 143, 143, .05, 62, true, false);
 
 }
 
-Block.prototype.update = function () {
+Block.prototype.collisionCheck = function() {
+    
+
+    // Get the Map out of the Games Entity list
+    var map = null;
+    for (var i = 0; i < this.game.entities.length; i++) {
+        var e = this.game.entities[i];
+        if (e.type === "map") {
+            map = e;
+        }
+    }
+
+
+    var gridY = Math.round(map.rows * (this.y / (64 * map.rows)));
+    var gridX = Math.round(map.cols * (this.x / (64 * map.cols)));
+
+    if (gridX < 0)
+        gridX = 0;
+    if (gridY < 0)
+        gridY = 0;
+
+    var gridXStart = gridX - 1;
+    var gridYStart = gridY - 1;
+    if (gridXStart < 0)
+        gridXStart = 0;
+    if (gridYStart < 0)
+        gridYStart = 0;
+
+    var gridXEnd = gridX + 1;
+    var gridYEnd = gridY + 1;
+    if (gridXEnd >= map.cols)
+        gridXEnd = map.cols - 1;
+    if (gridYEnd >= map.rows)
+        gridYEnd = map.rows - 1;
+
+
+    // Detection for hitting a Block
+    for (var i = gridYStart; i <= gridYEnd; i++) {
+        for (var j = gridXStart; j <= gridXEnd; j++) {
+            var block = map.mapBlocks[i][j];
+
+            // If its block type 1
+
+            if (block.type === 1 || block.type === 5 || block.type === 9) {
+
+                // Head
+                if (this.y >= block.y - 8) {
+                    console.log("LANDED");
+
+                    this.landed = true;
+                }
+
+
+            }
+
+        }
+    }
+};
+
+Block.prototype.update = function (map) {
+    
+    var currentX = Math.floor(this.x / this.width);
+    var currentY = Math.floor(this.y / this.height);
+    var prevX = this.x;
+    var prevY = this.y;
+    
+    if (this.type === 12 && !this.landed) {
+        this.y += this.fallspeed;
+        this.fallCounter += this.fallspeed;
+        
+        
+        if (this.fallCounter >= 64) {
+            this.fallCounter = 0;
+            
+            var newX = Math.floor(this.x / this.width);
+            var newY = Math.floor(this.y / this.height);
+
+          
+           map.mapBlocks[currentY][currentX] = new Block(this.game, prevY, prevX, 0);
+           var newBlock = new Block(this.game, this.x, this.y, 12);
+           newBlock.landed = false;
+           map.mapBlocks[newY][newX] = newBlock;
+            
+        }
+        this.collisionCheck();
+        
+    }
 
 };
 
@@ -1072,7 +1211,30 @@ Block.prototype.draw = function (ctx) {
                 this.height,
                 this.width);
 
-    } else if (this.type === 5) {
+    }
+    
+    else if (this.type === 3) {
+        
+        
+          
+      if (this.opening) {
+          
+        this.chestAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 1.6);
+    
+      }
+      else {
+        ctx.drawImage(AM.getAsset("./img/chest_open_rightside.png"),
+                    0 , 0,  // source from sheet
+                    44, 44,
+                    this.x, this.y,
+                    44 * 1.6,
+                    44 * 1.6);
+      }
+    }
+
+
+  
+    else if (this.type === 5) {
 
         this.lava.drawFrame(this.game.clockTick, ctx, this.x - 10, this.y, 2.3);
 
@@ -1132,8 +1294,8 @@ var mapArray = [[2, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
                 [2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
                 [2, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
                 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0],
+                [1, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0],
                 [1, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
                 [1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 8, 0, 0, 0, 0, 8, 0, 0, 1, 1, 1, 0, 8, 0, 8, 0, 8, 0, 8, 1, 1],
                 [1, 0, 8, 0, 8, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 8, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -1159,7 +1321,7 @@ var mapArray = [[2, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
                                 ];
 
                                 var mapArray3 = [[2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                                                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                [0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                                                 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
                                                 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
                                                 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -1169,8 +1331,8 @@ var mapArray = [[2, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
                                                 [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                                                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                                                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                                                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                                                [1, 1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 5, 5, 5, 5, 10]
+                                                [0, 0, 0, 0, 0, 0, 0, 0, 1, 9, 5, 9, 9, 9, 9, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                [1, 1, 1, 1, 1, 1, 1, 1, 11, 5, 5, 5, 5, 5, 5, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 5, 5, 5, 5, 10]
                                                 ];
 
 
@@ -1206,6 +1368,9 @@ AM.queueDownload("./img/title.png");
 AM.queueDownload("./img/right_dismount.png");
 AM.queueDownload("./img/left_dismount.png");
 AM.queueDownload("./img/target.png");
+AM.queueDownload("./img/left_facing_open_chest.png");
+AM.queueDownload("./img/chest_open_rightside.png");
+
 
 
 

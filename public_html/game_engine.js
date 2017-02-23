@@ -143,26 +143,49 @@ GameEngine.prototype.startInput = function () {
         e.preventDefault();
     }, false);
 
-    this.ctx.canvas.addEventListener("click", function(e) {
-        that.click = getXandY(e);
-
-
-        if (that.clicked === true) {
-            that.clicked = false;
-        }
-        else {
-            that.clicked = true;
-        }
-
-        e.preventDefault();
-    }, false);
+//    this.ctx.canvas.addEventListener("click", function(e) {
+//        that.click = getXandY(e);
+//
+//
+//        if (that.clicked === true) {
+//            that.clicked = false;
+//        }
+//        else {
+//            that.clicked = true;
+//        }
+//
+//        e.preventDefault();
+//    }, false);
 
     this.ctx.canvas.addEventListener("mousemove", function(e) {
     that.mousePos = getXandY(e);
+    
 
     e.preventDefault();
 
 }, false);
+
+    this.ctx.canvas.addEventListener("mousedown", function(e) {
+        that.mousePos = getXandY(e);
+        that.click = getXandY(e);
+    
+        that.clicked = true;
+    //e.preventDefault();
+
+}, false);
+
+
+    this.ctx.canvas.addEventListener("mouseup", function(e) {
+        
+
+    that.mousePos = getXandY(e);
+    
+       that.clicked = false;
+
+    //e.preventDefault();
+
+}, false);
+
 
     console.log('Input started');
 };
