@@ -124,10 +124,12 @@ function collisionCheck(game, sprite) {
                     collide.bottom = true;
 
                     sprite.y = block.y - sprite.height;
-
+                    sprite.wasHooked = false;
                     if (sprite.fallDeath) {
                         sprite.hitGround = true;
                     }
+
+
 
                 }
 
@@ -188,6 +190,47 @@ function collisionCheck(game, sprite) {
 
 //Entity Area
 
+function StartButton(x, y, game) {
+  this.x = x;
+  this.y = y;
+  this.game = game;
+  this.width = 650;
+  this.height = 125;
+}
+
+StartButton.prototype.update = function() {
+    if (this.game.clicked) {
+      this.targetX = this.game.click.x;
+      this.targetY = this.game.click.y;
+      if((this.targetY >= this.y && this.targetY <= this.y + this.height) &&
+          (this.targetX >= this.x && this.targetX <= this.x + this.width)) {
+          this.game.changeScene = true;
+          this.game.nextScene = 1;
+        }
+    }
+
+};
+
+StartButton.prototype.draw = function(ctx) {
+  ctx.beginPath();
+  ctx.rect(this.x, this.y, this.width, this.height);
+  ctx.lineWidth = 7;
+  ctx.fill();
+  ctx.strokeStyle = 'black';
+  ctx.stroke();
+
+  ctx.font = "60px Comic Sans MS";
+  ctx.fillStyle = "red";
+  ctx.textAlign = "center";
+  ctx.fillText("Start the Adventure", 600, 650);
+};
+
+
+
+
+
+
+
 function Hero(game, x, y) {
     this.type = "hero";
     this.animationRight = new Animation(AM.getAsset("./img/horz_walk_right.png"), 0, 0, 104, 128, .03, 31, true, false);
@@ -197,14 +240,14 @@ function Hero(game, x, y) {
     this.animationLeftFall = new Animation(AM.getAsset("./img/right_forward_fall.png"), 0, 0, 67, 60, .05, 25, true, false);
     this.animationRightFall = new Animation(AM.getAsset("./img/right_forward_fall.png"), 0, 0, 67, 60, .05, 25, true, false);
     this.animationLeftFall = new Animation(AM.getAsset("./img/left_fall_forward.png"), 0, 0, 62, 60, .05, 25, true, false);
-
     this.animationRightFallDeath = new Animation(AM.getAsset("./img/right_forward_facing_fall_death.png"), 0, 0, 131, 102, .05, 25, false, false);
     this.animationLeftFallDeath = new Animation(AM.getAsset("./img/left_fall_forward_death.png"), 0, 0, 121, 102, .05, 25, false, false);
-
     this.animationRightSpikeDeath = new Animation(AM.getAsset("./img/forward_facing_spike_death.png"), 0, 0, 79, 97, .05, 35, false, false);
     this.animationLeftSpikeDeath = new Animation(AM.getAsset("./img/left_forward_facing_spike_death.png"), 0, 0, 79, 97, .05, 35, false, false);
     this.animationRightStand = new Animation(AM.getAsset("./img/right_stand.png"), 0, 0, 48, 58, 0.1, 25, true, false);
     this.animationLeftStand = new Animation(AM.getAsset("./img/left_stand.png"), 0, 0, 33, 58, 0.1, 25, true, false);
+    this.animationLeftDismount = new Animation(AM.getAsset("./img/left_dismount.png"), 0, 0, 65, 66, 0.05, 10, false, false);
+    this.animationRightDismount = new Animation(AM.getAsset("./img/right_dismount.png"), 0, 0, 52, 60, 0.05, 10, false, false);
     this.game = game;
     this.x = x;
     this.y = y;
@@ -233,6 +276,9 @@ function Hero(game, x, y) {
     this.spikeDeath = false;
     this.DeathDirection = null;
     this.FallDirection = null;
+    this.secondHalf = false;
+    this.wasHooked = false;
+
 }
 
 Hero.prototype.update = function () {
@@ -241,8 +287,6 @@ Hero.prototype.update = function () {
         this.hookY = this.y;
         this.fallY = this.y;
     }
-
-
 
     if (!this.hooked) {
 
@@ -263,7 +307,7 @@ Hero.prototype.update = function () {
       }
     }
 
-    if (this.game.tickCount >= 121 ) {
+    if (this.game.tickCount >= 121 && !this.wasHooked ) {
         var xDif = Math.abs(this.lastX - this.x);
         var yDif = Math.abs(this.lastY - this.y);
         if (xDif <= 64 && yDif > 3) {
@@ -280,21 +324,63 @@ Hero.prototype.update = function () {
         this.game.tickCount = 120;
     }
 
-    if (this.game.rightEdge === true) {
+    if (this.game.rightEdge === true && !this.secondHalf) {
+
         this.x = 1;
         this.y = 600;
+        this.secondHalf = true;
     }
-
-    if (this.game.leftEdge === true) {
+    else if (this.game.leftEdge === true) {
         this.x = 1190;
         this.y = 600;
+        this.secondHalf = false;
+        //go to next scene
     }
+    else if (this.game.rightEdge === true && this.secondHalf) {
+
+      this.game.changeScene = true;
+      this.game.nextScene = 2;
+      this.secondHalf = false;
+      this.x = 100;
+      this.y = 0;
+      this.speed = 275;
+      this.jumpSpeed = 6;
+      this.fallSpeed = 12;
+      this.jumpMax = this.jumpSpeed * 18;
+      this.jumpCurrent = 0;
+      this.hooked = false;
+      this.removeFromWorld = false;
+      this.width = 40;
+      this.height = 70;
+      this.scale = 1.3;
+      this.lastX = null;//
+      this.lastY = null;//
+      this.triggerFall = false;
+      this.defaultFallDistance = 200;
+      this.fallCount = 0;
+      this.fallY = 580;
+      this.fallDeath = false;
+      this.hitGround = false;
+      this.jumpAllowed = true;
+      this.hookY = null;
+      this.isDead = false;
+      this.spikeDeath = false;
+      this.DeathDirection = null;
+      this.FallDirection = null;
+      this.game.rightEdge = false;
+      this.game.leftEdge = true;
+      this.secondHalf = false;
+
+    }
+
+  //  if (this.game)
     if (this.game.moveRight && !this.hooked) {
         this.x += this.game.clockTick * this.speed;
     }
     if (this.game.moveLeft && !this.hooked) {
         this.x -= this.game.clockTick * this.speed;
     }
+
 
 
     var landed = collisionCheck(this.game, this);
@@ -304,7 +390,7 @@ Hero.prototype.update = function () {
         this.DeathDirection = this.game.direction;
       }
       this.spikeDeath = true;
-      console.log(this.spikeDeath);
+      //console.log(this.spikeDeath);
     }
 
     else  if (this.game.jumping && (landed.bottom || this.jumpAllowed) && !this.hooked) {
@@ -364,22 +450,86 @@ Hero.prototype.update = function () {
 
     }
   }
-
-
-
+  //Dead Hero
+   else {
+     if (this.game.clicked) {
+       this.targetX = this.game.click.x;
+       this.targetY = this.game.click.y;
+       if((this.targetY >= 300 && this.targetY <= 425) &&
+           (this.targetX >= 450 && this.targetX <= 850)) {
+           this.game.changeScene = true;
+           this.game.nextScene = 0;
+           this.x = 100;
+           this.y = 0;
+           this.speed = 275;
+           this.jumpSpeed = 6;
+           this.fallSpeed = 12;
+           this.jumpMax = this.jumpSpeed * 18;
+           this.jumpCurrent = 0;
+           this.hooked = false;
+           this.removeFromWorld = false;
+           this.width = 40;
+           this.height = 70;
+           this.scale = 1.3;
+           this.lastX = null;//
+           this.lastY = null;//
+           this.triggerFall = false;
+           this.defaultFallDistance = 200;
+           this.fallCount = 0;
+           this.fallY = 580;
+           this.fallDeath = false;
+           this.hitGround = false;
+           this.jumpAllowed = true;
+           this.hookY = null;
+           this.isDead = false;
+           this.spikeDeath = false;
+           this.DeathDirection = null;
+           this.FallDirection = null;
+           this.game.rightEdge = false;
+           this.game.leftEdge = true;
+           this.secondHalf = false;
+         }
+       }
+    }
 };
 
 Hero.prototype.draw = function (ctx) {
 
-  ctx.save();
-  ctx.beginPath();
-  ctx.strokeStyle ="Yellow";
-  ctx.rect(this.x, this.y, this.width, this.height);
-  ctx.stroke();
-  ctx.restore();
+  // ctx.save();
+  // ctx.beginPath();
+  // ctx.strokeStyle ="Yellow";
+  // ctx.rect(this.x, this.y, this.width, this.height);
+  // ctx.stroke();
+  // ctx.restore();
 
+  if (this.isDead) {
+    ctx.beginPath();
+    ctx.rect(450, 300, 400, 125);
+    ctx.lineWidth = 7;
+    ctx.fill();
+    ctx.strokeStyle = 'black';
+    ctx.stroke();
 
-    if (this.spikeDeath) {
+    ctx.font = "30px Comic Sans MS";
+    ctx.fillStyle = "red";
+    ctx.textAlign = "center";
+    ctx.fillText("Game Over Weakling!", 655, 345);
+
+    ctx.font = "25px Comic Sans MS";
+    ctx.fillStyle = "red";
+    ctx.textAlign = "center";
+    ctx.fillText("Click for another feeble attempt! ", 655, 400);
+    }
+    console.log(this.wasHooked );
+    if(this.wasHooked && !this.hooked) {
+      console.log("wasHooked");
+;      if(this.game.direction === "left") {
+        this.animationLeftDismount.drawFrame(this.game.clockTick, ctx, this.x, this.y, 1.5);
+      } else if (this.game.direction === "right") {
+        this.animationRightDismount.drawFrame(this.game.clockTick, ctx, this.x, this.y, 1.5);
+      }
+    }
+    else if (this.spikeDeath) {
       this.isDead = true;
       if(this.DeathDirection === "right") {
         this.animationRightSpikeDeath.drawFrame(this.game.clockTick, ctx, this.x + 3, this.y + 40, 1.5);
@@ -395,7 +545,7 @@ Hero.prototype.draw = function (ctx) {
         this.animationRightFallDeath.drawFrame(this.game.clockTick, ctx, this.x - 50, this.y - 25, 1.5);
       }
     }
-    else if (this.fallDeath) {
+    else if (this.fallDeath && !this.hooked) {
       if(this.FallDirection === "right") {
         this.animationRightFall.drawFrame(this.game.clockTick, ctx, this.x, this.y, 1.5);
       } else if (this.FallDirection === "left") {
@@ -491,6 +641,13 @@ function Hookshot(game, hero) {
     this.map = null;
     this.count = 1; // remove test only
     this.travelDistance = null;
+    this.swingSpeed = 1;
+    this.maxSwingSpeed = 12;
+    this.lastY = null;
+    this.removeFromWorld = false;
+    this.noSwing = false;
+    this.currentSwingSpeed = 0;
+
 
 
 
@@ -507,7 +664,6 @@ Hookshot.prototype.update = function () {
         }
     }
 
-
     if (this.startX === null && this.startY === null) {
         this.startX = this.owner.x + this.owner.width;
         this.startY = this.owner.y + (this.owner.height / 2);
@@ -518,7 +674,6 @@ Hookshot.prototype.update = function () {
 
 
     if (this.game.clicked) {
-
         this.swinging = true;
         this.targetX = this.game.click.x;
         this.targetY = this.game.click.y;
@@ -539,10 +694,19 @@ Hookshot.prototype.update = function () {
             this.owner.hooked = true;
 
 
-
-            if (this.length === null) {
+            if (this.length === null || this.game.verticalDirection === "up" || this.game.verticalDirection === "down") {
 //                this.owner.y -= 35;
 //                this.startY -= 35;
+
+                  if(this.game.verticalDirection === "up") {
+                    this.startY -= this.game.clockTick * this.owner.speed;
+
+                  }
+                  else if(this.game.verticalDirection === "down") {
+                    this.startY += this.game.clockTick * this.owner.speed;
+                  }
+
+
                 this.swingDirection = this.game.direction;
 
                 this.height = (this.startY - this.targetY);
@@ -550,10 +714,54 @@ Hookshot.prototype.update = function () {
 
                 this.length = (Math.sqrt((this.width * this.width) + (this.height * this.height)));
                 this.travelDistance = Math.abs(2 * (this.targetX - this.startX));
+                if(this.travelDistance < 75) {
+                  this.noSwing = true;
+                } else {
+                  this.noSwing = false;
+                }
+                //console.log("travelDistance: " + this.travelDistance);
+                this.lastY = this.owner.y;
+
 
             }
 
-            this.swing(5);
+            if(!this.noSwing) {
+            //Velocity Controls
+            // Falling right
+            if(this.owner.x < this.targetX && this.owner.y > this.lastY) {
+            // console.log("speedup 1");
+              if (this.swingSpeed < this.maxSwingSpeed) {
+                this.swingSpeed += .5;
+              }
+              // Raising Right
+            } else if(this.owner.x >= this.targetX && this.owner.y <= this.lastY) {
+              //  console.log("slowdown 1");
+              if (this.swingSpeed > 1) {
+                this.swingSpeed -= .5;
+              //  console.log(this.swingSpeed);
+
+              }
+              //Swing originating from Right
+            } else if(this.owner.x > this.targetX && this.owner.y > this.lastY) {
+                //  console.log("speedup 2");
+                  if (this.swingSpeed < this.maxSwingSpeed) {
+                    this.swingSpeed += .5;
+                  }
+           } else if(this.owner.x <= this.targetX && this.owner.y <= this.lastY) {
+               //console.log("slowdown 2");
+                  if (this.swingSpeed > 1) {
+                    this.swingSpeed -= .5;
+
+                  }
+           }
+           this.currentSwingSpeed = 1.5 * this.swingSpeed;
+         } else {
+           this.currentSwingSpeed = 0;
+         }
+
+
+            this.lastY = this.owner.y;
+            this.swing(this.currentSwingSpeed);
 
         }
 
@@ -575,6 +783,8 @@ Hookshot.prototype.update = function () {
         this.swingDirection = null;
         this.currentDegree = 0;
         this.count = 1;
+        this.swingSpeed = 1;
+        this.maxSwingSpeed = 12;
 
     }
 
@@ -586,11 +796,12 @@ Hookshot.prototype.draw = function (ctx) {
 
     if (this.hooked && !this.game.clicked) {
         this.hooked = false;
+        this.owner.wasHooked = true;
         this.owner.hooked = false;
     }
 
     if (this.game.clicked && this.hooked) {
-
+        this.owner.wasHooked = true;
         ctx.save();
         ctx.beginPath();
         ctx.strokeStyle = "saddleBrown";
@@ -622,76 +833,84 @@ Hookshot.prototype.swing = function (movePixel) {
     //Swing right
     if (this.swingDirection === "right") {
 
-        console.log("right1");
+
+      //  console.log("right1");
 
         if (this.startX < this.targetX) {
 
             if (this.owner.x < this.startX + this.travelDistance) {
 
-                console.log("right2");
+            //    console.log("right2");
 
                 this.owner.x += movePixel;
 
                 this.owner.y = Math.sqrt(this.length * this.length
                                     - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
                                     + this.targetY;
-            } 
+            }
             else {
-                
 
-                console.log("right3");
+
+              //  console.log("right3");
                 this.startX = this.owner.x;
                 this.swingDirection = 'left';
                 this.game.direction = 'left';
-                
+                this.swingSpeed = 1;
+
             }
 
         }
         // else if (this.startX > this.targetX) {
         else {
-        
+
             this.swingDirection = 'left';
             this.game.direction = 'left';
-    
+            this.swingSpeed = 1;
 
-        } 
-        
+
+
+        }
+
     //Swing left
     } else {
-        
-        console.log("left1");
+
+        //console.log("left1");
 
 
         if (this.startX > this.targetX) {
 
             if (this.owner.x > this.startX - this.travelDistance) {
 
-                console.log("left2");
+              //  console.log("left2");
 
                 this.owner.x -= movePixel;
 
                 this.owner.y = Math.sqrt(this.length * this.length
                                     - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
                                     + this.targetY;
-            
+
             }
             else {
-                console.log("left3");
+              //  console.log("left3");
                 this.startX = this.owner.x;
                 this.swingDirection = 'right';
                 this.game.direction = 'right';
+                this.swingSpeed = 1;
+
             }
 
         }
         else {
             this.swingDirection = 'right';
             this.game.direction = 'right';
-            
+            this.swingSpeed = 1;
+
+
         }
     }
-    
+
     var collide = collisionCheck(this.game, this.owner);
-    
+
     if (collide.bottom || collide.right || collide.left) {
         this.hooked = false;
         this.owner.hooked = false;
@@ -703,11 +922,12 @@ Hookshot.prototype.swing = function (movePixel) {
 };
 
 
-function Background(game) {
+function Background(game, path, width, height) {
     this.type = "background";
-    this.x = 0;
-    this.y = 400;
-    this.radius = 200;
+    this.path = path;
+    this.width = width;
+    this.height = height;
+    this.removeFromWorld = false;
 }
 
 
@@ -717,12 +937,11 @@ Background.prototype.update = function () {
 Background.prototype.draw = function (ctx) {
     ctx.save();
 
-    ctx.drawImage(AM.getAsset("./img/stonebackground.png"),
+    ctx.drawImage(AM.getAsset(this.path),
             0, 0, // source from sheet
-            1190, 798,
+            this.width, this.height,
             0, 0,
-            1200,
-            800);
+            this.width, this.height);
     ctx.restore();
 };
 
@@ -732,6 +951,7 @@ function Map(game, map) {
     this.rows = 13;
     this.cols = 38;
     this.map = map;
+    this.removeFromWorld = false;
     this.mapBlocks = new Array(this.rows);
 
     for (var i = 0; i < this.rows; i++) {
@@ -775,14 +995,43 @@ Map.prototype.draw = function (ctx) {
     }
 };
 
+
+function Target(game) {
+    this.x = 0;
+    this.y = 0;
+    this.size = 32;
+    this.game = game;
+
+
+
+}
+
+Target.prototype.draw = function(ctx) {
+
+
+    ctx.drawImage(AM.getAsset("./img/target.png"),
+        0, 0,
+        256, 256,
+        this.x - (this.size / 2), this.y - (this.size/ 2),
+        this.size,
+        this.size);
+
+};
+
+Target.prototype.update = function() {
+    this.x = this.game.mousePos.x;
+    this.y = this.game.mousePos.y;
+
+};
+
 function Block(game, x, y, type) {
     this.type = type;
     this.game = game;
+    this.removeFromWorld = false;
     this.x = x;
     this.y = y;
     this.spriteHeight = 32;
     this.spriteWidth = 32;
-    //this.scale = 2;
     this.height = 64;
     this.width = 64;
     this.torch = new Animation(AM.getAsset("./img/torch.png"), 0, 0, 59, 148, .03, 50, true, false);
@@ -797,12 +1046,12 @@ Block.prototype.update = function () {
 
 Block.prototype.draw = function (ctx) {
 
-     ctx.save();
-     ctx.beginPath();
-     ctx.strokeStyle ="Blue";
-     ctx.rect(this.x, this.y, this.width, this.height);
-     ctx.stroke();
-     ctx.restore();
+    //  ctx.save();
+    //  ctx.beginPath();
+    //  ctx.strokeStyle ="Blue";
+    //  ctx.rect(this.x, this.y, this.width, this.height);
+    //  ctx.stroke();
+    //  ctx.restore();
 
 
 
@@ -878,6 +1127,7 @@ Block.prototype.draw = function (ctx) {
     }
 };
 
+
 var mapArray = [[2, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                 [2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
                 [2, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -892,6 +1142,38 @@ var mapArray = [[2, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
                 [1, 1, 1, 1, 4, 4, 1, 1, 11, 5, 5, 5, 5, 5, 5, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                 [1, 1, 1, 1, 1, 1, 1, 1, 11, 5, 5, 5, 5, 5, 5, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
                 ];
+
+                var mapArray2 = [[2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                                [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+                                [1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
+                                [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1, 0, 0, 1, 1, 9, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+                                [1, 1, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 8, 1, 11, 5, 10, 1, 0, 8, 0, 8, 0, 8, 0, 8, 1, 1],
+                                [1, 0, 8, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 8, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                                [1, 1, 1, 4, 4, 1, 1, 4, 4, 9, 9, 1, 1, 9, 9, 1, 1, 1, 4, 7, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9, 9, 9, 9, 10],
+                                [1, 1, 1, 1, 1, 1, 1, 1, 11, 5, 5, 5, 5, 5, 5, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 5, 5, 5, 5, 10]
+                                ];
+
+                                var mapArray3 = [[2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                                                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                                                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                                                [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                [1, 1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 5, 5, 5, 5, 10]
+                                                ];
+
+
 var AM = new AssetManager();
 
 AM.queueDownload("./img/horz_walk_left.png");
@@ -920,6 +1202,12 @@ AM.queueDownload("./img/left_stand.png");
 AM.queueDownload("./img/right_stand.png");
 AM.queueDownload("./img/left_fall_forward.png");
 AM.queueDownload("./img/left_fall_forward_death.png");
+AM.queueDownload("./img/title.png");
+AM.queueDownload("./img/right_dismount.png");
+AM.queueDownload("./img/left_dismount.png");
+AM.queueDownload("./img/target.png");
+
+
 
 
 
@@ -927,25 +1215,67 @@ AM.queueDownload("./img/left_fall_forward_death.png");
 
 AM.downloadAll(function () {
 
-
     var canvas = document.getElementById("GameWorld");
     var ctx = canvas.getContext("2d");
 
     var gameEngine = new GameEngine();
 
+
     gameEngine.ctx = ctx;
-    var bg = new Background(gameEngine);
+
+    //******************************************************************//
+    //                          Title Screen                            //
+    //******************************************************************//
+    var bg = new Background(gameEngine, "./img/title.png", 1200, 800);
+    var startbtn = new StartButton(280, 568, gameEngine);
+    var target = new Target(gameEngine);
+    var title_scene_elements = [bg, startbtn, target];
+    var title = new Scene(title_scene_elements, gameEngine, 0);
+
+
+    //******************************************************************//
+    //                          Level 1 - part 1                        //
+    //******************************************************************//
+    var bg = new Background(gameEngine, "./img/stonebackground.png", 1210, 800);
     var map = new Map(gameEngine, mapArray);
     var hero = new Hero(gameEngine, 100, 0);
     var hookshot = new Hookshot(gameEngine, hero);
+    var target1 = new Target(gameEngine);
+    var scene_two_elements = [bg, map, hero, hookshot, target1];
+    var Scene2 = new Scene(scene_two_elements, gameEngine, 1);
 
 
+
+    //******************************************************************//
+    //                          Level 1 - part 2                        //
+    //******************************************************************//
+    var bg2 = new Background(gameEngine, "./img/stonebackground.png", 1210, 800);
+    var map2 = new Map(gameEngine, mapArray2);
+    var hero2 = new Hero(gameEngine, 1, 300);
+    var hookshot2 = new Hookshot(gameEngine, hero2);
+    var target2 = new Target(gameEngine);
+    var scene_three_elements = [bg2, map2, hero2, hookshot2, target2];
+    var Scene3 = new Scene(scene_three_elements, gameEngine, 2);
+
+
+
+
+
+    //******************************************************************//
+    //                         Load Scenes                              //
+    //******************************************************************//
+
+
+    //Set Scenes
+    var gameScenes = [title, Scene2, Scene3];
+    gameEngine.scenes = gameScenes;
     gameEngine.init(ctx);
+    title.init();
+    //Scence3.init();
 
-    gameEngine.addEntity(bg);
-    gameEngine.addEntity(map);
-    gameEngine.addEntity(hookshot);
-    gameEngine.addEntity(hero);
+
+
+
 
 
 

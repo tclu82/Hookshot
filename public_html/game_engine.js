@@ -35,6 +35,7 @@ function GameEngine() {
     this.click = null;
     this.clicked = false;
     this.mouse = null;
+    this.mousePos = {x:0, y:0};
     this.rightMove = null;
     this.leftMove = null;
     this.direction = "right";
@@ -45,6 +46,12 @@ function GameEngine() {
     this.rightEdge = null;
     this.leftEdge = null;
     this.tickCount = 0;
+    this.changeScene = false;
+    this.lastScene = 0;
+    this.nextScene = 0;
+    this.scenes = null;
+    this.verticalDirection = "none";
+
 
 }
 
@@ -95,6 +102,17 @@ GameEngine.prototype.startInput = function () {
          if (e.key === 'a') {
            that.moveLeft = true;
            that.direction = "left";
+
+         }
+
+         if (e.key === 'w') {
+           that.moveup = true;
+           that.verticalDirection = "up";
+         }
+
+         if (e.key === 's') {
+           that.movedown = true;
+           that.verticalDirection = "down";
          }
         e.preventDefault();
     }, false);
@@ -104,10 +122,22 @@ GameEngine.prototype.startInput = function () {
 
         if (e.key === 'd') {
           that.moveRight = false;
+
         }
 
         if (e.key === 'a') {
           that.moveLeft = false;
+        }
+
+        if (e.key === 'w') {
+          that.moveup = false;
+          that.verticalDirection = "none";
+        }
+
+        if (e.key === 's') {
+          that.movedown = false;
+          that.verticalDirection = "none";
+
         }
 
         e.preventDefault();
@@ -126,6 +156,13 @@ GameEngine.prototype.startInput = function () {
 
         e.preventDefault();
     }, false);
+
+    this.ctx.canvas.addEventListener("mousemove", function(e) {
+    that.mousePos = getXandY(e);
+
+    e.preventDefault();
+
+}, false);
 
     console.log('Input started');
 };
@@ -175,6 +212,15 @@ GameEngine.prototype.loop = function () {
     this.update();
     this.draw();
     this.space = null;
+    if(this.changeScene) {
+      this.changeScene = false;
+      console.log("changing:" + this.nextScene);
+      this.scenes[this.nextScene].init();
+      this.scenes[this.lastScene].remove();
+
+    }
+    this.lastScene = this.nextScene;
+
 };
 
 /*
