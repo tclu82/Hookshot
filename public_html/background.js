@@ -1,9 +1,11 @@
-function Background(game) {
+function Background(game, path, width, height) {
     this.type = "background";
-    this.x = 0;
-    this.y = 400;
-    this.radius = 200;
+    this.path = path;
+    this.width = width;
+    this.height = height;
+    this.removeFromWorld = false;
 }
+
 
 Background.prototype.update = function () {
 };
@@ -11,11 +13,10 @@ Background.prototype.update = function () {
 Background.prototype.draw = function (ctx) {
     ctx.save();
 
-    ctx.drawImage(AM.getAsset("./img/stonebackground.png"),
+    ctx.drawImage(AM.getAsset(this.path),
             0, 0, // source from sheet
-            1190, 798,
+            this.width, this.height,
             0, 0,
-            1200,
-            800);
+            this.width, this.height);
     ctx.restore();
 };

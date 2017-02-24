@@ -4,6 +4,7 @@ function Map(game, map) {
     this.rows = 13;
     this.cols = 38;
     this.map = map;
+    this.removeFromWorld = false;
     this.mapBlocks = new Array(this.rows);
 
     for (var i = 0; i < this.rows; i++) {
@@ -34,6 +35,7 @@ Map.prototype.update = function () {
         }
         this.game.leftEdge = false;
     }
+
 };
 
 Map.prototype.draw = function (ctx) {
@@ -42,6 +44,7 @@ Map.prototype.draw = function (ctx) {
         for (var j = 0; j < this.cols; j++) {
             var tile = this.mapBlocks[i][j];
             tile.draw(ctx);
+            tile.update(this);
         }
     }
 };

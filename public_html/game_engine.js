@@ -35,6 +35,7 @@ function GameEngine() {
     this.click = null;
     this.clicked = false;
     this.mouse = null;
+    this.mousePos = {x:0, y:0};
     this.rightMove = null;
     this.leftMove = null;
     this.direction = "right";
@@ -45,6 +46,12 @@ function GameEngine() {
     this.rightEdge = null;
     this.leftEdge = null;
     this.tickCount = 0;
+    this.changeScene = false;
+    this.lastScene = 0;
+    this.nextScene = 0;
+    this.scenes = null;
+    this.verticalDirection = "none";
+
 
 }
 
@@ -86,24 +93,27 @@ GameEngine.prototype.startInput = function () {
           that.jumping = true;
 
         }
+
         if (e.key === 'd') {
             that.moveRight = true;
             that.direction = "right";
-        }
-        if (e.key === 'a') {
+         }
+
+         if (e.key === 'a') {
            that.moveLeft = true;
            that.direction = "left";
-        }
-        if (e.key === 'w') {
-            console.log("w is hit");
-            that.moveUp = true;
 
-        }
-        if (e.key === 's') {
-            console.log("s is hit");
-            that.moveDown = true;
-        }
+         }
 
+         if (e.key === 'w') {
+           that.moveup = true;
+           that.verticalDirection = "up";
+         }
+
+         if (e.key === 's') {
+           that.movedown = true;
+           that.verticalDirection = "down";
+         }
         e.preventDefault();
     }, false);
 
@@ -112,6 +122,7 @@ GameEngine.prototype.startInput = function () {
 
         if (e.key === 'd') {
           that.moveRight = false;
+
         }
 
         if (e.key === 'a') {
@@ -119,32 +130,62 @@ GameEngine.prototype.startInput = function () {
         }
 
         if (e.key === 'w') {
-            console.log("w is release");
-            that.moveUp = false;
-
+          that.moveup = false;
+          that.verticalDirection = "none";
         }
+
         if (e.key === 's') {
-            console.log("s is release");
-            that.moveDown = false;
+          that.movedown = false;
+          that.verticalDirection = "none";
 
         }
 
         e.preventDefault();
     }, false);
 
-    this.ctx.canvas.addEventListener("click", function(e) {
+//    this.ctx.canvas.addEventListener("click", function(e) {
+//        that.click = getXandY(e);
+//
+//
+//        if (that.clicked === true) {
+//            that.clicked = false;
+//        }
+//        else {
+//            that.clicked = true;
+//        }
+//
+//        e.preventDefault();
+//    }, false);
+
+    this.ctx.canvas.addEventListener("mousemove", function(e) {
+    that.mousePos = getXandY(e);
+    
+
+    e.preventDefault();
+
+}, false);
+
+    this.ctx.canvas.addEventListener("mousedown", function(e) {
+        that.mousePos = getXandY(e);
         that.click = getXandY(e);
+    
+        that.clicked = true;
+    //e.preventDefault();
+
+}, false);
 
 
-        if (that.clicked === true) {
-            that.clicked = false;
-        }
-        else {
-            that.clicked = true;
-        }
+    this.ctx.canvas.addEventListener("mouseup", function(e) {
+        
 
-        e.preventDefault();
-    }, false);
+    that.mousePos = getXandY(e);
+    
+       that.clicked = false;
+
+    //e.preventDefault();
+
+}, false);
+
 
     console.log('Input started');
 };
@@ -194,6 +235,15 @@ GameEngine.prototype.loop = function () {
     this.update();
     this.draw();
     this.space = null;
+    if(this.changeScene) {
+      this.changeScene = false;
+      console.log("changing:" + this.nextScene);
+      this.scenes[this.nextScene].init();
+      this.scenes[this.lastScene].remove();
+
+    }
+    this.lastScene = this.nextScene;
+
 };
 
 /*
