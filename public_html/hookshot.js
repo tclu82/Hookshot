@@ -5,9 +5,9 @@ function Hookshot(game, hero) {
     this.swinging = false;
     this.swingDirection = null;
     this.hooked = false;
-    // this.startAngle = null;
     this.startX = null;
     this.startY = null;
+    this.endX = null;
     this.currentX = null;
     this.currentY = null;
     this.targetX = null;
@@ -15,13 +15,10 @@ function Hookshot(game, hero) {
     this.height = null;
     this.width = null;
     this.length = null;
-    // this.currentDegree = 0;
+    this.fixedLength = null;
     this.map = null;
     this.count = 1; // remove test only
     this.travelDistance = null;
-
-
-
 }
 
 Hookshot.prototype.update = function () {
@@ -36,17 +33,23 @@ Hookshot.prototype.update = function () {
     }
 
 
-    if (this.startX === null && this.startY === null) {
-        this.startX = this.owner.x + this.owner.width;
-        this.startY = this.owner.y + (this.owner.height / 2);
-    }
-    this.currentX = this.owner.x;
-    this.currentY = this.owner.y;
+    // if (this.startX === null && this.startY === null) {
+    //     this.startX = this.owner.x + this.owner.width;
+    //     this.startY = this.owner.y + (this.owner.height / 2);
+    // }
+    // this.currentX = this.owner.x;
+    // this.currentY = this.owner.y;
 
 
 
     if (this.game.clicked) {
 
+        if (this.startX === null && this.startY === null) {
+            this.startX = this.owner.x + this.owner.width;
+            this.startY = this.owner.y + (this.owner.height / 2);
+        }
+        this.currentX = this.owner.x;
+        this.currentY = this.owner.y;
         this.swinging = true;
         this.targetX = this.game.click.x;
         this.targetY = this.game.click.y;
@@ -54,7 +57,6 @@ Hookshot.prototype.update = function () {
 
         var gridY = Math.floor(this.map.rows * (this.targetY / (64 * this.map.rows)));
         var gridX = Math.floor(this.map.cols * (this.targetX / (64 * this.map.cols)));
-
 
         if (gridX < 0)
             gridX = 0;
@@ -66,20 +68,16 @@ Hookshot.prototype.update = function () {
             this.hooked = true;
             this.owner.hooked = true;
 
-
-
             if (this.length === null) {
-//                this.owner.y -= 35;
-//                this.startY -= 35;
                 this.swingDirection = this.game.direction;
-
                 this.height = (this.startY - this.targetY);
                 this.width = (this.startX - this.targetX);
                 // length of HookShot
                 this.length = (Math.sqrt((this.width * this.width) + (this.height * this.height)));
+                // Fixed length for ratio
+                this.fixedLength = this.length;
                 // Hero travels from startX, ends startX + travelDistance
                 this.travelDistance = Math.abs(2 * (this.targetX - this.startX));
-
             }
 
             this.swing(5);
@@ -91,6 +89,7 @@ Hookshot.prototype.update = function () {
         this.owner.hooked = false;
         this.swinging = false;
         this.startX = null;
+        this.endX = null;
         this.currentX = null;
         this.currentY = null;
         this.startY = null;
@@ -99,6 +98,7 @@ Hookshot.prototype.update = function () {
         this.height = null;
         this.width = null;
         this.length = null;
+        this.fixedLength = null;
         this.travelDistancel = null;
         this.startAngle = null;
         this.swingDirection = null;
@@ -138,8 +138,7 @@ Hookshot.prototype.draw = function (ctx) {
          this.height);
 
          */
-
-    }
+    }    
 };
 
 // This funciton return Y coordination according to HookShot's X coordination druing swing
@@ -151,40 +150,49 @@ Hookshot.prototype.calculateOwnerY = function(ownerX) {
 
 Hookshot.prototype.swing = function (movePixel) {
 
+    this.endX = this.swingDirection === "right" ? this.startX + this.travelDistance : this.startX - this.travelDistance;
+
+    if (this.game.moveUp) {
+        this.length -= 5;
+        var ratio = this.length / this.fixedLength;
+        this.travelDistance = this.travelDistance * ratio;
+        this.startX = this.targetX - this.travelDistance / 2;
+        this.endX = this.targetX + this.travelDistance / 2;
+    }   
+
+
     // Facing right and swing right
     if (this.swingDirection === "right") {
 
+        
         // console.log("right1");
 
         // Start to swing right
         if (this.startX < this.targetX) {
+
             // During the swing
-            if (this.owner.x < this.startX + this.travelDistance) {
+            if (this.owner.x < this.endX) {
 
                 // console.log("right2");
 
                 this.owner.x += movePixel;
                 this.owner.y = this.calculateOwnerY(this.owner.x);
-    
             }
             // Hit the end, reverse direction 
             else {
                 
                 // console.log("right3");
                 this.startX = this.owner.x;
+                // this.endX = this.startX - this.travelDistance;
+
                 this.swingDirection = 'left';
                 this.game.direction = 'left';
-                
             }
-
         }
         // facing right but shot left
         else {
-        
             this.swingDirection = 'left';
             this.game.direction = 'left';
-    
-
         } 
         
     // Facing left and swing left
@@ -193,30 +201,38 @@ Hookshot.prototype.swing = function (movePixel) {
         // console.log("left1");
 
 
+        // if (this.game.moveUp) {
+            // this.length -= 3;
+            // var ratio = this.length / this.fixedLength;
+            // this.travelDistance *= 1;
+            // this.startX = this.targetX + this.travelDistance / 2;
+        // }   
+        // console.log("this length: " + this.length);
+
+        // Start to swing left
         if (this.startX > this.targetX) {
             // During the swing
-            if (this.owner.x > this.startX - this.travelDistance) {
+            if (this.owner.x > this.endX) {
 
                 // console.log("left2");
 
                 this.owner.x -= movePixel;
                 this.owner.y = this.calculateOwnerY(this.owner.x);
-            
+
             }
             // Hit the end, reverse direction 
             else {
                 // console.log("left3");
                 this.startX = this.owner.x;
+                // this.endX = this.startX + this.travelDistance
                 this.swingDirection = 'right';
                 this.game.direction = 'right';
             }
-
         }
         // facing left but shot right
         else {
             this.swingDirection = 'right';
             this.game.direction = 'right';
-            
         }
     }
     

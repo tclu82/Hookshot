@@ -86,16 +86,24 @@ GameEngine.prototype.startInput = function () {
           that.jumping = true;
 
         }
-
         if (e.key === 'd') {
             that.moveRight = true;
             that.direction = "right";
-         }
-
-         if (e.key === 'a') {
+        }
+        if (e.key === 'a') {
            that.moveLeft = true;
            that.direction = "left";
-         }
+        }
+        if (e.key === 'w') {
+            console.log("w is hit");
+            that.moveUp = true;
+
+        }
+        if (e.key === 's') {
+            console.log("s is hit");
+            that.moveDown = true;
+        }
+
         e.preventDefault();
     }, false);
 
@@ -108,6 +116,17 @@ GameEngine.prototype.startInput = function () {
 
         if (e.key === 'a') {
           that.moveLeft = false;
+        }
+
+        if (e.key === 'w') {
+            console.log("w is release");
+            that.moveUp = false;
+
+        }
+        if (e.key === 's') {
+            console.log("s is release");
+            that.moveDown = false;
+
         }
 
         e.preventDefault();
