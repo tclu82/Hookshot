@@ -315,7 +315,7 @@ Hero.prototype.draw = function (ctx) {
 
     if(this.wasHooked && !this.hooked) {
       console.log("wasHooked");
-;      if(this.game.direction === "left") {
+      if(this.game.direction === "left") {
         this.animationLeftDismount.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
       } else if (this.game.direction === "right") {
         this.animationRightDismount.drawFrame(this.game.clockTick, ctx, this.x - 30, this.y, this.scale);

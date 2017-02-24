@@ -6,8 +6,6 @@ function Target(game) {
 }
 
 Target.prototype.draw = function(ctx) {
-
-
     ctx.drawImage(AM.getAsset("./img/target.png"),
         0, 0,
         256, 256,

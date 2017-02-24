@@ -11,7 +11,6 @@ window.requestAnimFrame = (function () {
             };
 })();
 
-
 function Timer() {
     this.gameTime = 0;
     this.maxStep = 0.05;
@@ -159,7 +158,7 @@ GameEngine.prototype.startInput = function () {
 
     this.ctx.canvas.addEventListener("mousemove", function(e) {
     that.mousePos = getXandY(e);
-    
+
 
     e.preventDefault();
 
@@ -168,19 +167,21 @@ GameEngine.prototype.startInput = function () {
     this.ctx.canvas.addEventListener("mousedown", function(e) {
         that.mousePos = getXandY(e);
         that.click = getXandY(e);
-    
-        that.clicked = true;
+
+        that.clicked = !that.clicked;
+
+
     //e.preventDefault();
 
 }, false);
 
 
     this.ctx.canvas.addEventListener("mouseup", function(e) {
-        
+
 
     that.mousePos = getXandY(e);
-    
-       that.clicked = false;
+
+       // that.clicked = false;
 
     //e.preventDefault();
 

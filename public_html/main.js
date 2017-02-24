@@ -83,22 +83,10 @@ AM.queueDownload("./img/left_facing_open_chest.png");
 AM.queueDownload("./img/chest_open_rightside.png");
 AM.queueDownload("./img/door.png");
 
-
-
-
-
-
-
-
-
 AM.downloadAll(function () {
-
     var canvas = document.getElementById("GameWorld");
     var ctx = canvas.getContext("2d");
-
     var gameEngine = new GameEngine();
-
-
     gameEngine.ctx = ctx;
 
     //******************************************************************//
@@ -150,13 +138,5 @@ AM.downloadAll(function () {
     gameEngine.init(ctx);
     title.init();
     //Scence3.init();
-
-
-
-
-
-
-
     gameEngine.start();
-
 });
