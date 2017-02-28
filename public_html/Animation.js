@@ -55,7 +55,6 @@ Animation.prototype.currentFrame = function () {
 
 Animation.prototype.isDone = function () {
     if (this.lockFrame && this.elapsedTime >= this.totalTime) {
-        console.log("LastFrame");
         this.elapsedTime -= this.frameDuration;
         return false;
     } 

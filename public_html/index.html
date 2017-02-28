@@ -6,6 +6,7 @@
     <title>Game Project Shell</title>
     <script type="text/javascript" src="./game_engine.js"></script>
     <script type="text/javascript" src="./assetmanager.js"></script>
+    <script type="text/javascript" src="./musicmanager.js"></script>
     <script type="text/javascript" src="./Animation.js"></script>
     <script type="text/javascript" src="./collisionCheck.js"></script>
     <script type="text/javascript" src="./Scene.js"></script>
@@ -17,10 +18,14 @@
     <script type="text/javascript" src="./key.js"></script>
     <script type="text/javascript" src="./startButton.js"></script>
     <script type="text/javascript" src="./block.js"></script>
+    <script type="text/javascript" src="./nextLevel.js"></script>
     <script type="text/javascript" src="./main.js"></script>
   </head>
 
   <body>
+    <div>Game Timer: <span id="minutes">00</span>:<span id="seconds">00</span></div>
+    <div id = "score"> Score: </div>
+    <div id = "Inventory"> Items: </div>
     <canvas id="GameWorld" height="800" width="1200" tabindex="1" style="border: 1px solid
             #000000; cursor: none"></canvas>
 
