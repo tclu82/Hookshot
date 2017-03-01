@@ -13,16 +13,18 @@ function Block(game, x, y, type) {
     this.width = 64;
     this.locked = true;
     this.inventory = [];
-    this.opening = null;
+    this.chest_opening = null;
+    this.door_opening = null;
     this.chestAnimation = new Animation(AM.getAsset("./img/chest_open_rightside.png"), 0, 0, 47, 44, .05, 49, false, false, true);
     this.torch = new Animation(AM.getAsset("./img/torch.png"), 0, 0, 59, 148, .03, 50, true, false);
     this.surfaceLava = new Animation(AM.getAsset("./img/surface_lava.png"), 1, 0, 40, 56, .05, 50, true, false);
     this.lava = new Animation(AM.getAsset("./img/lava.png"), 0, 0, 143, 143, .05, 62, true, false);
+    this.animation_door = new Animation(AM.getAsset("./img/doors.png"), 0, 0, 96, 96, .05, 12, false, false, true);
 
 }
 
 Block.prototype.collisionCheck = function() {
-    
+
 
     // Get the Map out of the Games Entity list
     var map = null;
@@ -64,65 +66,62 @@ Block.prototype.collisionCheck = function() {
 
             // If its block type 1
 
-            if (block.type === 1 || block.type === 5 || block.type === 9) {
+            if (block.type === 1 || block.type === 5 || block.type === 9 || block.type === 4 || block.type === 7) {
 
                 // Head
                 if (this.y >= block.y - 8) {
 
                     this.landed = true;
                 }
-
-
             }
-
         }
     }
 };
 
 Block.prototype.update = function (map) {
-    
+
     var currentX = Math.floor(this.x / this.width);
     var currentY = Math.floor(this.y / this.height);
     var prevX = this.x;
     var prevY = this.y;
-    
+
     if(this.type === 3) {
             this.inventory = new Key();
         }
-    
+
     if (this.type === 12 && !this.landed) {
         this.y += this.fallspeed;
         this.fallCounter += this.fallspeed;
-        
-        
+
+
         if (this.fallCounter >= 64) {
             this.fallCounter = 0;
-            
+
             var newX = Math.floor(this.x / this.width);
             var newY = Math.floor(this.y / this.height);
 
-          
+
            map.mapBlocks[currentY][currentX] = new Block(this.game, prevY, prevX, 0);
            var newBlock = new Block(this.game, this.x, this.y, 12);
            newBlock.landed = false;
            map.mapBlocks[newY][newX] = newBlock;
-            
+
         }
         this.collisionCheck();
-        
-       
     }
-
 };
 
 Block.prototype.draw = function (ctx) {
+//
+//    if (this.type === 13) {
+//      ctx.save();
+//      ctx.beginPath();
+//      ctx.strokeStyle ="Blue";
+//      ctx.rect(this.x, this.y, this.width, this.height);
+//      ctx.stroke();
+//      ctx.restore();
+//    }
 
-    //  ctx.save();
-    //  ctx.beginPath();
-    //  ctx.strokeStyle ="Blue";
-    //  ctx.rect(this.x, this.y, this.width, this.height);
-    //  ctx.stroke();
-    //  ctx.restore();
 
 
 
@@ -144,15 +143,12 @@ Block.prototype.draw = function (ctx) {
                 this.width);
 
     }
-    
+
     else if (this.type === 3) {
-        
-        
-          
-      if (this.opening) {
-          
+      if (this.chest_opening) {
+
         this.chestAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 1.6);
-    
+
       }
       else {
         ctx.drawImage(AM.getAsset("./img/chest_open_rightside.png"),
@@ -163,39 +159,43 @@ Block.prototype.draw = function (ctx) {
                     44 * 1.6);
       }
     }
-
-
-  
+    else if (this.type === 4) {
+      ctx.drawImage(AM.getAsset("./img/skeleton_spike2.png"),
+              83, 0, // source from sheet
+              270, 382,
+              this.x, this.y,
+              this.height,
+              this.width);
+    }
     else if (this.type === 5) {
 
-        this.lava.drawFrame(this.game.clockTick, ctx, this.x - 10, this.y, 2.3);
+        this.lava.drawFrame(this.game.clockTick, ctx, this.x - 10, this.y, 1.3);
 
-    } else if (this.type === 4) {
-        ctx.drawImage(AM.getAsset("./img/skeleton_spike2.png"),
-                83, 0, // source from sheet
-                270, 382,
-                this.x, this.y,
-                this.height,
-                this.width);
-    } else if (this.type === 6) {
+
+    }
+    else if (this.type === 6) {
         ctx.drawImage(AM.getAsset("./img/Empty_Spike2.png"),
                 83, 0, // source from sheet
                 270, 382,
                 this.x, this.y,
                 this.height,
                 this.width);
-    } else if (this.type === 7) {
+    }
+    else if (this.type === 7) {
         ctx.drawImage(AM.getAsset("./img/SpikeWithSkull2.png"),
                 83, 0, // source from sheet
                 270, 382,
                 this.x, this.y,
                 this.height,
                 this.width);
-    } else if (this.type === 8) {
+    }
+    else if (this.type === 8) {
         this.torch.drawFrame(this.game.clockTick, ctx, this.x, this.y, 0.5);
-    } else if (this.type === 9) {
+    }
+    else if (this.type === 9) {
         this.surfaceLava.drawFrame(this.game.clockTick, ctx, this.x - 10, this.y, 2.7);
-    } else if (this.type === 10) {
+    }
+    else if (this.type === 10) {
         ctx.drawImage(AM.getAsset("./img/lavarightside.png"),
               0, 0, // source from sheet
               512, 512,
@@ -203,7 +203,8 @@ Block.prototype.draw = function (ctx) {
               this.height,
               this.width);
 
-    } else if (this.type === 11) {
+    }
+    else if (this.type === 11) {
         ctx.drawImage(AM.getAsset("./img/leftlavaSide.png"),
             0, 0, // source from sheet
             512, 512,
@@ -211,18 +212,34 @@ Block.prototype.draw = function (ctx) {
             this.height,
             this.width);
 
-    } else if (this.type === 12) {
+    }
+    else if (this.type === 12) {
               ctx.drawImage(AM.getAsset("./img/BrokenTile.png"),
                   0, 0, // source from sheet
                   512, 512,
                   this.x, this.y,
                   this.height,
                   this.width);
-    }   else if (this.type === 13) {
-                ctx.drawImage(AM.getAsset("./img/door.png"),
+    }
+    else if (this.type === 13) {
+        if (this.door_opening) {
+            this.animation_door.drawFrame(this.game.clockTick, ctx, this.x, this.y - 20, 1);
+        }
+        else {
+                ctx.drawImage(AM.getAsset("./img/doors.png"),
                 0 , 0,  // source from sheet
-                94, 60,
-                this.x, this.y,
-                94,
-                60);  }
+                96, 96,
+                this.x, this.y - 20,
+                96,
+                96);
+        }
+     }
+     else if (this.type === 14) {
+                  ctx.drawImage(AM.getAsset("./img/doors.png"),
+                  0 , 0,  // source from sheet
+                  96, 96,
+                  this.x, this.y - 20,
+                  96,
+                  96);
+          }
 };

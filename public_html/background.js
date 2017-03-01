@@ -17,6 +17,6 @@ Background.prototype.draw = function (ctx) {
             0, 0, // source from sheet
             this.width, this.height,
             0, 0,
-            this.width, this.height);
+            this.width * 1.03, this.height * 1.03);
     ctx.restore();
 };

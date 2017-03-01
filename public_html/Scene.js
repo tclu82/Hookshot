@@ -1,8 +1,10 @@
-function Scene(objects, gameEngine, number) {
+function Scene(objects, gameEngine, number, startTimer, stopTimer) {
   this.objects = objects;
   this.game = gameEngine;
   this.number = number;
-}
+  this.startTimer = startTimer;
+  this.stopTimer = stopTimer
+};
 
 Scene.prototype.init = function() {
   for(var i = 0; i < this.objects.length; i++) {
@@ -10,10 +12,17 @@ Scene.prototype.init = function() {
     this.game.addEntity(this.objects[i]);
 
     if(this.objects[i].type === "hero") {
-      if(this.number === 2) {
-        console.log("change");
-        this.objects[i].x = 1;
-        this.objects[i].y = 300
+      if(this.number === 1) {
+        this.objects[i].x = 100;
+        this.objects[i].y = 1;
+      }
+      else if(this.number === 2) {
+        this.objects[i].x = 96;
+        this.objects[i].y = 300;
+      }
+      else if(this.numer === 3) {
+        this.objects[i].x = 100;
+        this.objects[i].y = 640;
       }
     }
   }

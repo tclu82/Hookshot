@@ -16,6 +16,18 @@ function Hero(game, x, y) {
     this.animationLeftDismount = new Animation(AM.getAsset("./img/left_dismount.png"), 0, 0, 65, 66, 0.05, 10, true, false, true);
     this.animationRightDismount = new Animation(AM.getAsset("./img/right_dismount.png"), 0, 0, 66, 65, 0.05, 10, true, false, true);
     this.animationOpenChest = new Animation(AM.getAsset("./img/left_facing_open_chest.png"), 0, 0, 44, 59, .05, 29, false, false);
+
+    //TODO sound effects
+    this.soundEFWalk        = MM.getSoundEF("./sound/walk.wav");
+    this.soundEFSpikeDeath  = MM.getSoundEF("./sound/spikeDeath.flac");
+    this.soundEFFallDeath   = MM.getSoundEF("./sound/fallDeath.wav");
+    this.soundEFJump        = null; //not yet
+    this.soundEFHookshot    = MM.getSoundEF("./sound/hookshot.wav");
+    this.soundEFOpenDoor    = MM.getSoundEF("./sound/openDoor.wav");
+    this.soundEFOpenChest   = MM.getSoundEF("./sound/openChest.wav");
+    this.soundEFDeathPlayed = false;
+    this.soundEFOpenChestPlayed = false;
+
     this.game = game;
     this.x = x;
     this.y = y;
@@ -48,10 +60,19 @@ function Hero(game, x, y) {
     this.wasHooked = false;
     this.action_OpenChest = false;
     this.inventory = [];
+    this.goToNext = false;
+    this.doorAnimationDone = null;
 
 }
 
+Hero.prototype.hasKey = function() {
+  return this.inventory[0].type === "key";
+
+};
+
 Hero.prototype.update = function () {
+
+
   if(!this.isDead) {
     if (this.hookY === null && this.hooked) {
         this.hookY = this.y;
@@ -95,24 +116,30 @@ Hero.prototype.update = function () {
     }
 
     if (this.game.rightEdge === true && !this.secondHalf) {
+      console.log("Yeah");
 
         this.x = 1;
         this.y = 600;
         this.secondHalf = true;
     }
     else if (this.game.leftEdge === true) {
+      console.log("whoot");
+
         this.x = 1190;
         this.y = 600;
         this.secondHalf = false;
         //go to next scene
     }
-    else if (this.game.rightEdge === true && this.secondHalf) {
 
+
+    /// bug somewhere here
+
+
+    else if (this.goToNext && this.game.anotherCount - this.doorAnimationDone > 80) {
+      console.log("Next");
       this.game.changeScene = true;
-      this.game.nextScene = 2;
+      this.game.nextScene ++;
       this.secondHalf = false;
-      this.x = 100;
-      this.y = 0;
       this.speed = 275;
       this.jumpSpeed = 6;
       this.fallSpeed = 12;
@@ -140,27 +167,41 @@ Hero.prototype.update = function () {
       this.game.rightEdge = false;
       this.game.leftEdge = true;
       this.secondHalf = false;
+      this.goToNext = false;
+      this.doorAnimationDone = null;
 
     }
 
   //  if (this.game)
     if (this.game.moveRight && !this.hooked) {
+
+        //music, walk sound.
+        if (this.jumpAllowed && this.jumpCurrent === 0) {
+           this.soundEFWalk.play();
+        }
+
         this.x += this.game.clockTick * this.speed;
     }
     if (this.game.moveLeft && !this.hooked) {
+
+        //music, walk sound.
+        if (this.jumpAllowed && this.jumpCurrent === 0) {
+           this.soundEFWalk.play();
+        }
+
         this.x -= this.game.clockTick * this.speed;
     }
 
 
 
     var landed = collisionCheck(this.game, this);
-    
+
     if(landed.bottom || landed.spike) {
         this.wasHooked = false;
         this.animationLeftDismount.elapsedTime = 0;
         this.animationRightDismount.elapsedTime = 0;
     }
-    
+
 
     if(landed.spike) {
       if(this.DeathDirection === null) {
@@ -168,24 +209,36 @@ Hero.prototype.update = function () {
       }
       this.spikeDeath = true;
       //console.log(this.spikeDeath);
-    } 
-    
-    else if (landed.door !== null) {
-        console.log("Whack door");
     }
+
+//    if (landed.door !== null) {
+//
+//                  // DOOR
+//
+//        if (this.hasKey()) {
+//            landed.door.door_opening = true;
+//            console.log("door opened");
+//        }
+//        else {
+//            console.log("locked");
+//        }
+//
+//    }
+
     else if (landed.chest !== null) {
-        landed.chest.opening = true;
+        landed.chest.chest_opening = true;
         this.inventory[0] = landed.chest.inventory;
         if(this.inventory[0] === "Key") {
             this.inventory[0].owner = this;
             this.inventory[0].setCoords();
         }
-       
+
         this.action_OpenChest = true;
-        
+
     }
 
-    else  if (this.game.jumping && (landed.bottom || this.jumpAllowed) && !this.hooked) {
+
+    else if (this.game.jumping && (landed.bottom || this.jumpAllowed) && !this.hooked) {
 
         if (this.jumpCurrent < this.jumpMax) {
             if (this.jumpCurrent >= .8 * this.jumpMax) {
@@ -245,14 +298,19 @@ Hero.prototype.update = function () {
   //Dead Hero
    else {
      if (this.game.clicked) {
+       console.log("Yep Head");
+
+       //music, reset dead SFX played.
+       this.soundEFDeathPlayed = false;
+
        this.targetX = this.game.click.x;
        this.targetY = this.game.click.y;
        if((this.targetY >= 300 && this.targetY <= 425) &&
            (this.targetX >= 450 && this.targetX <= 850)) {
            this.game.changeScene = true;
            this.game.nextScene = 0;
-           this.x = 100;
-           this.y = 0;
+          //  this.x = 100;
+          //  this.y = 0;
            this.speed = 275;
            this.jumpSpeed = 6;
            this.fallSpeed = 12;
@@ -280,9 +338,18 @@ Hero.prototype.update = function () {
            this.game.rightEdge = false;
            this.game.leftEdge = true;
            this.secondHalf = false;
+           this.goToNext = false;
+           this.doorAnimationDone = null;
          }
        }
     }
+
+    if (this.inventory.length === 0 ) {
+    document.getElementById("Inventory").innerHTML = "Inventory: Empty" ;
+  } else if (this.inventory.length === 1) {
+    document.getElementById("Inventory").innerHTML = "Inventory: " + this.inventory[0].type;
+
+  }
 };
 
 Hero.prototype.draw = function (ctx) {
@@ -295,6 +362,11 @@ Hero.prototype.draw = function (ctx) {
   // ctx.restore();
 
   if (this.isDead) {
+
+    //pause the music when dead.
+    backgroundMusic.pause();
+    this.soundEFDeathPlayed = true;
+
     ctx.beginPath();
     ctx.rect(450, 300, 400, 125);
     ctx.lineWidth = 7;
@@ -314,7 +386,6 @@ Hero.prototype.draw = function (ctx) {
     }
 
     if(this.wasHooked && !this.hooked) {
-      console.log("wasHooked");
 ;      if(this.game.direction === "left") {
         this.animationLeftDismount.drawFrame(this.game.clockTick, ctx, this.x, this.y, this.scale);
       } else if (this.game.direction === "right") {
@@ -322,13 +393,24 @@ Hero.prototype.draw = function (ctx) {
       }
     }
      else if (this.action_OpenChest) {
-         console.log("KEY: " + this.inventory[0]);
+
+       //music chest open.
+        this.soundEFOpenChest.play();
+
       this.animationOpenChest.drawFrame(this.game.clockTick, ctx, this.x - 15, this.y - 8, this.scale);
       if (this.animationOpenChest.isDone()) {
         this.action_OpenChest = false;
       }
     }
     else if (this.spikeDeath) {
+
+      //music spike death.
+      if (!this.soundEFDeathPlayed) {
+          this.soundEFSpikeDeath.play();
+          //stop the sound effect keep playing while dead.
+          this.soundEFDeathPlayed = true;
+      }
+
       this.isDead = true;
       if(this.DeathDirection === "right") {
         this.animationRightSpikeDeath.drawFrame(this.game.clockTick, ctx, this.x + 3, this.y + 40, this.scale);
@@ -337,6 +419,14 @@ Hero.prototype.draw = function (ctx) {
       }
     }
       else if (this.hitGround && this.fallDeath) {
+
+        //fall death
+        if (!this.soundEFDeathPlayed) {
+            this.soundEFFallDeath.play();
+            //stop the sound effect keep playing while dead.
+            this.soundEFDeathPlayed = true;
+        }
+
       this.isDead = true;
       if(this.FallDirection === "left") {
         this.animationLeftFallDeath.drawFrame(this.game.clockTick, ctx, this.x - 50, this.y - 10, this.scale);
@@ -410,7 +500,6 @@ Hero.prototype.draw = function (ctx) {
 //                        this.x, this.y,
 //                        85 * this.scale,
 //                        128 * this.scale);
-
                 break;
         }
 
