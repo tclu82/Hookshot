@@ -46,11 +46,14 @@ function GameEngine() {
     this.rightEdge = null;
     this.leftEdge = null;
     this.tickCount = 0;
+    this.anotherCount = 0;
     this.changeScene = false;
     this.lastScene = 0;
     this.nextScene = 0;
     this.scenes = null;
     this.verticalDirection = "none";
+    this.scoreTimerStart = null;
+
 
 
 }
@@ -159,7 +162,7 @@ GameEngine.prototype.startInput = function () {
 
     this.ctx.canvas.addEventListener("mousemove", function(e) {
     that.mousePos = getXandY(e);
-    
+
 
     e.preventDefault();
 
@@ -168,7 +171,7 @@ GameEngine.prototype.startInput = function () {
     this.ctx.canvas.addEventListener("mousedown", function(e) {
         that.mousePos = getXandY(e);
         that.click = getXandY(e);
-    
+
         that.clicked = true;
     //e.preventDefault();
 
@@ -176,10 +179,10 @@ GameEngine.prototype.startInput = function () {
 
 
     this.ctx.canvas.addEventListener("mouseup", function(e) {
-        
+
 
     that.mousePos = getXandY(e);
-    
+
        that.clicked = false;
 
     //e.preventDefault();
@@ -216,7 +219,6 @@ GameEngine.prototype.update = function () {
 
           } else if (entity.type === "hero" && entity.x < 0) {
             this.leftEdge = true;
-            console.log("need to go left");
           }
             entity.update();
         }
@@ -227,17 +229,23 @@ GameEngine.prototype.update = function () {
             this.entities.splice(i, 1);
         }
     }
-}
+};
 
 GameEngine.prototype.loop = function () {
+  document.getElementById("minutes").innerHTML = Math.floor(((this.timer.gameTime - this.scoreTimer) / 60) % 60);
+  document.getElementById("seconds").innerHTML = Math.floor(this.timer.gameTime - this.scoreTimer);
     this.clockTick = this.timer.tick();
     this.tickCount ++;
+    this.anotherCount++;
     this.update();
     this.draw();
     this.space = null;
     if(this.changeScene) {
       this.changeScene = false;
-      console.log("changing:" + this.nextScene);
+      console.log("next scene: " + this.nextScene);
+      if (this.scenes[this.nextScene].startTimer) {
+        this.scoreTimer = this.timer.gameTime;
+      }
       this.scenes[this.nextScene].init();
       this.scenes[this.lastScene].remove();
 

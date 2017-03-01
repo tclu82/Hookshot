@@ -1,4 +1,5 @@
 function Key() {
+    this.type = "key";
     this.image = "";
     this.x = null;
     this.y = null;
