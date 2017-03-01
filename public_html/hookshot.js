@@ -26,6 +26,8 @@ function Hookshot(game, hero) {
     this.noSwing = false;
     this.currentSwingSpeed = 0;
 
+    //music
+    this.soundEFHookshot = MM.getSoundEF("./sound/hookshot.wav");
 
 
 
@@ -65,13 +67,19 @@ Hookshot.prototype.update = function () {
             gridX = 0;
         if (gridY < 0)
             gridY = 0;
-        
+
         var block = this.map.mapBlocks[gridY][gridX];
 
         if (block.type === 2) {
 
+            //music hookshot sfx.
+            if(!this.hooked){
+                this.soundEFHookshot.play();
+            }
+
             this.hooked = true;
             this.owner.hooked = true;
+
 
 
             if (this.length === null || this.game.verticalDirection === "up" || this.game.verticalDirection === "down") {
@@ -144,10 +152,10 @@ Hookshot.prototype.update = function () {
             this.lastY = this.owner.y;
             this.swing(this.currentSwingSpeed);
 
-        } 
+        }
         else if (block.type === 12) {
             block.landed = false;
-            
+
         } else {
             this.game.clicked = false;
         }
@@ -185,7 +193,7 @@ Hookshot.prototype.draw = function (ctx) {
         this.hooked = false;
         this.owner.wasHooked = true;
         this.owner.hooked = false;
-    } 
+    }
     else if (this.game.clicked && this.hooked) {
         this.owner.wasHooked = true;
         ctx.save();
@@ -205,8 +213,8 @@ Hookshot.prototype.draw = function (ctx) {
         ctx.lineTo(this.targetX, this.targetY);
         ctx.stroke();
         ctx.restore();
-        
-   
+
+
 
         /*
          ctx.drawImage(AM.getAsset("./img/shot.png"),

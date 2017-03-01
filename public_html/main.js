@@ -104,11 +104,31 @@ AM.queueDownload("./img/left_facing_open_chest.png");
 AM.queueDownload("./img/chest_open_rightside.png");
 AM.queueDownload("./img/doors.png");
 
+var MM = new MusicManager();
+MM.queueDownload("./sound/bgm.mp3");
+MM.queueDownload("./sound/spikeDeath.flac");
+MM.queueDownload("./sound/fallDeath.wav");
+MM.queueDownload("./sound/openChest.wav");
+MM.queueDownload("./sound/walk.wav");
+MM.queueDownload("./sound/hookshot.wav");
+MM.queueDownload("./sound/openDoor.wav");
+//access it in hero.js, so music can be start and stop.
+var backgroundMusic
 
-AM.downloadAll(function () {
+
+MM.downloadAll(AM.downloadAll(function () {
 
   var canvas = document.getElementById("GameWorld");
   var ctx = canvas.getContext("2d");
+
+  //initialize bgm for the first stage.
+  backgroundMusic = MM.getSoundEF("./sound/bgm.mp3");
+    backgroundMusic.addEventListener('ended', function () {
+        this.currentTime = 0;
+        this.play();
+    }, false);
+
+
 
   var gameEngine = new GameEngine();
 
@@ -186,4 +206,4 @@ AM.downloadAll(function () {
 
   gameEngine.start();
 
-});
+}));

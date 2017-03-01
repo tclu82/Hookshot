@@ -8,6 +8,11 @@ function StartButton(x, y, game) {
 
 StartButton.prototype.update = function() {
     if (this.game.clicked) {
+
+      //music, start the bgm from the beginning.
+      backgroundMusic.currentTime = 0;
+      backgroundMusic.play();
+
       this.targetX = this.game.click.x;
       this.targetY = this.game.click.y;
       if((this.targetY >= this.y && this.targetY <= this.y + this.height) &&

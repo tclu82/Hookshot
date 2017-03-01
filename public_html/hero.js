@@ -16,6 +16,18 @@ function Hero(game, x, y) {
     this.animationLeftDismount = new Animation(AM.getAsset("./img/left_dismount.png"), 0, 0, 65, 66, 0.05, 10, true, false, true);
     this.animationRightDismount = new Animation(AM.getAsset("./img/right_dismount.png"), 0, 0, 66, 65, 0.05, 10, true, false, true);
     this.animationOpenChest = new Animation(AM.getAsset("./img/left_facing_open_chest.png"), 0, 0, 44, 59, .05, 29, false, false);
+
+    //TODO sound effects
+    this.soundEFWalk        = MM.getSoundEF("./sound/walk.wav");
+    this.soundEFSpikeDeath  = MM.getSoundEF("./sound/spikeDeath.flac");
+    this.soundEFFallDeath   = MM.getSoundEF("./sound/fallDeath.wav");
+    this.soundEFJump        = null; //not yet
+    this.soundEFHookshot    = MM.getSoundEF("./sound/hookshot.wav");
+    this.soundEFOpenDoor    = MM.getSoundEF("./sound/openDoor.wav");
+    this.soundEFOpenChest   = MM.getSoundEF("./sound/openChest.wav");
+    this.soundEFDeathPlayed = false;
+    this.soundEFOpenChestPlayed = false;
+
     this.game = game;
     this.x = x;
     this.y = y;
@@ -118,7 +130,7 @@ Hero.prototype.update = function () {
         this.secondHalf = false;
         //go to next scene
     }
-    
+
 
     /// bug somewhere here
 
@@ -162,9 +174,21 @@ Hero.prototype.update = function () {
 
   //  if (this.game)
     if (this.game.moveRight && !this.hooked) {
+
+        //music, walk sound.
+        if (this.jumpAllowed && this.jumpCurrent === 0) {
+           this.soundEFWalk.play();
+        }
+
         this.x += this.game.clockTick * this.speed;
     }
     if (this.game.moveLeft && !this.hooked) {
+
+        //music, walk sound.
+        if (this.jumpAllowed && this.jumpCurrent === 0) {
+           this.soundEFWalk.play();
+        }
+
         this.x -= this.game.clockTick * this.speed;
     }
 
@@ -275,6 +299,10 @@ Hero.prototype.update = function () {
    else {
      if (this.game.clicked) {
        console.log("Yep Head");
+
+       //music, reset dead SFX played.
+       this.soundEFDeathPlayed = false;
+
        this.targetX = this.game.click.x;
        this.targetY = this.game.click.y;
        if((this.targetY >= 300 && this.targetY <= 425) &&
@@ -334,6 +362,11 @@ Hero.prototype.draw = function (ctx) {
   // ctx.restore();
 
   if (this.isDead) {
+
+    //pause the music when dead.
+    backgroundMusic.pause();
+    this.soundEFDeathPlayed = true;
+
     ctx.beginPath();
     ctx.rect(450, 300, 400, 125);
     ctx.lineWidth = 7;
@@ -360,12 +393,24 @@ Hero.prototype.draw = function (ctx) {
       }
     }
      else if (this.action_OpenChest) {
+
+       //music chest open.
+        this.soundEFOpenChest.play();
+
       this.animationOpenChest.drawFrame(this.game.clockTick, ctx, this.x - 15, this.y - 8, this.scale);
       if (this.animationOpenChest.isDone()) {
         this.action_OpenChest = false;
       }
     }
     else if (this.spikeDeath) {
+
+      //music spike death.
+      if (!this.soundEFDeathPlayed) {
+          this.soundEFSpikeDeath.play();
+          //stop the sound effect keep playing while dead.
+          this.soundEFDeathPlayed = true;
+      }
+
       this.isDead = true;
       if(this.DeathDirection === "right") {
         this.animationRightSpikeDeath.drawFrame(this.game.clockTick, ctx, this.x + 3, this.y + 40, this.scale);
@@ -374,6 +419,14 @@ Hero.prototype.draw = function (ctx) {
       }
     }
       else if (this.hitGround && this.fallDeath) {
+
+        //fall death
+        if (!this.soundEFDeathPlayed) {
+            this.soundEFFallDeath.play();
+            //stop the sound effect keep playing while dead.
+            this.soundEFDeathPlayed = true;
+        }
+
       this.isDead = true;
       if(this.FallDirection === "left") {
         this.animationLeftFallDeath.drawFrame(this.game.clockTick, ctx, this.x - 50, this.y - 10, this.scale);
