@@ -5,8 +5,11 @@ function Block(game, x, y, type) {
     this.x = x;
     this.y = y;
     this.landed = true;
+    this.movingRight = true;
     this.fallCounter = 0;
+    this.slideCounter = 0;
     this.fallspeed = 8;
+    this.slidespeed = 2;
     this.spriteHeight = 32;
     this.spriteWidth = 32;
     this.height = 64;
@@ -20,6 +23,11 @@ function Block(game, x, y, type) {
     this.surfaceLava = new Animation(AM.getAsset("./img/surface_lava.png"), 1, 0, 40, 56, .05, 50, true, false);
     this.lava = new Animation(AM.getAsset("./img/lava.png"), 0, 0, 143, 143, .05, 62, true, false);
     this.animation_door = new Animation(AM.getAsset("./img/doors.png"), 0, 0, 96, 96, .05, 12, false, false, true);
+    
+    
+    if (this.type === 15) {
+        this.height = 64;
+    }
 
 }
 
@@ -89,7 +97,7 @@ Block.prototype.update = function (map) {
             this.inventory = new Key();
         }
 
-    if (this.type === 12 && !this.landed) {
+    else if (this.type === 12 && !this.landed) {
         this.y += this.fallspeed;
         this.fallCounter += this.fallspeed;
 
@@ -108,6 +116,48 @@ Block.prototype.update = function (map) {
 
         }
         this.collisionCheck();
+    }
+    
+    else if (this.type === 15) {
+        // Moving blocks from the left to the right for x distance 
+        // then move back to initial point.
+        
+
+        if (this.movingRight) {
+            this.x += this.slidespeed;
+
+            this.slideCounter += this.slidespeed;
+        }
+        else {
+            this.x -= this.slidespeed;
+            this.slideCounter -= this.slidespeed;
+
+        }
+        
+
+        
+
+        
+        var newX = Math.floor(this.x / this.width);
+        var newY = Math.floor(this.y / this.height);
+         
+        
+        if (this.slideCounter >= this.width * 2 && this.movingRight) {
+            this.movingRight = false;
+
+        }
+        else if (this.slideCounter <= 0 && !this.movingRight) {
+            this.movingRight = true;
+
+        }
+        
+        map.mapBlocks[currentY][currentX] = new Block(this.game, prevY, prevX, 0);
+        var newBlock = new Block(this.game, this.x, this.y, 15);
+        newBlock.slideCounter = this.slideCounter;
+        newBlock.movingRight = this.movingRight;
+        map.mapBlocks[newY][newX] = newBlock;
+        
+        
     }
 };
 
@@ -235,11 +285,28 @@ Block.prototype.draw = function (ctx) {
         }
      }
      else if (this.type === 14) {
-                  ctx.drawImage(AM.getAsset("./img/doors.png"),
-                  0 , 0,  // source from sheet
-                  96, 96,
-                  this.x, this.y - 20,
-                  96,
-                  96);
-          }
+        ctx.drawImage(AM.getAsset("./img/doors.png"),
+            0 , 0,  // source from sheet
+            96, 96,
+            this.x, this.y - 20,
+            96,
+            96);
+        }
+          
+     else if (this.type === 15) {
+         ctx.drawImage(AM.getAsset("./img/background_tile.png"),
+                0, 0, // source from sheet
+                512, 512,
+                this.x, this.y,
+                this.width,
+                this.height);
+                
+//        ctx.drawImage(AM.getAsset("./img/background_tile.png"),
+//                0, 0, // source from sheet
+//                512, 512,
+//                this.x, this.y,
+//                this.height,
+//                this.width);
+                
+     }
 };
