@@ -27,10 +27,7 @@ function Hookshot(game, hero) {
     this.currentSwingSpeed = 0;
 
     //music
-    this.soundEFHookshot = MM.getSoundEF("./sound/hookshot.wav");
-
-
-
+    this.soundEFHookshot = MM.getSoundEF("./sound/hookshot.wav")
 }
 
 Hookshot.prototype.update = function () {
