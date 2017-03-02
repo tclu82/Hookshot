@@ -7,8 +7,7 @@ function collisionCheck(game, sprite) {
         bottom: false,
         spike: false,
         chest: null,
-        door: null,
-        platform: null
+        door: null
     };
 
     // Get the Map out of the Games Entity list
@@ -53,7 +52,7 @@ function collisionCheck(game, sprite) {
 
             // If its block type 1
 
-            if (block.type === 1 || block.type === 2 || block.type === 12 || block.type === 3 || block.type === 15) {
+            if (block.type === 1 || block.type === 2 || block.type === 12 || block.type === 3) {
 
                 //If Hero hits a block from the top with Hero's Feet
                 if (sprite.y + sprite.height <= block.y + sprite.fallSpeed &&
@@ -63,15 +62,6 @@ function collisionCheck(game, sprite) {
                                         sprite.x <= block.x + block.width))) {
 
                     collide.bottom = true;
-                    
-                    if (block.type === 15) {
-                        if (block.movingRight) {
-                            sprite.x += 1;
-                        }
-                        else {
-                            sprite.x -= 1;
-                        }
-                    }
 
                     sprite.y = block.y - sprite.height;
 
