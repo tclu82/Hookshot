@@ -55,7 +55,6 @@ function collisionCheck(game, sprite) {
 
             if (block.type === 1 || block.type === 2 || block.type === 12 || block.type === 3 || block.type === 15) {
 
-
                 //If Hero hits a block from the top with Hero's Feet
                 if (sprite.y + sprite.height <= block.y + sprite.fallSpeed &&
                         sprite.y + sprite.height >= block.y &&
@@ -64,7 +63,7 @@ function collisionCheck(game, sprite) {
                                         sprite.x <= block.x + block.width))) {
 
                     collide.bottom = true;
-
+                    
                     if (block.type === 15) {
                         if (block.movingRight) {
                             sprite.x += 1;

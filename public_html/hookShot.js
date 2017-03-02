@@ -28,6 +28,9 @@ function Hookshot(game, hero) {
 
     //music
     this.soundEFHookshot = MM.getSoundEF("./sound/hookshot.wav");
+
+
+
 }
 
 Hookshot.prototype.update = function () {
