@@ -35,5 +35,5 @@ StartButton.prototype.draw = function(ctx) {
   ctx.font = "60px Comic Sans MS";
   ctx.fillStyle = "red";
   ctx.textAlign = "center";
-  ctx.fillText("Start the Adventure", 600, 650);
+  ctx.fillText("Start the Adventure", 350, 550);
 };

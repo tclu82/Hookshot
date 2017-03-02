@@ -23,9 +23,9 @@ function Block(game, x, y, type) {
     this.surfaceLava = new Animation(AM.getAsset("./img/surface_lava.png"), 1, 0, 40, 56, .05, 50, true, false);
     this.lava = new Animation(AM.getAsset("./img/lava.png"), 0, 0, 143, 143, .05, 62, true, false);
     this.animation_door = new Animation(AM.getAsset("./img/doors.png"), 0, 0, 96, 96, .05, 12, false, false, true);
-    
-    
-    if (this.type === 15) {
+    this.lava_roof = new Animation(AM.getAsset("./img/lavaCeiling.png"), 0, 0, 121, 117, .05, 50, true, false);
+
+	    if (this.type === 15) {
         this.height = 64;
     }
 
@@ -36,10 +36,14 @@ Block.prototype.collisionCheck = function() {
 
     // Get the Map out of the Games Entity list
     var map = null;
+    var hero = null;
     for (var i = 0; i < this.game.entities.length; i++) {
         var e = this.game.entities[i];
         if (e.type === "map") {
             map = e;
+        }
+        if(e.type === "hero") {
+          hero = e;
         }
     }
 
@@ -65,6 +69,15 @@ Block.prototype.collisionCheck = function() {
         gridXEnd = map.cols - 1;
     if (gridYEnd >= map.rows)
         gridYEnd = map.rows - 1;
+
+        if(hero.y <= this.y + this.height &&
+                  hero.y >= (this.y + this.height) - hero.jumpSpeed  &&
+                  ((hero.x <= this.x + this.width && hero.x >= this.x) ||
+                          (hero.x + hero.width > this.x &&
+                                  hero.x < this.x + this.width))) {
+                                    console.log('Swack');
+                                    hero.crushDeath = true;
+                                  }
 
 
     // Detection for hitting a Block
@@ -264,6 +277,7 @@ Block.prototype.draw = function (ctx) {
 
     }
     else if (this.type === 12) {
+
               ctx.drawImage(AM.getAsset("./img/BrokenTile.png"),
                   0, 0, // source from sheet
                   512, 512,
@@ -285,7 +299,7 @@ Block.prototype.draw = function (ctx) {
         }
      }
      else if (this.type === 14) {
-        ctx.drawImage(AM.getAsset("./img/doors.png"),
+      ctx.drawImage(AM.getAsset("./img/doors.png"),
             0 , 0,  // source from sheet
             96, 96,
             this.x, this.y - 20,
@@ -309,4 +323,8 @@ Block.prototype.draw = function (ctx) {
 //                this.width);
                 
      }
+    else if (this.type === 17) {
+            this.lava_roof.drawFrame(this.game.clockTick, ctx, this.x - 5, this.y - 7, 1.2);
+
+    }
 };
