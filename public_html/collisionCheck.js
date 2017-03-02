@@ -8,7 +8,8 @@ function collisionCheck(game, sprite) {
         spike: false,
         chest: null,
         door: null,
-        platform: null
+        lava: false,
+	platform: null
     };
 
     // Get the Map out of the Games Entity list
@@ -78,9 +79,6 @@ function collisionCheck(game, sprite) {
                     if (sprite.fallDeath) {
                         sprite.hitGround = true;
                     }
-
-
-
                 }
 
                 // Head
@@ -88,8 +86,7 @@ function collisionCheck(game, sprite) {
                         sprite.y >= (block.y + block.height) - sprite.jumpSpeed * 2 &&
                         ((sprite.x <= block.x + block.width && sprite.x >= block.x) ||
                                 (sprite.x + sprite.width > block.x &&
-                                        sprite.x < block.x + block.width))) {
-
+                                        sprite.x < block.x + block.width))) {                                       
                     collide.top = true;
                     sprite.y = block.y + block.height;
                 }
@@ -131,15 +128,22 @@ function collisionCheck(game, sprite) {
 
                 }
             }
-            else if (block.type === 4 || block.type === 6 ||block.type === 7 ) {
+            else if (block.type === 4 || block.type === 6 ||block.type === 7 || block.type === 5) {
 
               if (sprite.y + sprite.height <= block.y + sprite.fallSpeed &&
                       sprite.y + sprite.height >= block.y &&
                       ((sprite.x <= block.x + (block.width * .75) && sprite.x >= block.x +(block.width / 4)) ||
                       (sprite.x + sprite.width >= block.x  + (block.width / 4) &&
                       sprite.x <= block.x + (block.width * .75)))) {
+                  if (block.type === 4 || block.type === 6 ||block.type === 7 ) {
+                    collide.spike = true;
+                  }
 
-                                        collide.spike = true;
+                  if (block.type === 5 || block.type === 9) {
+                        collide.lava = true;
+                        collide.bottom = true;
+                  }
+
 
                                         //sprite.y = block.y - sprite.height/2.5;
 
@@ -149,6 +153,7 @@ function collisionCheck(game, sprite) {
               if (sprite.hasKey()) {
                   block.door_opening = true;
                   sprite.goToNext = true;
+                  sprite.inventory.key = null;
                   if(sprite.doorAnimationDone === null) {
                     sprite.doorAnimationDone = game.anotherCount;
                 }
@@ -157,6 +162,19 @@ function collisionCheck(game, sprite) {
 
               //collide.door = block;
           }
+          else if(block.type === 12) {
+            // Head
+            if (sprite.y <= block.y + block.height &&
+                    sprite.y >= (block.y + block.height) - sprite.jumpSpeed * 2 &&
+                    ((sprite.x <= block.x + block.width && sprite.x >= block.x) ||
+                            (sprite.x + sprite.width > block.x &&
+                                    sprite.x < block.x + block.width))) {
+            console.log("hit");
+            collide.crush = true;
+          }
+        }
+
+
 
 
 
