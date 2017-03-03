@@ -54,6 +54,11 @@ function GameEngine() {
     this.verticalDirection = "none";
     this.scoreTimerStart = null;
 
+    /**
+     * Added
+     *
+     */
+    this.score = null;
 
 
 }
@@ -232,17 +237,35 @@ GameEngine.prototype.update = function () {
 };
 
 GameEngine.prototype.loop = function () {
-  document.getElementById("minutes").innerHTML = Math.floor(((this.timer.gameTime - this.scoreTimer) / 60) % 60);
-  document.getElementById("seconds").innerHTML = Math.floor(this.timer.gameTime - this.scoreTimer) % 60;
+  // document.getElementById("minutes").innerHTML = Math.floor(((this.timer.gameTime - this.scoreTimer) / 60) % 60);
+  // document.getElementById("seconds").innerHTML = Math.floor(this.timer.gameTime - this.scoreTimer) % 60;
+
+    /**
+     * Changes start here
+     *
+     *
+     */
+    var time = this.timer.gameTime - this.scoreTimer
+    document.getElementById("minutes").innerHTML = Math.floor(time / 60);
+    document.getElementById("seconds").innerHTML = Math.floor(time) % 60;
+
+    // Keep running
+    this.score = 10 - Math.floor(time) * 2;
+    document.getElementById("score").innerHTML = this.score;
+    // console.log(currentTime);
+
+
     this.clockTick = this.timer.tick();
     this.tickCount ++;
     this.anotherCount++;
     this.update();
     this.draw();
     this.space = null;
+
     if(this.changeScene) {
       this.changeScene = false;
       console.log("next scene: " + this.nextScene);
+
       if (this.scenes[this.nextScene].startTimer) {
         this.scoreTimer = this.timer.gameTime;
       }
