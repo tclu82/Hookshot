@@ -366,6 +366,7 @@ Hero.prototype.draw = function (ctx) {
     //pause the music when dead.
     backgroundMusic.pause();
     this.soundEFDeathPlayed = true;
+    // this.game.time.pause();
 
     ctx.beginPath();
     ctx.rect(450, 300, 400, 125);
@@ -383,6 +384,7 @@ Hero.prototype.draw = function (ctx) {
     ctx.fillStyle = "red";
     ctx.textAlign = "center";
     ctx.fillText("Click for another feeble attempt! ", 655, 400);
+
     }
 
     if(this.wasHooked && !this.hooked) {

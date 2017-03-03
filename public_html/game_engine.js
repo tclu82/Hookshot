@@ -58,8 +58,8 @@ function GameEngine() {
      * Added
      *
      */
+    this.time = null;
     this.score = null;
-
 
 }
 
@@ -245,14 +245,16 @@ GameEngine.prototype.loop = function () {
      *
      *
      */
-    var time = this.timer.gameTime - this.scoreTimer
-    document.getElementById("minutes").innerHTML = Math.floor(time / 60);
-    document.getElementById("seconds").innerHTML = Math.floor(time) % 60;
+    this.time = this.timer.gameTime - this.scoreTimer
+    document.getElementById("minutes").innerHTML = Math.floor(this.time / 60);
+    document.getElementById("seconds").innerHTML = Math.floor(this.time) % 60;
 
     // Keep running
-    this.score = 10 - Math.floor(time) * 2;
+    this.score = 1000 - Math.floor(this.time) * 2;
     document.getElementById("score").innerHTML = this.score;
     // console.log(currentTime);
+
+
 
 
     this.clockTick = this.timer.tick();
