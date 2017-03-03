@@ -50,11 +50,13 @@ function collisionCheck(game, sprite) {
         for (var j = gridXStart; j <= gridXEnd; j++) {
             var block = map.mapBlocks[i][j];
 
+            if (block === undefined) console.log("x: " + i + " " + "y: " + j);
+
 
 
             // If its block type 1
 
-            if (block.type === 1 || block.type === 2 || block.type === 12 || block.type === 3 || block.type === 15) {
+            if (block.type === 1 || block.type === 2 || block.type === 12 || block.type === 3 || block.type === 15 || block.type === 19) {
 
                 //If Hero hits a block from the top with Hero's Feet
                 if (sprite.y + sprite.height <= block.y + sprite.fallSpeed &&
@@ -64,7 +66,7 @@ function collisionCheck(game, sprite) {
                                         sprite.x <= block.x + block.width))) {
 
                     collide.bottom = true;
-                    
+
                     if (block.type === 15) {
                         if (block.movingRight) {
                             sprite.x += 1;
@@ -86,7 +88,7 @@ function collisionCheck(game, sprite) {
                         sprite.y >= (block.y + block.height) - sprite.jumpSpeed * 2 &&
                         ((sprite.x <= block.x + block.width && sprite.x >= block.x) ||
                                 (sprite.x + sprite.width > block.x &&
-                                        sprite.x < block.x + block.width))) {                                       
+                                        sprite.x < block.x + block.width))) {
                     collide.top = true;
                     sprite.y = block.y + block.height;
                 }
@@ -101,6 +103,12 @@ function collisionCheck(game, sprite) {
                     collide.left = true;
                     if (block.type === 3 && block.chest_opening === null) {
                         collide.chest = block;
+
+                    }
+
+                    if (block.type === 19 && block.chest_opening === null) {
+                        collide.chest = block;
+                        sprite.inventory.getRandomItem();
 
                     }
 

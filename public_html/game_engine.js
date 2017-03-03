@@ -242,7 +242,6 @@ GameEngine.prototype.loop = function () {
     this.space = null;
     if(this.changeScene) {
       this.changeScene = false;
-      console.log("next scene: " + this.nextScene);
       if (this.scenes[this.nextScene].startTimer) {
         this.scoreTimer = this.timer.gameTime;
       }

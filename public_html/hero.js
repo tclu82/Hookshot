@@ -1,4 +1,4 @@
-function Hero(game, x, y) {
+function Hero(game, x, y, invetoryCTX) {
   this.type = "hero";
   this.animationRight = new Animation(AM.getAsset("./img/horz_walk_right.png"), 0, 0, 104, 128, .03, 31, true, false);
   this.animationLeft = new Animation(AM.getAsset("./img/horz_walk_left.png"), 0, 0, 80, 128, .03, 31, true, false);
@@ -32,6 +32,8 @@ function Hero(game, x, y) {
   this.game = game;
   this.x = x;
   this.y = y;
+  this.StartX = x;
+  this.StartY = y;
   this.speed = 275;
   this.jumpSpeed = 6;
   this.fallSpeed = 12;
@@ -40,6 +42,7 @@ function Hero(game, x, y) {
   this.hooked = false;
   this.removeFromWorld = false;
   this.ctx = game.ctx;
+  this.invetoryCTX = invetoryCTX;
   this.width = 40;
   this.height = 70;
   this.scale = 1.3;
@@ -61,7 +64,7 @@ function Hero(game, x, y) {
   this.secondHalf = false;
   this.wasHooked = false;
   this.action_OpenChest = false;
-  this.inventory = new Inventory();
+  this.inventory = new Inventory(this.invetoryCTX, this);
   this.goToNext = false;
   this.doorAnimationDone = null;
   this.lava = false;
@@ -110,6 +113,14 @@ Hero.prototype.reset = function() {
   this.smokeScale = 1;
   this.game.tickCount = 0;
 
+  //Inventory reset
+  this.inventory.key = null;
+  this.inventory.invincibility = null;
+  this.inventory.Revive = null;
+  this.inventory.safeFall = null;
+  this.inventory.lowGrav = null;
+
+
 };
 
 Hero.prototype.hasKey = function() {
@@ -133,7 +144,7 @@ Hero.prototype.update = function () {
       }
 
 
-      if (this.fallCount >= this.defaultFallDistance) {
+      if (this.fallCount >= this.defaultFallDistance && this.inventory.invincibility === null) {
         //console.log("FallDeath: " + this.fallDeath);
         this.fallDeath = true;
         if (this.FallDirection === null) {
@@ -183,37 +194,7 @@ Hero.prototype.update = function () {
         this.game.changeScene = true;
         this.game.nextScene ++;
         this.reset();
-        // this.secondHalf = false;
-        // this.speed = 275;
-        // this.jumpSpeed = 6;
-        // this.fallSpeed = 12;
-        // this.jumpMax = this.jumpSpeed * 18;
-        // this.jumpCurrent = 0;
-        // this.hooked = false;
-        // this.removeFromWorld = false;
-        // this.width = 40;
-        // this.height = 70;
-        // this.scale = 1.3;
-        // this.lastX = null;//
-        // this.lastY = null;//
-        // this.triggerFall = false;
-        // this.defaultFallDistance = 200;
-        // this.fallCount = 0;
-        // this.fallY = 580;
-        // this.triggerFall = false;
-        // this.fallDeath = false;
-        // this.hitGround = false;
-        // this.jumpAllowed = true;
-        // this.hookY = null;
-        // this.isDead = false;
-        // this.spikeDeath = false;
-        // this.DeathDirection = null;
-        // this.FallDirection = null;
-        // this.game.rightEdge = false;
-        // this.game.leftEdge = true;
-        // this.secondHalf = false;
-        // this.goToNext = false;
-        // this.doorAnimationDone = null;
+
 
       }
 
@@ -240,7 +221,7 @@ Hero.prototype.update = function () {
 
       var landed = collisionCheck(this.game, this);
 
-      if(landed.lava && this.lavaDeath == null) {
+      if(landed.lava && this.lavaDeath == null && this.inventory.invincibility === null) {
         this.lavaDeath = true;
 
       }
@@ -252,7 +233,7 @@ Hero.prototype.update = function () {
       }
 
 
-      if(landed.spike) {
+      if(landed.spike && this.inventory.invincibility === null) {
         if(this.DeathDirection === null) {
           this.DeathDirection = this.game.direction;
         }
@@ -274,11 +255,15 @@ Hero.prototype.update = function () {
       //
       //    }
 
-      else if (landed.chest !== null) {
+      else if (landed.chest !== null && landed.chest.type === 3) {
         landed.chest.chest_opening = true;
         this.inventory.key = landed.chest.inventory;
           this.inventory.key.owner = this;
           this.inventory.key.setCoords();
+          this.action_OpenChest = true;
+      }
+      else if (landed.chest !== null && landed.chest.type === 19) {
+          landed.chest.chest_opening = true;
           this.action_OpenChest = true;
       }
 
@@ -361,9 +346,19 @@ Hero.prototype.update = function () {
       this.targetY = this.game.click.y;
       if((this.targetY >= 300 && this.targetY <= 425) &&
       (this.targetX >= 450 && this.targetX <= 850)) {
+
+        if(this.inventory.Revive !== null) {
+          console.log("Used Revive");
+          this.x = this.StartX;
+          this.y = this.StartY;
+          this.inventory.Revive = null;
+          this.reset();
+
+        } else {
         this.game.changeScene = true;
         this.game.nextScene = 0;
         this.reset();
+      }
       }
     }
   }
@@ -374,17 +369,23 @@ document.getElementById("Inventory").innerHTML = "Inventory: Key";
   document.getElementById("Inventory").innerHTML = "Inventory: Empty";
 }
 
+if (this.inventory.invincibility !== null && this.inventory.invincibility.empty) {
+  this.inventory.invincibility = null;
+}
+
 
 };
 
 Hero.prototype.draw = function (ctx) {
 
-//  ctx.save();
-//  ctx.beginPath();
-//  ctx.strokeStyle ="Yellow";
-//  ctx.rect(this.x, this.y, this.width, this.height);
-//  ctx.stroke();
-//  ctx.restore();
+  this.inventory.draw();
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.strokeStyle ="Yellow";
+  ctx.rect(this.x, this.y, this.width, this.height);
+  ctx.stroke();
+  ctx.restore();
 
   if(this.wasHooked && !this.hooked) {
     ;      if(this.game.direction === "left") {
@@ -475,6 +476,19 @@ Hero.prototype.draw = function (ctx) {
     this.isDead = true;
 
   }
+
+  else if (this.hitGround && this.fallDeath && this.inventory.safeFall !== null && this.inventory.safeFall.fallsLeft > 0) {
+    console.log("Safe");
+    this.inventory.safeFall.landed();
+    this.hitGround = false;
+    this.fallDeath = false;
+    this.fallCount = 0;
+    if(this.inventory.safeFall.fallsLeft === 0) {
+      this.inventory.safeFall = null;
+    }
+  }
+
+
   else if (this.hitGround && this.fallDeath) {
 
     this.isDead = true;
@@ -500,6 +514,7 @@ Hero.prototype.draw = function (ctx) {
               1200,
               800);
   }
+
 
   else if (this.crushDeath) {
     this.animationRightCrushDeath.drawFrame(this.game.clockTick, ctx, this.x - 40, this.y - 20, .65);
