@@ -5,10 +5,10 @@ function Inventory(InventoryCTX, hero) {
   this.invincibility = null;
   this.safeFall = null;
   this.lowGrav = null;
-  this.itemlist = [function() {return new Revive()},
-                   function() {return new invincibility()},
-                   function() {return new safeFall()},
-                   function() {return new lowGrav()}];
+  this.itemlist = [function() {return new Revive();},
+                   function() {return new invincibility();},
+                   function() {return new safeFall();},
+                   function() {return new lowGrav();}];
 
 
   this.InventoryCTX = InventoryCTX;
@@ -135,12 +135,28 @@ Inventory.prototype.draw = function() {
   }
 
   if(this.lowGrav !== null) {
+    var item = this.lowGrav;
+
+    item.timer++;
+
+    if (item.timer >= item.timeLimit) {
+      item.empty = true;
+    }
+
+
     this.itemCount ++;
-    this.InventoryCTX.drawImage(AM.getAsset("./img/lowGrav.png"),
+
+    this.InventoryCTX.drawImage(AM.getAsset("./img/lowGravGray.png"),
             0, 0, // source from sheet
             88, 81,
             itemWidth * this.itemCount  + 10, 10,
             80, 80);
+
+    this.InventoryCTX.drawImage(AM.getAsset("./img/lowGrav.png"),
+            0, 0, // source from sheet
+            88, 81 - item.timer * item.drawReduction,
+            itemWidth * this.itemCount  + 10, 10,
+            80, 80 - item.timer * item.drawReduction);
   }
   this.itemCount = -1;
 };
@@ -152,7 +168,7 @@ function Key() {
     this.x = null;
     this.y = null;
     this.owner = null;
-    this.used = false
+    this.used = false;
 };
 
 
@@ -167,7 +183,7 @@ function Revive() {
     this.x = null;
     this.y = null;
     this.owner = null;
-    this.used = false
+    this.used = false;
 };
 
 
@@ -190,9 +206,9 @@ function safeFall() {
 
 safeFall.prototype.landed = function() {
   this.fallsLeft--;
-  this.sizeLeft += 20;
+  this.sizeLeft += 40;
   console.log("Falls Left: " + this.fallsLeft);
-}
+};
 
 safeFall.prototype.setCoords = function() {
     this.x = this.owner.x;
@@ -205,7 +221,13 @@ function lowGrav() {
     this.x = null;
     this.y = null;
     this.owner = null;
-    this.used = false
+    this.used = false;
+
+    this.timeLimit = 1200;
+    this.timer = 0;
+    this.empty = false;
+
+    this.drawReduction = 1 / (this.timeLimit / 80);
 };
 
 

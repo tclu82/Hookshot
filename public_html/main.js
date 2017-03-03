@@ -37,8 +37,8 @@ var mapArray3 =
 [[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
 [1, 0, 0, 0, 12, 12, 12, 12, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+[1, 19, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+[1, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1],
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1],
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1],
@@ -51,11 +51,11 @@ var mapArray3 =
 
 
 var mapArray4 =
-[[2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 5, 5, 5, 5, 5, 5, 5, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 1],
+[[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
+[1, 0, 0, 0, 12, 12, 0, 0, 0, 1, 5, 5, 5, 5, 5, 5, 5, 5, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 1],
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 5, 5, 5, 5, 5, 5, 5, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 17, 17, 17, 17, 2, 2, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+[1, 19, 0, 0, 0, 0, 0, 0, 0, 2, 2, 17, 17, 17, 17, 2, 2, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+[1, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1],
@@ -131,22 +131,20 @@ var test =
 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
 
-
-
-
+// Map Template
 var Default =
-[[2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
+[[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 1],
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
 
@@ -204,15 +202,16 @@ AM.queueDownload("./img/Revive.png");
 AM.queueDownload("./img/invincibility.png");
 AM.queueDownload("./img/safefall.png");
 AM.queueDownload("./img/lowGrav.png");
-
 AM.queueDownload("./img/InvincibilityItem.png");
 AM.queueDownload("./img/keyItem.png");
 AM.queueDownload("./img/reviveItem.png");
 AM.queueDownload("./img/lowgravItem.png");
 AM.queueDownload("./img/lowGrav.png");
+AM.queueDownload("./img/lowGravGray.png");
 AM.queueDownload("./img/safefallGray.png");
 AM.queueDownload("./img/invincibilityGray.png");
-
+AM.queueDownload("./img/lowGravWaves.png");
+AM.queueDownload("./img/invincibilityBubble.png");
 
 
 
@@ -265,10 +264,7 @@ MM.downloadAll(AM.downloadAll(function () {
   //******************************************************************//
   var bg = new Background(gameEngine, "./img/stonebackground.png", 1250, 900);
   var map = new Map(gameEngine, mapArray1);
-  //var map = new Map(gameEngine, test);
   var hero = new Hero(gameEngine, 100, 0, ctx2);
-
-
   var hookshot = new Hookshot(gameEngine, hero);
   var target1 = new Target(gameEngine);
   var scene_one_elements = [bg, map, hero, hookshot, target1];
@@ -278,9 +274,7 @@ MM.downloadAll(AM.downloadAll(function () {
   //                          Level 1 - part 2                        //
   //******************************************************************//
   var bg2 = new Background(gameEngine, "./img/stonebackground.png", 1250, 900);
-  var map2 = new Map(gameEngine, mapArray5);
-  //var map2 = new Map(gameEngine, test);
-
+  var map2 = new Map(gameEngine, mapArray2);
   var hero2 = new Hero(gameEngine, 96, 300, ctx2);
   var hookshot2 = new Hookshot(gameEngine, hero2);
   var target2 = new Target(gameEngine);
@@ -291,7 +285,7 @@ MM.downloadAll(AM.downloadAll(function () {
   //                          Level 1 - part 3                        //
   //******************************************************************//
   var bg3 = new Background(gameEngine, "./img/stonebackground.png", 1250, 900);
-  var map3 = new Map(gameEngine, mapArray6);
+  var map3 = new Map(gameEngine, mapArray3);
   var hero3 = new Hero(gameEngine, 100, 640, ctx2);
   var hookshot3 = new Hookshot(gameEngine, hero3);
   var target3 = new Target(gameEngine);
@@ -319,13 +313,58 @@ MM.downloadAll(AM.downloadAll(function () {
   var complete = new Scene(Level_complete_scene_elements, gameEngine, 4, false, false);
 
 
+
+
+  //******************************************************************//
+  //                          Level 2 - part 1                        //
+  //******************************************************************//
+  var bg2_1 = new Background(gameEngine, "./img/stonebackground.png", 1250, 900);
+  var map2_1 = new Map(gameEngine, mapArray5);
+  var hero2_1 = new Hero(gameEngine, 96, 300, ctx2);
+  var hookshot2_1 = new Hookshot(gameEngine, hero2_1);
+  var target2_1 = new Target(gameEngine);
+  var scene_2_1_elements = [bg2_1, map2_1, hero2_1, hookshot2_1, target2_1];
+  var Scene2_1 = new Scene(scene_2_1_elements, gameEngine, 5, true, false);
+
+  //******************************************************************//
+  //                          Level 2 - part 2                        //
+  //******************************************************************//
+  var bg2_2 = new Background(gameEngine, "./img/stonebackground.png", 1250, 900);
+  var map2_2 = new Map(gameEngine, mapArray6);
+  var hero2_2 = new Hero(gameEngine, 96, 300, ctx2);
+  var hookshot2_2 = new Hookshot(gameEngine, hero2_2);
+  var target2_2 = new Target(gameEngine);
+  var scene_2_2_elements = [bg2, map2, hero2, hookshot2, target2];
+  var Scene2_2 = new Scene(scene_2_2_elements, gameEngine, 6, false, false);
+
+  //******************************************************************//
+  //                          Level 2 - part 3                        //
+  //******************************************************************//
+  var bg2_3 = new Background(gameEngine, "./img/stonebackground.png", 1250, 900);
+  var map2_3 = new Map(gameEngine, mapArray7);
+  var hero2_3 = new Hero(gameEngine, 100, 640, ctx2);
+  var hookshot2_3 = new Hookshot(gameEngine, hero2_3);
+  var target2_3 = new Target(gameEngine);
+  var scene_2_3_elements = [bg2_3, map2_3, hero2_3, hookshot2_3, target2_3];
+  var Scene2_3 = new Scene(scene_2_3_elements, gameEngine, 7, false, false);
+
+  //******************************************************************//
+  //                          Level Complete                          //
+  //******************************************************************//
+  var bg2_c = new Background(gameEngine, "./img/stonebackground.png", 1250, 900);
+  var nextbutton2_c = new NextButton(280, 568, gameEngine);
+  var target2_c = new Target(gameEngine);
+  var Level_2_c_elements = [bg2_c, nextbutton2_c, target2_c];
+  var complete2_c = new Scene(Level_2_c_elements, gameEngine, 8, false, false);
+
+
   //******************************************************************//
   //                         Load Scenes                              //
   //******************************************************************//
 
 
   //Set Scenes
-  var gameScenes = [title, Scene1, Scene2, Scene3, Scene4, complete];
+  var gameScenes = [title, Scene1, Scene2, Scene3, Scene4, complete, Scene2_1, Scene2_2, Scene2_3, complete2_c];
   gameEngine.scenes = gameScenes;
   gameEngine.init(ctx);
   title.init();
