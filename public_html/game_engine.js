@@ -233,7 +233,7 @@ GameEngine.prototype.update = function () {
 
 GameEngine.prototype.loop = function () {
   document.getElementById("minutes").innerHTML = Math.floor(((this.timer.gameTime - this.scoreTimer) / 60) % 60);
-  document.getElementById("seconds").innerHTML = Math.floor(this.timer.gameTime - this.scoreTimer);
+  document.getElementById("seconds").innerHTML = Math.floor(this.timer.gameTime - this.scoreTimer) % 60;
     this.clockTick = this.timer.tick();
     this.tickCount ++;
     this.anotherCount++;

@@ -35,7 +35,7 @@ MusicManager.prototype.downloadAll = function (callback) {
             if (that.isDone()) callback();
         });
 
-        aud.src = path;
+        // aud.src = path;
         this.cache[path] = aud;
     }
 
