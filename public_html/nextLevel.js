@@ -13,7 +13,7 @@ NextButton.prototype.update = function() {
       if((this.targetY >= this.y && this.targetY <= this.y + this.height) &&
           (this.targetX >= this.x && this.targetX <= this.x + this.width)) {
           this.game.changeScene = true;
-          this.game.nextScene = 1;
+          this.game.nextScene++;
         }
     }
 
@@ -23,5 +23,5 @@ NextButton.prototype.draw = function(ctx) {
   ctx.font = "60px Comic Sans MS";
   ctx.fillStyle = "red";
   ctx.textAlign = "center";
-  ctx.fillText("End of level, more content coming soon", 600, 650);
+  ctx.fillText("Click for Next Level", 600, 650);
 };
