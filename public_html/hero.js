@@ -18,6 +18,10 @@ function Hero(game, x, y, invetoryCTX) {
   this.animationOpenChest = new Animation(AM.getAsset("./img/left_facing_open_chest.png"), 0, 0, 44, 59, .05, 29, false, false);
   this.animationRightCrushDeath = new Animation(AM.getAsset("./img/crush.png"), 0, 0, 138, 207, .02, 25, false, false, true);
 
+  this.animationLowGrav = new Animation(AM.getAsset("./img/lowGravWaves.png"), 0, 0, 179, 176, .02, 50, true, false, false);
+  this.animationInvincibility = new Animation(AM.getAsset("./img/invincibilityBubble.png"), 0, 0, 90, 157, .02, 50, true, false, false);
+
+
   //TODO sound effects
   this.soundEFWalk        = MM.getSoundEF("./sound/walk.wav");
   this.soundEFSpikeDeath  = MM.getSoundEF("./sound/spikeDeath.flac");
@@ -129,6 +133,15 @@ Hero.prototype.hasKey = function() {
 
 Hero.prototype.update = function () {
 
+    if (this.inventory.lowGrav !== null && !this.inventory.lowGrav.empty) {
+        this.fallSpeed = 3;
+        this.fallCount = 0;
+
+    } else {
+        this.fallSpeed = 12;
+        this.inventory.lowGrav = null;
+    }
+
 
   if(!this.isDead) {
     if (this.hookY === null && this.hooked) {
@@ -144,7 +157,7 @@ Hero.prototype.update = function () {
       }
 
 
-      if (this.fallCount >= this.defaultFallDistance && this.inventory.invincibility === null) {
+      if (this.fallCount >= this.defaultFallDistance && (this.inventory.invincibility === null && this.inventory.lowGrav === null)) {
         //console.log("FallDeath: " + this.fallDeath);
         this.fallDeath = true;
         if (this.FallDirection === null) {
@@ -190,7 +203,6 @@ Hero.prototype.update = function () {
 
 
       else if (this.goToNext && this.game.anotherCount - this.doorAnimationDone > 80) {
-        console.log("Next");
         this.game.changeScene = true;
         this.game.nextScene ++;
         this.reset();
@@ -337,7 +349,6 @@ Hero.prototype.update = function () {
   //Dead Hero
   else {
     if (this.game.clicked) {
-      console.log("Yep Head");
 
       //music, reset dead SFX played.
       this.soundEFDeathPlayed = false;
@@ -348,7 +359,6 @@ Hero.prototype.update = function () {
       (this.targetX >= 450 && this.targetX <= 850)) {
 
         if(this.inventory.Revive !== null) {
-          console.log("Used Revive");
           this.x = this.StartX;
           this.y = this.StartY;
           this.inventory.Revive = null;
@@ -376,6 +386,16 @@ if (this.inventory.invincibility !== null && this.inventory.invincibility.empty)
 
 };
 
+Hero.prototype.drawItems = function(ctx) {
+  if(this.inventory.lowGrav !== null) {
+    this.animationLowGrav.drawFrame(this.game.clockTick, ctx, this.x - (this.width * .75), this.y + (this.height * .75), .63);
+  }
+
+  if(this.inventory.invincibility !== null) {
+    this.animationInvincibility.drawFrame(this.game.clockTick, ctx, this.x - (this.width * .2), this.y - (this.height * .35), .8);
+  }
+}
+
 Hero.prototype.draw = function (ctx) {
 
   this.inventory.draw();
@@ -402,6 +422,7 @@ Hero.prototype.draw = function (ctx) {
     this.animationOpenChest.drawFrame(this.game.clockTick, ctx, this.x - 15, this.y - 8, this.scale);
     if (this.animationOpenChest.isDone()) {
       this.action_OpenChest = false;
+      this.animationOpenChest.elapsedTime = 0;
     }
   }
   else if (this.spikeDeath) {
@@ -478,7 +499,6 @@ Hero.prototype.draw = function (ctx) {
   }
 
   else if (this.hitGround && this.fallDeath && this.inventory.safeFall !== null && this.inventory.safeFall.fallsLeft > 0) {
-    console.log("Safe");
     this.inventory.safeFall.landed();
     this.hitGround = false;
     this.fallDeath = false;
@@ -489,8 +509,9 @@ Hero.prototype.draw = function (ctx) {
   }
 
 
-  else if (this.hitGround && this.fallDeath) {
 
+
+  else if (this.hitGround && this.fallDeath) {
     this.isDead = true;
 
     //fall death
@@ -501,7 +522,6 @@ Hero.prototype.draw = function (ctx) {
     }
 
     if(this.FallDirection === "left") {
-      console.log("Left");
       this.animationLeftFallDeath.drawFrame(this.game.clockTick, ctx, this.x - 50, this.y - 10, this.scale);
     } else if (this.FallDirection === "right") {
       this.animationRightFallDeath.drawFrame(this.game.clockTick, ctx, this.x - 50, this.y - 10, this.scale);
@@ -529,7 +549,7 @@ Hero.prototype.draw = function (ctx) {
 
   }
 
-  else if (this.fallDeath && !this.hooked) {
+  else if (this.fallDeath && !this.hooked && this.inventory.invincibility === null) {
     if(this.FallDirection === "right") {
       this.animationRightFall.drawFrame(this.game.clockTick, ctx, this.x - 30, this.y, this.scale);
     } else if (this.FallDirection === "left") {
@@ -599,6 +619,8 @@ Hero.prototype.draw = function (ctx) {
     }
 
   }
+
+  this.drawItems(ctx);
 
   if (this.isDead) {
 
