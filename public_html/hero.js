@@ -157,7 +157,7 @@ Hero.prototype.update = function () {
       }
 
 
-      if (this.fallCount >= this.defaultFallDistance && (this.inventory.invincibility === null || this.inventory.lowGrav === null)) {
+      if (this.fallCount >= this.defaultFallDistance && (this.inventory.invincibility === null && this.inventory.lowGrav === null)) {
         //console.log("FallDeath: " + this.fallDeath);
         this.fallDeath = true;
         if (this.FallDirection === null) {
