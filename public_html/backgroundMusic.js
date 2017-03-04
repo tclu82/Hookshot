@@ -3,7 +3,7 @@ function BackgroundMusic() {
     this.bgm = [];
     this.current = 0;
 }
-
+ 
 BackgroundMusic.prototype.setMusic = function (music) {
     this.bgm[this.count] = music;
     this.bgm[this.count].addEventListener('ended', function () {
