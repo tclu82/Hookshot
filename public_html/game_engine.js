@@ -53,9 +53,8 @@ function GameEngine() {
     this.scenes = null;
     this.verticalDirection = "none";
     this.scoreTimerStart = null;
-
-
-
+    this.time = null;
+    this.score = null;
 }
 
 GameEngine.prototype.init = function (ctx) {
@@ -232,8 +231,16 @@ GameEngine.prototype.update = function () {
 };
 
 GameEngine.prototype.loop = function () {
-  document.getElementById("minutes").innerHTML = Math.floor(((this.timer.gameTime - this.scoreTimer) / 60) % 60);
-  document.getElementById("seconds").innerHTML = Math.floor(this.timer.gameTime - this.scoreTimer);
+  // document.getElementById("minutes").innerHTML = Math.floor(((this.timer.gameTime - this.scoreTimer) / 60) % 60);
+  // document.getElementById("seconds").innerHTML = Math.floor(this.timer.gameTime - this.scoreTimer);
+    this.time = this.timer.gameTime - this.scoreTimer
+    document.getElementById("minutes").innerHTML = Math.floor(this.time / 60);
+    document.getElementById("seconds").innerHTML = Math.floor(this.time) % 60;
+
+    // Keep running
+    this.score = 1000 - Math.floor(this.time) * 5;
+    document.getElementById("score").innerHTML = this.score;
+
     this.clockTick = this.timer.tick();
     this.tickCount ++;
     this.anotherCount++;
