@@ -7,7 +7,13 @@ function collisionCheck(game, sprite) {
         bottom: false,
         spike: false,
         chest: null,
+<<<<<<< HEAD
         door: null
+=======
+        door: null,
+        lava: false,
+	platform: null
+>>>>>>> master
     };
 
     // Get the Map out of the Games Entity list
@@ -48,11 +54,17 @@ function collisionCheck(game, sprite) {
         for (var j = gridXStart; j <= gridXEnd; j++) {
             var block = map.mapBlocks[i][j];
 
+            if (block === undefined) console.log("x: " + i + " " + "y: " + j);
+
 
 
             // If its block type 1
 
+<<<<<<< HEAD
             if (block.type === 1 || block.type === 2 || block.type === 12 || block.type === 3) {
+=======
+            if (block.type === 1 || block.type === 2 || block.type === 12 || block.type === 3 || block.type === 15 || block.type === 19) {
+>>>>>>> master
 
                 //If Hero hits a block from the top with Hero's Feet
                 if (sprite.y + sprite.height <= block.y + sprite.fallSpeed &&
@@ -62,15 +74,24 @@ function collisionCheck(game, sprite) {
                                         sprite.x <= block.x + block.width))) {
 
                     collide.bottom = true;
+<<<<<<< HEAD
+=======
+
+                    if (block.type === 15) {
+                        if (block.movingRight) {
+                            sprite.x += 1;
+                        }
+                        else {
+                            sprite.x -= 1;
+                        }
+                    }
+>>>>>>> master
 
                     sprite.y = block.y - sprite.height;
 
                     if (sprite.fallDeath) {
                         sprite.hitGround = true;
                     }
-
-
-
                 }
 
                 // Head
@@ -79,7 +100,6 @@ function collisionCheck(game, sprite) {
                         ((sprite.x <= block.x + block.width && sprite.x >= block.x) ||
                                 (sprite.x + sprite.width > block.x &&
                                         sprite.x < block.x + block.width))) {
-
                     collide.top = true;
                     sprite.y = block.y + block.height;
                 }
@@ -94,6 +114,12 @@ function collisionCheck(game, sprite) {
                     collide.left = true;
                     if (block.type === 3 && block.chest_opening === null) {
                         collide.chest = block;
+
+                    }
+
+                    if (block.type === 19 && block.chest_opening === null) {
+                        collide.chest = block;
+                        sprite.inventory.getRandomItem();
 
                     }
 
@@ -121,15 +147,22 @@ function collisionCheck(game, sprite) {
 
                 }
             }
-            else if (block.type === 4 || block.type === 6 ||block.type === 7 ) {
+            else if (block.type === 4 || block.type === 6 ||block.type === 7 || block.type === 5) {
 
               if (sprite.y + sprite.height <= block.y + sprite.fallSpeed &&
                       sprite.y + sprite.height >= block.y &&
                       ((sprite.x <= block.x + (block.width * .75) && sprite.x >= block.x +(block.width / 4)) ||
                       (sprite.x + sprite.width >= block.x  + (block.width / 4) &&
                       sprite.x <= block.x + (block.width * .75)))) {
+                  if (block.type === 4 || block.type === 6 ||block.type === 7 ) {
+                    collide.spike = true;
+                  }
 
-                                        collide.spike = true;
+                  if (block.type === 5 || block.type === 9) {
+                        collide.lava = true;
+                        collide.bottom = true;
+                  }
+
 
                                         //sprite.y = block.y - sprite.height/2.5;
 
@@ -139,6 +172,7 @@ function collisionCheck(game, sprite) {
               if (sprite.hasKey()) {
                   block.door_opening = true;
                   sprite.goToNext = true;
+                  sprite.inventory.key = null;
                   if(sprite.doorAnimationDone === null) {
                     sprite.doorAnimationDone = game.anotherCount;
                 }
@@ -147,6 +181,19 @@ function collisionCheck(game, sprite) {
 
               //collide.door = block;
           }
+          else if(block.type === 12) {
+            // Head
+            if (sprite.y <= block.y + block.height &&
+                    sprite.y >= (block.y + block.height) - sprite.jumpSpeed * 2 &&
+                    ((sprite.x <= block.x + block.width && sprite.x >= block.x) ||
+                            (sprite.x + sprite.width > block.x &&
+                                    sprite.x < block.x + block.width))) {
+            console.log("hit");
+            collide.crush = true;
+          }
+        }
+
+
 
 
 
