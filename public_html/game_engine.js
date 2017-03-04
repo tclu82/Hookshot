@@ -53,8 +53,9 @@ function GameEngine() {
     this.scenes = null;
     this.verticalDirection = "none";
     this.scoreTimerStart = null;
-    this.time = null;
-    this.score = null;
+
+
+
 }
 
 GameEngine.prototype.init = function (ctx) {
