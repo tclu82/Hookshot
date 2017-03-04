@@ -215,16 +215,24 @@ AM.queueDownload("./img/invincibilityBubble.png");
 
 
 
+//when mute === true : mute
+var MUTE = false;
 var MM = new MusicManager();
 MM.queueDownload("./sound/bgm.mp3");
+MM.queueDownload("./sound/bgm2.mp3");
+MM.queueDownload("./sound/bgm3.mp3");
 MM.queueDownload("./sound/spikeDeath.flac");
 MM.queueDownload("./sound/fallDeath.wav");
 MM.queueDownload("./sound/openChest.wav");
 MM.queueDownload("./sound/walk.wav");
 MM.queueDownload("./sound/hookshot.wav");
 MM.queueDownload("./sound/openDoor.wav");
+MM.queueDownload("./sound/land.wav");
+MM.queueDownload("./sound/flameDeath.mp3");
+MM.queueDownload("./sound/falling.mp3");
+MM.queueDownload("./sound/fail.wav");
 //access it in hero.js, so music can be start and stop.
-var backgroundMusic;
+var backgroundMusic = new BackgroundMusic();
 
 
 MM.downloadAll(AM.downloadAll(function () {
@@ -236,11 +244,11 @@ MM.downloadAll(AM.downloadAll(function () {
   var ctx2 = inventoryCanvas.getContext("2d");
 
   //initialize bgm for the first stage.
-  backgroundMusic = MM.getSoundEF("./sound/bgm.mp3");
-    backgroundMusic.addEventListener('ended', function () {
+  backgroundMusic.setMusic(MM.getSoundEF("./sound/bgm.mp3"));
+ /*   backgroundMusic.addEventListener('ended', function () {
         this.currentTime = 0;
         this.play();
-    }, false);
+    }, false);*/
 
 
 
