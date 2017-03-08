@@ -18,7 +18,7 @@ BackgroundMusic.prototype.play = function (index) {
     index = index - 1;
     if (this.count > index) {
         this.bgm[index].play();
-        this.current = index
+        this.current = index;
     }
 };
 
