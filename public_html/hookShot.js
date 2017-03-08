@@ -98,7 +98,7 @@ Hookshot.prototype.update = function() {
 
       }
 
-      // Hook only, no swing
+      // Hook only, no swing (vertical up and down only)
       if (this.noSwing) {
         this.currentSwingSpeed = 0;
         // Vertical up and down when hooked only, no swing
@@ -107,24 +107,41 @@ Hookshot.prototype.update = function() {
 
         else if (this.game.verticalDirection === "down")
           this.startY += this.game.clockTick * this.owner.speed;
-
-        // Swinging
-      } else {
+      }
+      // Swinging
+      else {
         this.currentSwingSpeed = 5;
 
-        if (this.game.verticalDirection === "up")
-          this.currentSwingSpeed *= 0.9;
+        if (this.game.verticalDirection === "up") {
+          // // face left and swing from right side
+          // if (this.swingDirection === "left" && this.owner.x ) {
+          //   this.startX -= this.game.clockTick * this.owner.speed;
+          //
+          //   console.log("facing left");
+          // }
+          // // face right and swing from left side
+          // else if (this.swingDirection === "right" && this.owner.x === this.targetX) {
+          //   this.startX += this.game.clockTick * this.owner.speed;
+          //
+          //   console.log("facing right");
+          // }
 
-        else if (this.game.verticalDirection === "down")
 
-          if (this.currentSwingSpeed < this.maxSwingSpeed)
-            this.currentSwingSpeed *= 1.1;
 
+
+        }
+        else if (this.game.verticalDirection === "down") {
+
+
+
+
+
+
+        }
       }
 
       this.lastY = this.owner.y;
       this.swing(this.currentSwingSpeed);
-      console.log("swing speed: ", this.currentSwingSpeed);
 
     } else if (block.type === 12) {
       block.landed = false;
@@ -151,7 +168,7 @@ Hookshot.prototype.update = function() {
     this.height = null;
     this.width = null;
     this.length = null;
-    this.travelDistancel = null;
+    this.travelDistance = null;
     this.startAngle = null;
     this.swingDirection = null;
     this.currentDegree = 0;
@@ -207,11 +224,15 @@ Hookshot.prototype.draw = function(ctx) {
 };
 
 
+// This funciton return Y coordination according to HookShot's X coordination druing swing
+Hookshot.prototype.calculateOwnerY = function(ownerX) {
+     return Math.sqrt(this.length * this.length
+                     - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
+                     + this.targetY;
+ }
+
 
 Hookshot.prototype.swing = function(movePixel) {
-
-  //    var tarvelDistance = Math.abs(2 * (this.targetX - this.startX));
-
   //Swing right
   if (this.swingDirection === "right") {
 
@@ -226,9 +247,8 @@ Hookshot.prototype.swing = function(movePixel) {
 
         this.owner.x += movePixel;
 
-        this.owner.y = Math.sqrt(this.length * this.length -
-            (this.owner.x - this.targetX) * (this.owner.x - this.targetX)) +
-          this.targetY;
+        this.owner.y = this.calculateOwnerY(this.owner.x);
+
       } else {
 
 
@@ -266,9 +286,7 @@ Hookshot.prototype.swing = function(movePixel) {
 
         this.owner.x -= movePixel;
 
-        this.owner.y = Math.sqrt(this.length * this.length -
-            (this.owner.x - this.targetX) * (this.owner.x - this.targetX)) +
-          this.targetY;
+        this.owner.y = this.calculateOwnerY(this.owner.x);
 
       } else {
         //  console.log("left3");
@@ -287,6 +305,7 @@ Hookshot.prototype.swing = function(movePixel) {
 
     }
   }
+
 
   var collide = collisionCheck(this.game, this.owner);
 
