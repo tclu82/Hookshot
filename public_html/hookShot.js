@@ -29,9 +29,6 @@ function Hookshot(game, hero) {
   //music
   this.soundEFHookshot = MM.getSoundEF("./sound/hookshot.wav");
   this.soundEFHookFail = MM.getSoundEF("./sound/fail.wav");
-
-
-
 }
 
 Hookshot.prototype.update = function() {
@@ -223,89 +220,66 @@ Hookshot.prototype.draw = function(ctx) {
   }
 };
 
-
 // This funciton return Y coordination according to HookShot's X coordination druing swing
-Hookshot.prototype.calculateOwnerY = function(ownerX) {
+Hookshot.prototype.calculateOwnerY = function() {
      return Math.sqrt(this.length * this.length
                      - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
                      + this.targetY;
  }
 
-
 Hookshot.prototype.swing = function(movePixel) {
-  //Swing right
+  /// Facing right and swing right
   if (this.swingDirection === "right") {
-
-
-    //  console.log("right1");
-
+    // Start to swing right
     if (this.startX < this.targetX) {
-
+      // During the swing
       if (this.owner.x < this.startX + this.travelDistance) {
-
-        //    console.log("right2");
-
         this.owner.x += movePixel;
-
-        this.owner.y = this.calculateOwnerY(this.owner.x);
-
-      } else {
-
-
-        //  console.log("right3");
+        // this.owner.y = this.calculateOwnerY();
+      }
+      // Hit the end, reverse direction
+      else {
         this.startX = this.owner.x;
         this.swingDirection = 'left';
         this.game.direction = 'left';
         this.swingSpeed = 1;
-
       }
 
     }
-    // else if (this.startX > this.targetX) {
+    /// facing right but shot left
     else {
 
       this.swingDirection = 'left';
       this.game.direction = 'left';
       this.swingSpeed = 1;
-
-
-
     }
-
-    //Swing left
-  } else {
-
-    //console.log("left1");
-
+  }
+  // Facing left and swing left
+  else {
 
     if (this.startX > this.targetX) {
-
+      // During the swing
       if (this.owner.x > this.startX - this.travelDistance) {
-
-        //  console.log("left2");
-
         this.owner.x -= movePixel;
-
-        this.owner.y = this.calculateOwnerY(this.owner.x);
-
-      } else {
-        //  console.log("left3");
+        // this.owner.y = this.calculateOwnerY();
+      }
+      // Hit the end, reverse direction
+      else {
         this.startX = this.owner.x;
         this.swingDirection = 'right';
         this.game.direction = 'right';
         this.swingSpeed = 1;
-
       }
-
-    } else {
+    }
+    // Facing left but shot right
+    else {
       this.swingDirection = 'right';
       this.game.direction = 'right';
       this.swingSpeed = 1;
-
-
     }
   }
-
+  // Calulate owner y according to owner x
+  this.owner.y = this.calculateOwnerY();
 
   var collide = collisionCheck(this.game, this.owner);
 
