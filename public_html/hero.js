@@ -26,10 +26,10 @@ function Hero(game, x, y, invetoryCTX) {
   this.soundEFWalk        = MM.getSoundEF("./sound/walk.wav");
   this.soundEFSpikeDeath  = MM.getSoundEF("./sound/spikeDeath.flac");
   this.soundEFFallDeath   = MM.getSoundEF("./sound/fallDeath.wav");
-  this.soundEFJump        = null; //not yet
-  this.soundEFHookshot    = MM.getSoundEF("./sound/hookshot.wav");
-  this.soundEFOpenDoor    = MM.getSoundEF("./sound/openDoor.wav");
+    this.soundEFOpenDoor    = MM.getSoundEF("./sound/openDoor.wav");
   this.soundEFOpenChest   = MM.getSoundEF("./sound/openChest.wav");
+  this.soundEFFlameDeath  = MM.getSoundEF("./sound/flameDeath.mp3");
+  this.soundEFLand        = MM.getSoundEF("./sound/land.wav");
   this.soundEFDeathPlayed = false;
   this.soundEFOpenChestPlayed = false;
 
@@ -207,6 +207,18 @@ Hero.prototype.update = function () {
         this.game.nextScene ++;
         this.reset();
 
+        //music, add new bgm here
+        if (this.game.nextScene === 2) {
+            backgroundMusic.setMusic(MM.getSoundEF("./sound/bgm2.mp3"));
+        } else if (this.game.nextScene === 3){
+            backgroundMusic.setMusic(MM.getSoundEF("./sound/bgm3.mp3"));
+        } else {
+          backgroundMusic.setMusic(MM.getSoundEF("./sound/bgm.mp3"));
+        }
+
+        //music, play takes the number of current stage.
+        backgroundMusic.stop();
+        backgroundMusic.play(this.game.nextScene);
 
       }
 
@@ -330,6 +342,13 @@ Hero.prototype.update = function () {
 
       if (landed.bottom) {
         this.jumpCurrent = 0;
+
+	    //music, when landed
+        if (!this.jumpAllowed) {
+            this.soundEFLand.play();
+        }
+
+
         this.jumpAllowed = true;
       }
 
@@ -444,6 +463,12 @@ Hero.prototype.draw = function (ctx) {
 
 
   else if (this.lavaDeath) {
+	//music, flame death
+    if (!this.soundEFDeathPlayed) {
+        this.soundEFFlameDeath.play();
+        //stop the sound effect keep playing while dead.
+        this.soundEFDeathPlayed = true;
+    }
     this.isDead = true;
     var interval = 20;
 
@@ -625,8 +650,8 @@ Hero.prototype.draw = function (ctx) {
   if (this.isDead) {
 
 
-    //pause the music when dead.
-    backgroundMusic.pause();
+    //stop the music when dead.
+    backgroundMusic.stop();
     this.soundEFDeathPlayed = true;
 
     ctx.beginPath();
