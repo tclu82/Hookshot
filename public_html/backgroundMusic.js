@@ -30,3 +30,4 @@ BackgroundMusic.prototype.stop = function () {
 BackgroundMusic.prototype.pause = function () {
     this.bgm[this.current].pause();
 }
+;
