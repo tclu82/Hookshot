@@ -28,6 +28,7 @@ function Hookshot(game, hero) {
 
     //music
     this.soundEFHookshot = MM.getSoundEF("./sound/hookshot.wav");
+    this.soundEFHookFail = MM.getSoundEF("./sound/fail.wav");
 
 
 
@@ -155,6 +156,11 @@ Hookshot.prototype.update = function () {
         }
         else if (block.type === 12) {
             block.landed = false;
+
+        } else if (block.type === 1 || block.type === 13 || block.type === 14 || block.type === 15 || block.type === 17) {
+            //music entire if statement.
+            this.soundEFHookFail.play();
+            this.game.clicked = false;
 
         } else {
             this.game.clicked = false;
