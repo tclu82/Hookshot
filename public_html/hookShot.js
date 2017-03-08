@@ -54,7 +54,8 @@ Hookshot.prototype.update = function () {
 
 
 
-    if (this.game.clicked) {
+    var landed = collisionCheck(this.game, this.owner);
+    if (this.game.clicked && !landed.bottom) {
         this.swinging = true;
         this.targetX = this.game.click.x;
         this.targetY = this.game.click.y;
@@ -84,8 +85,6 @@ Hookshot.prototype.update = function () {
 
 
             if (this.length === null || this.game.verticalDirection === "up" || this.game.verticalDirection === "down") {
-//                this.owner.y -= 35;
-//                this.startY -= 35;
 
                   if(this.game.verticalDirection === "up") {
                     this.startY -= this.game.clockTick * this.owner.speed;

@@ -6,14 +6,14 @@ var timerStruct;
 
 timerStruct = {delay:50,
             next:0,
-            counter:0
+            counter:0,
             start: false};
 requestAnimationFrame(timer);
 
 function timer(current){
   requestAnimationFrame(timer);
 
-  if (start && current > timerStruct.next) {
+  if (timerStruct.start && current > timerStruct.next) {
     var t = timerStruct;
     t.next = current + t.delay;
     printTimer(t);
