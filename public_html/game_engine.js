@@ -65,6 +65,7 @@ GameEngine.prototype.init = function (ctx) {
     this.startInput();
     this.timer = new Timer();
     console.log('game initialized');
+    this.ctx.canvas.style.cursor = "none";
 };
 
 GameEngine.prototype.start = function () {
@@ -97,23 +98,23 @@ GameEngine.prototype.startInput = function () {
 
         }
 
-        if (e.key === 'd') {
+        if (e.code === 'KeyD') {
             that.moveRight = true;
             that.direction = "right";
          }
 
-         if (e.key === 'a') {
+         if (e.code === 'KeyA') {
            that.moveLeft = true;
            that.direction = "left";
 
          }
 
-         if (e.key === 'w') {
+         if (e.code === 'KeyW') {
            that.moveup = true;
            that.verticalDirection = "up";
          }
 
-         if (e.key === 's') {
+         if (e.code === 'KeyS') {
            that.movedown = true;
            that.verticalDirection = "down";
          }
@@ -123,21 +124,21 @@ GameEngine.prototype.startInput = function () {
 
     this.ctx.canvas.addEventListener("keyup", function(e) {
 
-        if (e.key === 'd') {
+        if (e.code === 'KeyD') {
           that.moveRight = false;
 
         }
 
-        if (e.key === 'a') {
+        if (e.code === 'KeyA') {
           that.moveLeft = false;
         }
 
-        if (e.key === 'w') {
+        if (e.code === 'KeyW') {
           that.moveup = false;
           that.verticalDirection = "none";
         }
 
-        if (e.key === 's') {
+        if (e.code === 'KeyS') {
           that.movedown = false;
           that.verticalDirection = "none";
 
