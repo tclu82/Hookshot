@@ -109,12 +109,12 @@ GameEngine.prototype.startInput = function () {
          }
 
          if (e.key === 'w') {
-           that.moveup = true;
+          //  that.moveup = true;
            that.verticalDirection = "up";
          }
 
          if (e.key === 's') {
-           that.movedown = true;
+          //  that.movedown = true;
            that.verticalDirection = "down";
          }
         e.preventDefault();
@@ -133,12 +133,12 @@ GameEngine.prototype.startInput = function () {
         }
 
         if (e.key === 'w') {
-          that.moveup = false;
+          // that.moveup = false;
           that.verticalDirection = "none";
         }
 
         if (e.key === 's') {
-          that.movedown = false;
+          // that.movedown = false;
           that.verticalDirection = "none";
 
         }

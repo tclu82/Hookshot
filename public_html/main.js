@@ -244,7 +244,18 @@ MM.downloadAll(AM.downloadAll(function () {
   var ctx2 = inventoryCanvas.getContext("2d");
 
   //initialize bgm for the first stage.
-  backgroundMusic.setMusic(MM.getSoundEF("./sound/bgm.mp3"));
+  // backgroundMusic.setMusic(MM.getSoundEF("./sound/bgm.mp3"));
+
+
+
+
+
+
+
+
+
+
+
  /*   backgroundMusic.addEventListener('ended', function () {
         this.currentTime = 0;
         this.play();
