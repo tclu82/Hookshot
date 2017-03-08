@@ -54,7 +54,11 @@ function GameEngine() {
     this.verticalDirection = "none";
     this.scoreTimerStart = null;
 
-
+    // update score
+    this.score = null;
+    this.offset = null;
+    this.time = null;
+    this.heroIsDead = null;
 
 }
 
@@ -234,13 +238,20 @@ GameEngine.prototype.update = function () {
 GameEngine.prototype.loop = function () {
   // document.getElementById("minutes").innerHTML = Math.floor(((this.timer.gameTime - this.scoreTimer) / 60) % 60);
   // document.getElementById("seconds").innerHTML = Math.floor(this.timer.gameTime - this.scoreTimer);
-    this.time = this.timer.gameTime - this.scoreTimer
+
+    if (!this.heroIsDead) {
+
+      this.time = this.timer.gameTime - this.scoreTimer
+
+    }
+
     document.getElementById("minutes").innerHTML = Math.floor(this.time / 60);
     document.getElementById("seconds").innerHTML = Math.floor(this.time) % 60;
 
     // Keep running
-    this.score = 1000 - Math.floor(this.time) * 5;
+    this.score = 1000 - Math.floor(this.time) * 5 + this.offset;
     document.getElementById("score").innerHTML = this.score;
+
 
     this.clockTick = this.timer.tick();
     this.tickCount ++;
