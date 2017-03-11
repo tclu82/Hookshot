@@ -29,9 +29,6 @@ function Hookshot(game, hero) {
     //music
     this.soundEFHookshot = MM.getSoundEF("./sound/hookshot.wav");
     this.soundEFHookFail = MM.getSoundEF("./sound/fail.wav");
-
-
-
 }
 
 Hookshot.prototype.update = function () {
@@ -51,8 +48,6 @@ Hookshot.prototype.update = function () {
     }
     this.currentX = this.owner.x;
     this.currentY = this.owner.y;
-
-
 
     var landed = collisionCheck(this.game, this.owner);
     if (this.game.clicked && !landed.bottom) {
@@ -109,61 +104,28 @@ Hookshot.prototype.update = function () {
                 }
                 //console.log("travelDistance: " + this.travelDistance);
                 this.lastY = this.owner.y;
-
-
             }
 
-            if(!this.noSwing) {
-            //Velocity Controls
-            // Falling right
-//            if(this.owner.x < this.targetX && this.owner.y > this.lastY) {
-//            // console.log("speedup 1");
-//              if (this.swingSpeed < this.maxSwingSpeed) {
-//                this.swingSpeed += .5;
-//              }
-//              // Raising Right
-//            } else if(this.owner.x >= this.targetX && this.owner.y <= this.lastY) {
-//              //  console.log("slowdown 1");
-//              if (this.swingSpeed > 1) {
-//                this.swingSpeed -= .5;
-//              //  console.log(this.swingSpeed);
-//
-//              }
-//              //Swing originating from Right
-//            } else if(this.owner.x > this.targetX && this.owner.y > this.lastY) {
-//                //  console.log("speedup 2");
-//                  if (this.swingSpeed < this.maxSwingSpeed) {
-//                    this.swingSpeed += .5;
-//                  }
-//           } else if(this.owner.x <= this.targetX && this.owner.y <= this.lastY) {
-//               //console.log("slowdown 2");
-//                  if (this.swingSpeed > 1) {
-//                    this.swingSpeed -= .5;
-//
-//                  }
-//           }
-           //this.currentSwingSpeed = 1.5 * this.swingSpeed;
-           this.currentSwingSpeed = 5;
-         } else {
-           this.currentSwingSpeed = 0;
-         }
+            if(!this.noSwing)
+              this.currentSwingSpeed = 5;
 
+            else
+              this.currentSwingSpeed = 0;
 
             this.lastY = this.owner.y;
             this.swing(this.currentSwingSpeed);
-
         }
-        else if (block.type === 12) {
+        else if (block.type === 12)
             block.landed = false;
 
-        } else if (block.type === 1 || block.type === 13 || block.type === 14 || block.type === 15 || block.type === 17) {
+        else if (block.type === 1 || block.type === 13 || block.type === 14 || block.type === 15 || block.type === 17) {
             //music entire if statement.
             this.soundEFHookFail.play();
             this.game.clicked = false;
 
-        } else {
-            this.game.clicked = false;
         }
+        else
+            this.game.clicked = false;
 
     } else {
         this.hooked = false;
@@ -185,12 +147,8 @@ Hookshot.prototype.update = function () {
         this.count = 1;
         this.swingSpeed = 1;
         this.maxSwingSpeed = 12;
-
     }
-
 };
-
-
 
 Hookshot.prototype.draw = function (ctx) {
 
@@ -218,106 +176,65 @@ Hookshot.prototype.draw = function (ctx) {
         ctx.lineTo(this.targetX, this.targetY);
         ctx.stroke();
         ctx.restore();
-
-
-
-        /*
-         ctx.drawImage(AM.getAsset("./img/shot.png"),
-         0 , 563,  // source from sheet
-         800, 20,
-         this.startX, this.startY,
-         this.width,
-         this.height);
-
-         */
-
     }
 };
 
 
+Hookshot.prototype.calculateOwnerY = function() {
+     return Math.sqrt(this.length * this.length
+                     - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
+                     + this.targetY;
+}
 
+// Swing function
 Hookshot.prototype.swing = function (movePixel) {
-
-//    var tarvelDistance = Math.abs(2 * (this.targetX - this.startX));
-
-    //Swing right
+    // Facing right and swing right
     if (this.swingDirection === "right") {
-
-
-      //  console.log("right1");
-
+        // Start to swing right
         if (this.startX < this.targetX) {
-
-            if (this.owner.x < this.startX + this.travelDistance) {
-
-            //    console.log("right2");
-
+            // During the swing
+            if (this.owner.x < this.startX + this.travelDistance)
                 this.owner.x += movePixel;
-
-                this.owner.y = Math.sqrt(this.length * this.length
-                                    - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
-                                    + this.targetY;
-            }
+            // Hit the end, reverse direction
             else {
-
-
-              //  console.log("right3");
                 this.startX = this.owner.x;
                 this.swingDirection = 'left';
                 this.game.direction = 'left';
                 this.swingSpeed = 1;
-
             }
-
         }
-        // else if (this.startX > this.targetX) {
+        // facing right but shot left
         else {
-
             this.swingDirection = 'left';
             this.game.direction = 'left';
             this.swingSpeed = 1;
-
-
-
         }
-
-    //Swing left
-    } else {
-
-        //console.log("left1");
-
+    }
+    // Facing left and swing left
+    else {
 
         if (this.startX > this.targetX) {
-
+            // During the swing
             if (this.owner.x > this.startX - this.travelDistance) {
-
-              //  console.log("left2");
-
                 this.owner.x -= movePixel;
-
-                this.owner.y = Math.sqrt(this.length * this.length
-                                    - (this.owner.x - this.targetX) * (this.owner.x - this.targetX))
-                                    + this.targetY;
-
             }
+            // Hit the end, reverse direction
             else {
-              //  console.log("left3");
                 this.startX = this.owner.x;
                 this.swingDirection = 'right';
                 this.game.direction = 'right';
                 this.swingSpeed = 1;
-
             }
-
         }
+        // facing left but shot right
         else {
             this.swingDirection = 'right';
             this.game.direction = 'right';
             this.swingSpeed = 1;
-
-
         }
     }
+    // Helper function calculate y position
+    this.owner.y = this.calculateOwnerY();
 
     var collide = collisionCheck(this.game, this.owner);
 
@@ -327,6 +244,5 @@ Hookshot.prototype.swing = function (movePixel) {
         this.game.clicked = false;
         this.swinging = false;
     }
-
     this.count++;
 };
